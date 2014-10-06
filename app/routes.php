@@ -12,22 +12,18 @@
 */
 
 
-Route::filter('Sentry', function()
+Route::filter('filter', function()
 {
-    if (!Sentry::check()) {
-        return Redirect::route('get_login')
-            ->withErrors((new Illuminate\Support\MessageBag)
-                ->add('user_must_login', Lang::get('message.user_must_login')))
-            ->with('return_url', Request::fullUrl());
-    } 
+    
 });
 
 /*
 | Filtered routes by Sentry
 */
-Route::group(array('before' => 'Sentry'),function()
+Route::group(array('before' => 'filter'),function()
 {
     Route::get('/', 'HomeController@index');
+    Route::get('/allPersons','PersonController@get_allPersons');
 });
 /*
 | End filtered routes by Sentry
@@ -36,42 +32,18 @@ Route::group(array('before' => 'Sentry'),function()
 /* Login */
 Route::get(
     '/login',
-    array('as' => 'get_login', 'uses' => 'AccountController@get_login')
+    array('as' => 'get_login', 'uses' => 'UserController@get_login')
 );
 
 Route::post(
     '/login',
-    array('as' => 'post_login', 'uses' => 'AccountController@post_login')
+    array('as' => 'post_login', 'uses' => 'UserController@post_login')
 );
 
-/* Register */
-Route::get(
-    '/register',
-    array('as' => 'get_register', 'uses' => 'AccountController@get_register')
-);
-
-Route::post(
-    '/register',
-    array('as' => 'post_register', 'uses' => 'AccountController@post_register')
-);
-
-/* Activation */
-Route::get('activation/{email}/{code}', 'AccountController@get_activation');
 
 /* Logout */
 Route::get(
     '/logout',
-    array('as' => 'get_logout', 'uses' => 'AccountController@get_logout')
+    array('as' => 'get_logout', 'uses' => 'UserController@get_logout')
 );
 
-/* Test */
-
-Route::get(
-    '/allusers',
-    array('as' => 'allusers', 'uses' => 'AccountController@allusers')
-);
-
-Route::get(
-    '/deleteAllUsers',
-    array('as' => 'deleteAllUsers', 'uses' => 'AccountController@deleteAllUsers')
-);
