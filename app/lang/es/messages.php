@@ -10,4 +10,6 @@ return array(
 	'wrong_password'				=> 'Contraseña incorrecta, inténtelo de nuevo.',
 	'code_not_valid'				=> 'Código de recuperación no válido.',
 	'user_must_login'				=> 'Debe identificarse para ingresar al sitio.',
+
+	'error_on_create_person'		=> 'Hubo un error mientras se intentaba guardar los datos de la persona',
 );

@@ -18,15 +18,26 @@ Route::filter('filter', function()
 });
 
 /*
-| Filtered routes by Sentry
+
 */
 Route::group(array('before' => 'filter'),function()
 {
-    Route::get('/', 'HomeController@index');
-    Route::get('/allPersons','PersonController@get_allPersons');
+    Route::get(
+    '/',
+    array('as' => 'home', 'uses' => 'HomeController@index'));
+
+    Route::get(
+    '/allPersons',
+    array('as' => 'allPersons', 'uses' => 'PersonController@get_all'));
+
+    Route::get(
+    '/create',
+    array('as' => 'create', 'uses' => 'PersonController@get_create'));
+
+    Route::post('/create','PersonController@post_create');
 });
 /*
-| End filtered routes by Sentry
+
 */
 
 /* Login */

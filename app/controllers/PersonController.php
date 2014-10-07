@@ -2,10 +2,34 @@
 
 class PersonController extends BaseController
 {
-	public function get_allPersons()
+	public function get_all()
 	{
-		$persons = $this->get('Person')->findAllPersons();
 
-		return View::make('person.allPersons')->with('persons',$persons);
+		$persons = $this->get('Person')->findAll();
+
+		return View::make('person.all')->with('persons',$persons);
+	}
+
+	public function get_create()
+	{
+		return View::make('person.create');
+	}
+
+	public function post_create()
+	{
+		try {
+			$this->get('Person')->create(Input::all());
+		}		
+		catch(App\Exceptions\ValidationException $e){
+			return Redirect::to('/create')
+                ->withErrors($e->getValidationErrors());
+		}
+		 catch (Exception $e) {
+			return Redirect::to('/create')
+			->withErrors((new Illuminate\Support\MessageBag)
+                ->add('error', $e->getMessage()));
+		}
+
+		return Redirect::to('/allPersons');
 	}
 }

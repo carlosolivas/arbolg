@@ -17,7 +17,7 @@ return array(
 	'next'     => 'Siguiente &raquo;',
 
 	"sign_in" 				=> "Ingresar",
-	"register"				=> "Registrarse"
+	"register"				=> "Registrarse",
 	"email"					=> "E-mail",
 	"password"				=> "Contraseña",
 

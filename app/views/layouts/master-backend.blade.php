@@ -33,7 +33,7 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
         <li class="active"><a href="#">Link</a></li>
-        <li><a href="#">Link</a></li>
+        <li><a href="/allPersons">Todos las personas</a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
@@ -77,3 +77,15 @@
     {{HTML::script('assets/bootstraptheme/js/bootstrap.min.js')}}
   </body>
 </html>
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+    $.datepicker.setDefaults( $.datepicker.regional[ "es" ] );
+  });
+
+ $(function() {
+    $(".datepicker").datepicker();
+  });
+
+</script>

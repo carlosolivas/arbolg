@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Exceptions\\ValidationException' => $baseDir . '/app/exceptions/ValidationException.php',
     'App\\Facades\\PersonService' => $baseDir . '/app/facades/PersonService.php',
     'App\\Models\\Person' => $baseDir . '/app/models/Person.php',
     'App\\Models\\Repositories\\BaseRepository' => $baseDir . '/app/models/repositories/BaseRepository.php',
