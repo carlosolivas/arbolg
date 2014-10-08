@@ -42,14 +42,34 @@
           'M') }}
         </div>
 
+         <div class="form-group">
+          {{Form::label('isDeceased', Lang::get('titles.isDeceased'))}} 
+          {{Form::checkbox('isDeceased')}}
+        </div>
+
         <div class="form-group">
           {{Form::label('dateOfBirth', Lang::get('titles.dateOfBirth'))}} 
           {{Form::text('dateOfBirth', null, array('class' => 'form-control datepicker'))}}
         </div>
 
+        <div class="form-group">
+          {{Form::label('placeOfBirth', Lang::get('titles.placeOfBirth'))}} 
+          {{Form::text('placeOfBirth', null, array('class' => 'form-control'))}}
+        </div>
+
+        <div class="form-group">
+          {{Form::label('country', Lang::get('titles.country'))}} 
+          {{Form::text('country', null, array('class' => 'form-control'))}}
+        </div>
+
          <div class="form-group">
           {{Form::label('email', Lang::get('titles.email'))}} 
           {{Form::email('email', null, array('class' => 'form-control'))}}
+        </div>
+
+        <div class="form-group">
+          {{Form::label('biography', Lang::get('titles.biography'))}} 
+          {{Form::textarea('biography', null, array('class' => 'form-control'))}}
         </div>
 
           {{Form::submit('Crear', array('class' => 'btn btn-default'))}}

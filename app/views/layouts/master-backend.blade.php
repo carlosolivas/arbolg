@@ -34,6 +34,7 @@
       <ul class="nav navbar-nav">
         <li class="active"><a href="#">Link</a></li>
         <li><a href="/allPersons">Todos las personas</a></li>
+        <li><a href="/familyTree">Arbol Familiar de {{ Session::get('User') }}</a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
@@ -55,7 +56,7 @@
       </form>
       <ul class="nav navbar-nav navbar-right">
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class='glyphicon glyphicon-user'></span> Username <span class="caret"></span></a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class='glyphicon glyphicon-user'></span> {{ Session::get('User') }} <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
             <li><a href="#">Perfil</a></li>
             <li class="divider"></li>

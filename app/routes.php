@@ -14,7 +14,7 @@
 
 Route::filter('filter', function()
 {
-    
+    Session::put('User', 'Federico');
 });
 
 /*
@@ -31,10 +31,31 @@ Route::group(array('before' => 'filter'),function()
     array('as' => 'allPersons', 'uses' => 'PersonController@get_all'));
 
     Route::get(
+    '/familyTree',
+    array('as' => 'familyTree', 'uses' => 'PersonController@get_familyTree'));
+
+    Route::get(
     '/create',
     array('as' => 'create', 'uses' => 'PersonController@get_create'));
 
     Route::post('/create','PersonController@post_create');
+
+    Route::get(
+    '/addParent',
+    array('as' => 'addParent', 'uses' => 'PersonController@get_addParent'));
+
+    Route::post('/addParent','PersonController@post_addParent');
+
+    Route::get(
+    '/addBrother',
+    array('as' => 'addBrother', 'uses' => 'PersonController@get_addBrother'));
+
+    Route::post('/addBrother','PersonController@post_addBrother');
+    
+
+    Route::get('/createRelation','PersonController@get_createRelation');
+
+    
 });
 /*
 

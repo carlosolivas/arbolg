@@ -16,6 +16,8 @@ return array(
 	"male"					=> 'Masculino',
 	"female"				=> 'Femenino',		
 	"isDeceased"			=> '¿Ha fallecido?',
-	
+	"placeOfBirth"			=> 'Lugar de nacimiento',
+	"country"				=> 'País',
+	"biography"				=> 'Biografía',
 
 );
