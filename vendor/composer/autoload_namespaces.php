@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Zizaco\\Confide' => array($vendorDir . '/zizaco/confide/src'),
     'Whoops' => array($vendorDir . '/filp/whoops/src'),
     'Vinelab\\NeoEloquent\\' => array($vendorDir . '/vinelab/neoeloquent/src'),
     'System' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
@@ -30,7 +31,9 @@ return array(
     'PHPParser' => array($vendorDir . '/nikic/php-parser/lib'),
     'Normalizer' => array($vendorDir . '/patchwork/utf8/class'),
     'Net' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
+    'Mcamara\\LaravelLocalization' => array($vendorDir . '/mcamara/laravel-localization/src'),
     'Math' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
+    'LaravelBook\\Ardent' => array($vendorDir . '/laravelbook/ardent/src'),
     'Jeremeamia\\SuperClosure' => array($vendorDir . '/jeremeamia/SuperClosure/src'),
     'Illuminate' => array($vendorDir . '/laravel/framework/src'),
     'File' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),

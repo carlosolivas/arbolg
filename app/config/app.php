@@ -78,7 +78,7 @@ return array(
 	|
 	*/
 
-	'key' => 'YourSecretKey!!!',
+	'key' => 'Z3ALV7yRUZmm21XEaZy0BhrNrftGQq60',
 
 	'cipher' => MCRYPT_RIJNDAEL_128,
 
@@ -123,6 +123,8 @@ return array(
 		'Illuminate\Workbench\WorkbenchServiceProvider',
 		'App\Services\IoCServiceProvider',
 		'Vinelab\NeoEloquent\NeoEloquentServiceProvider',
+		'Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider',
+		'Zizaco\Confide\ConfideServiceProvider',
 	),
 
 	/*
@@ -189,6 +191,8 @@ return array(
 		'URL'               => 'Illuminate\Support\Facades\URL',
 		'Validator'         => 'Illuminate\Support\Facades\Validator',
 		'View'              => 'Illuminate\Support\Facades\View',
+		'LaravelLocalization'   => 'Mcamara\LaravelLocalization\Facades\LaravelLocalization',
+		'Confide'         => 'Zizaco\Confide\ConfideFacade',
 	),
 
 );

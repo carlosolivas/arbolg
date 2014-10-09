@@ -7,7 +7,10 @@
 	"require": {
 		"laravel/framework": "4.2.*",
 		"everyman/neo4jphp":"dev-master",       	
-		 "vinelab/neoeloquent": "*"
+		 "vinelab/neoeloquent": "*",
+		 "mcamara/laravel-localization": "0.14.*",
+		 "laravelbook/ardent": "dev-master",
+		 "zizaco/confide": "3.2.x"
 	},
 	"autoload": {
 		"classmap": [
@@ -19,7 +22,8 @@
 			"app/database/seeds",
 			"app/tests/TestCase.php",
 			"app/facades",
-			"app/exceptions"
+			"app/exceptions",
+			"app/tests/TestCase.php"
 		]
 	},
 	"scripts": {
@@ -38,5 +42,6 @@
 	"config": {
 		"preferred-install": "dist"
 	},
-	"minimum-stability": "stable"
+	"minimum-stability": "stable",
+	"mcamara/laravel-localization": "0.14.*"
 }

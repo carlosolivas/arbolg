@@ -1,4 +1,4 @@
-@extends('layouts.master-backend')
+@extends('layouts.template')
 <title>Todas las personas</title>
 @section('content')
 

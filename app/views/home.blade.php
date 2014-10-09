@@ -1,4 +1,4 @@
-@extends('layouts.master-backend')
+@extends('layouts.template')
 
 @section('head')
 <style>

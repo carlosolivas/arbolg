@@ -12,15 +12,7 @@
 */
 
 
-Route::filter('filter', function()
-{
-    Session::put('User', 'Federico');
-});
-
-/*
-
-*/
-Route::group(array('before' => 'filter'),function()
+Route::group(array('prefix' => LaravelLocalization::setLocale()), function()
 {
     Route::get(
     '/',
@@ -50,32 +42,27 @@ Route::group(array('before' => 'filter'),function()
     '/addBrother',
     array('as' => 'addBrother', 'uses' => 'PersonController@get_addBrother'));
 
-    Route::post('/addBrother','PersonController@post_addBrother');
+    Route::post('/addBrother','PersonController@post_addBrother');  
+
+    Route::get('/', array('before' => 'auth', function()
+    {
+        return View::make('index');
+    }));
+
     
-
-    Route::get('/createRelation','PersonController@get_createRelation');
-
     
 });
-/*
 
-*/
+// Confide routes
+Route::get( 'user/create',                 'UserController@create');
+Route::post('user',                        'UserController@store');
+Route::get( 'login',                  'UserController@login');
+Route::post('login',                  'UserController@do_login');
+Route::get( 'user/confirm/{code}',         'UserController@confirm');
+Route::get( 'user/forgot_password',        'UserController@forgot_password');
+Route::post('user/forgot_password',        'UserController@do_forgot_password');
+Route::get( 'user/reset_password/{token}', 'UserController@reset_password');
+Route::post('user/reset_password',         'UserController@do_reset_password');
+Route::get( 'user/logout',                 'UserController@logout');
 
-/* Login */
-Route::get(
-    '/login',
-    array('as' => 'get_login', 'uses' => 'UserController@get_login')
-);
-
-Route::post(
-    '/login',
-    array('as' => 'post_login', 'uses' => 'UserController@post_login')
-);
-
-
-/* Logout */
-Route::get(
-    '/logout',
-    array('as' => 'get_logout', 'uses' => 'UserController@get_logout')
-);
 
