@@ -51,6 +51,11 @@ class PersonService extends BaseService
         return Person::all();
     }
 
+    /**
+     * [findPersonByName description]
+     * @param  $name The name of the person to find
+     * @return Person       
+     */
     public function findPersonByName($name)
     {
         return Person::where('name', '=', $name)->firstOrFail();
@@ -61,6 +66,7 @@ class PersonService extends BaseService
      */
     public function create($input)
     {
+        
     	try {
 
     		$validation = Validator::make($input, $this->createValidationRules());
@@ -130,15 +136,31 @@ class PersonService extends BaseService
         $person->brothers()->detach($personToUnAsignLikeBrother);
     }
 
-    public function addParent($son, $parent)
+    public function addParent($son, $parent, $anonymousParent = false)
     {
         $person = Person::where('name', '=', $son)->firstOrFail();
 
-        if ($person->parents()->count() < MAX_PARENTS_ALLOWED) {            
+        if ($person->parents()->count() < self::MAX_PARENTS_ALLOWED) {            
     
+            if (!$anonymousParent) {                
             $personToAsignLikeParent = Person::where('name', '=', $parent)->firstOrFail();
 
-            $person->parents()->save($personToAsignLikeParent);        
+            $person->parents()->save($personToAsignLikeParent);    
+            } else {
+                /*$anonymousParent = Person::create([
+                'name'              => name, 
+                'lastName'          => lastName,
+                'mothersMaidenName' => mothersMaidenName,
+                'gender'            => gender,
+                'isDeceased'        => isDeceased,
+                'dateOfBirth'       => dateOfBirth,
+                'placeOfBirth'      => placeOfBirth,
+                'country'           => country,
+                'email'             => email,
+                'biography'         => biography
+                ]);*/
+            }
+                
         }
     }
 
@@ -149,6 +171,10 @@ class PersonService extends BaseService
         $personToUnAsignLikeParent = Person::where('name', '=', $parent)->firstOrFail();
 
         $person->parents()->save($personToUnAsignLikeParent);                
+    }
+
+    public function getSons($parent)
+    {
     }
 
     /** 

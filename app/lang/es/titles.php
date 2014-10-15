@@ -19,5 +19,7 @@ return array(
 	"placeOfBirth"			=> 'Lugar de nacimiento',
 	"country"				=> 'País',
 	"biography"				=> 'Biografía',
+	"son"					=> 'Hijo/a',
+	"parent"				=> 'Padre/Madre'
 
 );

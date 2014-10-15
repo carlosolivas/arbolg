@@ -11,6 +11,7 @@ return array(
     'App\\Models\\Person' => $baseDir . '/app/models/Person.php',
     'App\\Models\\Repositories\\BaseRepository' => $baseDir . '/app/models/repositories/BaseRepository.php',
     'App\\Models\\Repositories\\UserRepository' => $baseDir . '/app/models/repositories/UserRepository.php',
+    'App\\Models\\viewModels\\Person' => $baseDir . '/app/models/viewModels/Person.php',
     'App\\Services\\BaseService' => $baseDir . '/app/services/BaseService.php',
     'App\\Services\\IoCServiceProvider' => $baseDir . '/app/services/IoCServiceProvider.php',
     'App\\Services\\PersonService' => $baseDir . '/app/services/PersonService.php',

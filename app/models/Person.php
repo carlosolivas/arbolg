@@ -6,15 +6,15 @@ class Person extends \NeoEloquent
 {
 	protected $label = 'Person';
 
-	public function brothers()
-    {
-        return $this->belongsToMany('App\Models\Person', 'BROTHER');
-    }
-
-    public function parents()
+	public function parents()
     {
         return $this->belongsToMany('App\Models\Person', 'PARENT');
     }
+
+	public function coup()
+    {
+        return $this->hasOne('App\Models\Person', 'COUP');
+    }    
 
 	protected $fillable = array(
 		'name', 
@@ -27,5 +27,5 @@ class Person extends \NeoEloquent
 		'country', 
 		'email',
 		'biography'
-		);
+	);
 }

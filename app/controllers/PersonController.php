@@ -1,15 +1,33 @@
 <?php
 
+use App\Models\viewModels\Person;
+
 class PersonController extends BaseController
 {
 	public function get_all()
 	{
 
-		$persons = $this->get('Person')->findAll();
+		$allPersons = $this->get('Person')->findAll();		
+		$persons = array();
 
-		foreach ($persons as $person) {
-					$brothers = $person->brothers;
-				}		
+		foreach ($allPersons as $personItem) {
+			$person = new Person();
+			$person->name($personItem->name);
+			$person->lastName($personItem->lastName);
+			$person->mothersMaidenName($personItem->mothersMaidenName);
+			$person->gender($personItem->gender);
+			$person->isDeceased($personItem->isDeceased);
+			$person->placeOfBirth($personItem->placeOfBirth);
+			$person->country($personItem->country);
+			$person->email($personItem->email);
+			$person->biography($personItem->biography);
+
+			$person->parents($personItem->parents);
+			
+			$person->sons($this->get('Person')->getSons($personItem->name));
+
+			array_push($persons,$person);
+		}
 
 		return View::make('person.all')->with('persons',$persons);
 	}
@@ -46,27 +64,16 @@ class PersonController extends BaseController
 
 	public function get_addParent()
 	{
-		
+		return View::make('person.addParent');
 	}
 
-	public function get_createRelation()
+	public function post_addParent()
 	{
-		$persons = $this->get('Person')->findAll();
+		$son = Input::get('son');
+		$parent = Input::get('parent');
 
-		foreach ($persons as $person) {
-			if ($person->name == 'Federico') {
+		$this->get('Person')->addParent($son, $parent);
 
-				$federico = $person;
-
-				foreach ($persons as $person2) {
-					if ($person2->name == 'Julian') {
-
-						$julian = $person2;
-						$federico->brothers()->detach($julian);
-						/*$federico->brothers()->save($julian);*/
-					}
-				}
-			}
-		}
+		return Redirect::to('/allPersons');
 	}
 }

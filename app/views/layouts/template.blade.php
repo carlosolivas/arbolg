@@ -115,7 +115,9 @@
 
                     </li>
                     <li>
-                        <a href="index.html"><i class="fa fa-th-large"></i> <span class="nav-label">Dashboard</span> </a>
+                        <a href="/allPersons"><i class="fa fa-th-large"></i> <span class="nav-label">Todas las personas</span> </a>
+
+                        <a href="/addParent"><i class="fa fa-th-large"></i> <span class="nav-label">Agregar hijo-padre</span> </a>
 
                     </li>
 

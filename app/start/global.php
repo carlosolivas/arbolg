@@ -20,6 +20,7 @@ ClassLoader::addDirectories(array(
 	app_path().'/services',
 	app_path().'/facades',
 	app_path().'/exceptions',
+	app_path().'/models/viewModels',
 ));
 
 /*

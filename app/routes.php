@@ -12,8 +12,8 @@
 */
 
 
-Route::group(array('prefix' => LaravelLocalization::setLocale()), function()
-{
+/*Route::group(array('prefix' => LaravelLocalization::setLocale()), function()
+{*/
     Route::get(
     '/',
     array('as' => 'home', 'uses' => 'HomeController@index'));
@@ -51,7 +51,7 @@ Route::group(array('prefix' => LaravelLocalization::setLocale()), function()
 
     
     
-});
+/*});*/
 
 // Confide routes
 Route::get( 'user/create',                 'UserController@create');

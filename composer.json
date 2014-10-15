@@ -17,6 +17,7 @@
 			"app/commands",
 			"app/controllers",
 			"app/models",
+			"app/models/viewModels",
 			"app/services",
 			"app/database/migrations",
 			"app/database/seeds",
