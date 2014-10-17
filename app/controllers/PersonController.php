@@ -7,29 +7,46 @@ class PersonController extends BaseController
 	public function get_all()
 	{
 
-		$allPersons = $this->get('Person')->findAll();		
-		$persons = array();
+		return $this->get('Person')->findAll();	
+	}
+	public function get_tree()
+	{
+		return View::make('person.tree');
+	}
 
-		foreach ($allPersons as $personItem) {
-			$person = new Person();
-			$person->name($personItem->name);
-			$person->lastName($personItem->lastName);
-			$person->mothersMaidenName($personItem->mothersMaidenName);
-			$person->gender($personItem->gender);
-			$person->isDeceased($personItem->isDeceased);
-			$person->placeOfBirth($personItem->placeOfBirth);
-			$person->country($personItem->country);
-			$person->email($personItem->email);
-			$person->biography($personItem->biography);
+	public function get_loadTreePersons()
+	{
+		$allPersons = $this->get('Person')->findAll();	
 
-			$person->parents($personItem->parents);
+		$nodes = array();
+		foreach ($allPersons as $person) {	
+			$personId = (string)$person->id;
+			$dataOfPerson = array("id" => $personId);
+			$data = array('data' => $dataOfPerson);
+			array_push($nodes, $data);
+		}
+		
+		return Response::json( $nodes );		
+	}
+
+	public function get_loadTreeRelations()
+	{
+		$allPersons = $this->get('Person')->findAll();	
+
+		$relations = array();
+		foreach ($allPersons as $person) {
 			
-			$person->sons($this->get('Person')->getSons($personItem->name));
+			foreach ($person->parents as $parent) {							
+				$source = (string)$person->id;
+				$target = (string)$parent->id;
+				$dataParOfRelations = array("source" => $source, "target" => $target);
+				$data = array("data" => $dataParOfRelations);
 
-			array_push($persons,$person);
+				array_push($relations, $data);
+			}
 		}
 
-		return View::make('person.all')->with('persons',$persons);
+		return Response::json( $relations );	
 	}
 
 	public function get_familyTree()

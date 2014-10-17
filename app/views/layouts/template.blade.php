@@ -82,6 +82,10 @@
     
     <!-- Jquery preimage -->
     {{ HTML::script('assets/js/plugins/preimage/preimage.js'); }}
+
+    <!-- Cytoscape -->
+    {{ HTML::script('assets/js/cytoscape.js'); }}
+
     
 @yield('head')
 </head>
@@ -262,7 +266,7 @@
                         <li>
                             <div class="dropdown-messages-box">
                                 <a href="profile.html" class="pull-left">
-                                    <img alt="image" class="img-circle" src="img/a7.jpg">
+                                    <img alt="image" class="img-circle" src="assets/img/a7.jpg">
                                 </a>
                                 <div class="media-body">
                                     <small class="pull-right">46h ago</small>
@@ -275,7 +279,7 @@
                         <li>
                             <div class="dropdown-messages-box">
                                 <a href="profile.html" class="pull-left">
-                                    <img alt="image" class="img-circle" src="img/a4.jpg">
+                                    <img alt="image" class="img-circle" src="assets/img/a4.jpg">
                                 </a>
                                 <div class="media-body ">
                                     <small class="pull-right text-navy">5h ago</small>
@@ -288,7 +292,7 @@
                         <li>
                             <div class="dropdown-messages-box">
                                 <a href="profile.html" class="pull-left">
-                                    <img alt="image" class="img-circle" src="img/profile.jpg">
+                                    <img alt="image" class="img-circle" src="assets/img/profile.jpg">
                                 </a>
                                 <div class="media-body ">
                                     <small class="pull-right">23h ago</small>

@@ -18,13 +18,21 @@
     '/',
     array('as' => 'home', 'uses' => 'HomeController@index'));
 
-    Route::get(
-    '/allPersons',
-    array('as' => 'allPersons', 'uses' => 'PersonController@get_all'));
+     Route::get(
+    '/all',
+    array('as' => 'all', 'uses' => 'PersonController@get_all'));
 
     Route::get(
-    '/familyTree',
-    array('as' => 'familyTree', 'uses' => 'PersonController@get_familyTree'));
+    '/tree',
+    array('as' => 'tree', 'uses' => 'PersonController@get_tree'));
+
+    Route::get(
+    '/loadTreePersons',
+    array('as' => 'loadTreePersons', 'uses' => 'PersonController@get_loadTreePersons'));
+
+    Route::get(
+    '/loadTreeRelations',
+    array('as' => 'loadTreeRelations', 'uses' => 'PersonController@get_loadTreeRelations'));
 
     Route::get(
     '/create',

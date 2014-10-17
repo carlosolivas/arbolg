@@ -175,6 +175,24 @@ class PersonService extends BaseService
 
     public function getSons($parent)
     {
+        $sons = array();
+
+        /*$sons = Person::with(array('parents' => function($query) use ($parent)
+        {
+            $query->where('name', 'like', $parent);
+
+        }))->get();*/
+
+        foreach (Person::with('parents')->get() as $son)
+        {
+            foreach ($son->parents as $parentItem) {
+                if ($parentItem->name == $parent) {
+                    array_push($sons,$son);
+                }
+            }
+        }
+
+        return $sons;
     }
 
     /** 
