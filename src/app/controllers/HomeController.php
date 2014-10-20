@@ -17,7 +17,8 @@ class HomeController extends BaseController {
 
 	public function showWelcome()
 	{
-		return View::make('hello');
+		$prueba = "Variable de prueba";
+		return View::make('hello', array('prueba' => $prueba));
 	}
 
 }
