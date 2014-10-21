@@ -21,7 +21,8 @@ class PersonController extends BaseController
 		$nodes = array();
 		foreach ($allPersons as $person) {	
 			$personId = (string)$person->id;
-			$dataOfPerson = array("id" => $personId);
+			$personName = $person->name;
+			$dataOfPerson = array("id" => $personId, "name" => $personName);
 			$data = array('data' => $dataOfPerson);
 			array_push($nodes, $data);
 		}
@@ -36,9 +37,13 @@ class PersonController extends BaseController
 		$relations = array();
 		foreach ($allPersons as $person) {
 			
-			foreach ($person->parents as $parent) {							
-				$source = (string)$person->id;
-				$target = (string)$parent->id;
+			foreach ($person->parents as $parent) {	
+				// Source is the parent of person					
+				$source = (string)$parent->id;
+
+				// Target is the person 
+				$target = (string)$person->id;
+
 				$dataParOfRelations = array("source" => $source, "target" => $target);
 				$data = array("data" => $dataParOfRelations);
 
@@ -76,7 +81,7 @@ class PersonController extends BaseController
                 ->add('error', $e->getMessage()));
 		}
 
-		return Redirect::to('/allPersons');
+		return Redirect::to('/tree');
 	}
 
 	public function get_addParent()
@@ -91,6 +96,6 @@ class PersonController extends BaseController
 
 		$this->get('Person')->addParent($son, $parent);
 
-		return Redirect::to('/allPersons');
+		return Redirect::to('/tree');
 	}
 }
