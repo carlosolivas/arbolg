@@ -3,30 +3,22 @@ $(function(){ // on dom ready
 var initNodes;
 var initEdges;
 
-// Flags
-var initNodesLoaded = false;
-
 // Load the initial nodes (Persons)
 $.ajax({
   type: "get",
   url: "/loadTreePersons",
   }).done(function( json ) {
     initNodes = json;
-    initNodesLoaded = true;
-  });
 
-// Load the initial edges (Relations)
-  $.ajax({
-  type: "get",
-  url: "/loadTreeRelations",
-  }).done(function( json ) {
-    initEdges = json;
-    if (initNodesLoaded) {
-       initializeCytoscape();
-     } else {
-        alert('Cannot load initial nodes');
-     }   
-  });
+    // Load the initial edges (Relations)
+    $.ajax({
+      type: "get",
+      url: "/loadTreeRelations",
+      }).done(function( json ) {
+        initEdges = json;    
+        initializeCytoscape();    
+    });
+});
 
 // cy is an instance of Cytoscape, so cy is a graph
 var cy;
@@ -91,7 +83,7 @@ function initializeCytoscape()
   });
 
   cy.on('tap', 'node', function(){
-    
+   
   });
 }
 

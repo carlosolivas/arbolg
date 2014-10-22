@@ -48,6 +48,9 @@ class PersonService extends BaseService
      */
     public function findAll() 
     {
+        /*foreach (Person::query('MATCH (n:Person) return n')->get() as $p) {
+            echo $p->name;
+        }*/
         return Person::all();
     }
 
@@ -178,7 +181,7 @@ class PersonService extends BaseService
      * @param  $id The id of the Person
      * @return Persons   
      */
-    public function getFamily($id)
+    public function getAscendingFamily($id)
     {        
         $person = Person::where('name', '=', $id)->first();  
         $tree = array();
@@ -187,7 +190,7 @@ class PersonService extends BaseService
         foreach ($person->parents as $parent) {
             
             /* Load Person's parents */
-            foreach ($this->getFamily($parent->name) as $value) {
+            foreach ($this->getAscendingFamily($parent->name) as $value) {
                 $tree[] = $value;
             }
 
@@ -208,6 +211,43 @@ class PersonService extends BaseService
 
         return $tree;
     }   
+
+    public function getDescendingFamily($id)
+    {
+        $person = Person::where('name', '=', $id)->first();  
+        $tree = array();        
+        $tree[] = $person;
+
+         foreach ($this->getSons($person->name) as $son) {
+
+            /* In this sections searches the ascending people in the parent's tree of person's sons */
+            foreach ($son->parents as $parent) {
+                if ($parent->name != $person->name) {
+
+                    /* Verified if the parent wasn't already loaded when other son was analyzed */
+                    $personAlreadyLoaded = false;
+                    foreach ($tree as $familiarAlreadyLoaded) {
+                        if ($familiarAlreadyLoaded->name == $parent->name) {
+                            $personAlreadyLoaded = true;
+                        }
+                    }
+                    if (!$personAlreadyLoaded) {
+                        foreach ($this->getAscendingFamily($parent->name) as $familiar)
+                        {
+                            $tree[] = $familiar;
+                        }
+                    }                    
+                }
+            }
+            
+            /* Load Sons's */
+            foreach ($this->getDescendingFamily($son->name) as $value) {
+                $tree[] = $value;
+            }
+        }
+
+        return $tree;
+    }
 
      /**
      * Get all brothers of a Person deducing through the Person's parent
@@ -231,7 +271,7 @@ class PersonService extends BaseService
         }
 
         return $brothers;
-    }
+    }    
 
      /**
      * Get all sons of a Person deducing through the Person's parent

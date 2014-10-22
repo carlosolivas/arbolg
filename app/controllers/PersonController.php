@@ -7,7 +7,13 @@ class PersonController extends BaseController
 	/* Artificial login */
 	public function login()
 	{
-		Session::put('userLogged', 'Bart');
+		if (!Session::has('userLogged'))
+		{
+		    Session::put('userLogged', 'Bart');
+		}
+
+		Session::put('userLogged', 'Marge');
+		
 		return Redirect::to('/tree');
 	}
 	public function get_all()
@@ -15,7 +21,8 @@ class PersonController extends BaseController
 		return $this->get('Person')->findAll();	
 	}
 	public function get_tree()
-	{	
+	{
+		
 		return View::make('person.tree');
 	}
 
@@ -24,7 +31,16 @@ class PersonController extends BaseController
 		/* Session */
 		$userIdentifier = Session::get('userLogged');
 
-		$family = $this->get('Person')->getFamily($userIdentifier);		
+		$family = $this->get('Person')->getAscendingFamily($userIdentifier);	
+		$descendingFamily = $this->get('Person')->getDescendingFamily($userIdentifier);	
+
+		/* Remove the first element because are the duplicated of the root (already was included in $family) */
+		array_shift($descendingFamily);
+		
+		/* Add the descending family to the complete array of family */
+		foreach ($descendingFamily as $descending) {
+			$family[] = $descending;
+		}	
 
 		$nodes = array();
 		foreach ($family as $person) {	
@@ -43,7 +59,16 @@ class PersonController extends BaseController
 		/* Session */
 		$userIdentifier = Session::get('userLogged');
 
-		$family = $this->get('Person')->getFamily($userIdentifier);		
+		$family = $this->get('Person')->getAscendingFamily($userIdentifier);	
+		$descendingFamily = $this->get('Person')->getDescendingFamily($userIdentifier);	
+
+		/* Remove the first element because are the duplicated of the root (already was included in $family) */
+		array_shift($descendingFamily);
+		
+		/* Add the descending family to the complete array of family */
+		foreach ($descendingFamily as $descending) {
+			$family[] = $descending;
+		}	
 
 		$relations = array();
 		foreach ($family as $person) {
@@ -65,12 +90,6 @@ class PersonController extends BaseController
 		return Response::json( $relations );	
 	}
 
-	public function get_familyTree()
-	{
-		$user = $this->get('Person')->findPersonByName(Session::get('User'));
-
-		return View::make('person.familyTree')->with('person', $user);
-	}
 
 	public function get_create()
 	{
