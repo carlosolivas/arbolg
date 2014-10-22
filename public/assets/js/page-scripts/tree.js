@@ -45,6 +45,12 @@ function initializeCytoscape()
               }
             },
             {
+              selector: 'edge',
+              css: {
+                'width': 6,
+              }
+            },
+            {
               selector: '$node > node',
               css: {
                 'padding-top': '10px',
@@ -58,10 +64,12 @@ function initializeCytoscape()
             {
               selector: ':selected',
               css: {
-                'background-color': 'black',
+                'background-color': 'green',
                 'line-color': 'black',
                 'target-arrow-color': 'black',
-                'source-arrow-color': 'black'
+                'source-arrow-color': 'black',
+                'border-width': 3,
+                'border-color': '#333'
               }
             }
     ],
@@ -81,7 +89,13 @@ function initializeCytoscape()
     }
 
   });
+
+  cy.on('tap', 'node', function(){
+    
+  });
 }
+
+
 
 }); // on dom ready
 

@@ -53,6 +53,21 @@ class SimpleCRUDTest extends TestCase {
         User::findOrFail(0);
     }
 
+    /**
+     * Regression test for issue #27
+     * @see https://github.com/Vinelab/NeoEloquent/issues/27
+     */
+    public function testDoesntCrashOnNonIntIds()
+    {
+        $u = User::create([]);
+        $id = (string) $u->id;
+        $found = User::where('id', "$id")->first();
+        $this->assertEquals($found, $u);
+
+        $foundAgain = User::where('id(individual)', "$id")->first();
+        $this->assertEquals($foundAgain, $u);
+    }
+
     public function testCreatingRecord()
     {
         $w = new Wiz(['fiz' => 'foo', 'biz' => 'boo']);
@@ -155,6 +170,32 @@ class SimpleCRUDTest extends TestCase {
         $this->assertEquals('up', $after->hurry);
     }
 
+    /**
+     * Regression test for issue #18 where querying and updating the same
+     * attributes messes up the values and keeps the old ones resulting in a failed update.
+     *
+     * @see  https://github.com/Vinelab/NeoEloquent/issues/18
+     * @return [type] [description]
+     */
+    public function testUpdatingRecordwithUpdateOnQuery()
+    {
+        $w = Wiz::create([
+            'fiz' => 'foo',
+            'biz' => 'boo'
+        ]);
+
+        Wiz::where('fiz', '=', 'foo')
+            ->where('biz', '=', 'boo')
+            ->update(['fiz' => 'notfooanymore', 'biz' => 'noNotBoo!', 'triz' => 'newhere']);
+
+        $found = Wiz::where('fiz', '=', 'notfooanymore')
+            ->orWhere('biz', '=', 'noNotBoo!')
+            ->orWhere('triz', '=', 'newhere')
+            ->first();
+
+        $this->assertEquals($w->getKey(), $found->getKey());
+    }
+
     public function testInsertingBatch()
     {
         $batch = [
@@ -231,6 +272,22 @@ class SimpleCRUDTest extends TestCase {
         $this->assertInstanceOf('Carbon\Carbon', $g->deleted_at);
     }
 
+    public function testRestoringSoftDeletedModel()
+    {
+        $w = WizDel::create([]);
+
+        $g = WizDel::first();
+        $g->delete();
+
+        $this->assertFalse($g->exists);
+        $this->assertInstanceOf('Carbon\Carbon', $g->deleted_at);
+
+        $h = WizDel::onlyTrashed()->where('id', $g->getKey())->first();
+        $this->assertInstanceOf('Carbon\Carbon', $h->deleted_at);
+        $this->assertTrue($h->restore());
+        $this->assertNull($h->deleted_at);
+    }
+
     public function testGettingModelCount()
     {
         $count = WizDel::count();
@@ -259,4 +316,41 @@ class SimpleCRUDTest extends TestCase {
 
         $this->assertEquals($w, $found);
     }
+
+    public function testCreatingNullAndBooleanValues()
+    {
+        $w = Wiz::create([
+            'fiz'  => null,
+            'biz'  => false,
+            'triz' => true
+        ]);
+
+        $this->assertNotNull($w->getKey());
+
+        $found = Wiz::where('fiz', '=', null)->where('biz', '=', false)->where('triz', '=', true)->first();
+
+        $this->assertNull($found->fiz);
+        $this->assertFalse($found->biz);
+        $this->assertTrue($found->triz);
+    }
+
+    public function testUpdatingNullAndBooleanValues()
+    {
+        $w = Wiz::create([
+            'fiz'  => 'foo',
+            'biz'  => 'boo',
+            'triz' => 'troo'
+        ]);
+
+        $this->assertNotNull($w->getKey());
+
+        $updated = Wiz::where('fiz', 'foo')->where('biz', 'boo')->where('triz', 'troo')->update([
+            'fiz'  => null,
+            'biz'  => false,
+            'triz' => true
+        ]);
+
+        $this->assertGreaterThan(0, $updated);
+    }
+
 }

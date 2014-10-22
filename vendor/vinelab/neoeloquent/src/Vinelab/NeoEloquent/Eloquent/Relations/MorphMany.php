@@ -1,7 +1,5 @@
 <?php namespace Vinelab\NeoEloquent\Eloquent\Relations;
 
-use Vinelab\NeoEloquent\Eloquent\Model;
-use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\Eloquent\Edges\EdgeOut;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 
@@ -97,6 +95,6 @@ class MorphMany extends BelongsToMany {
     {
         $model = ( ! is_null($model)) ? $model : $this->related;
 
-        $edge = new EdgeOut($this->query, $this->parent, $model, $this->type, $attributes);
+        return new EdgeOut($this->query, $this->parent, $model, $this->type, $attributes);
     }
 }

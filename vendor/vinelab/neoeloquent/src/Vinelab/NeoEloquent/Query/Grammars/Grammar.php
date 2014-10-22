@@ -1,6 +1,5 @@
 <?php namespace Vinelab\NeoEloquent\Query\Grammars;
 
-use Illuminate\Database\Query\Builder as Builder;
 use Illuminate\Database\Query\Grammars\Grammar as IlluminateGrammar;
 
 class Grammar extends IlluminateGrammar {
@@ -27,17 +26,22 @@ class Grammar extends IlluminateGrammar {
 
         // When coming from a WHERE statement we'll have to pluck out the column
         // from the collected attributes.
-        if(is_array($value) and isset($value['column']))
+        if(is_array($value) && isset($value['binding']))
+        {
+            $value = $value['binding'];
+        }
+        elseif (is_array($value) && isset($value['column']))
         {
             $value = $value['column'];
-        } elseif ($this->isExpression($value))
+        }
+        elseif ($this->isExpression($value))
         {
             $value = $this->getValue($value);
         }
 
         $property = $this->getIdReplacement($value);
 
-        if (strpos($property, '.') != false) $property = explode('.', $property)[1];
+        if (strpos($property, '.') !== false) $property = explode('.', $property)[1];
 
 		return '{' . $property . '}';
 	}
@@ -102,7 +106,7 @@ class Grammar extends IlluminateGrammar {
         // We will only wrap the value unless it has parentheses
         // in it which is the case where we're matching a node by id, or an *
         // and last whether this is a pre-formatted key.
-        if (preg_match('/[(|)]/', $value) or $value == '*' or strpos($value, '.') != false) return $value;
+        if (preg_match('/[(|)]/', $value) || $value == '*' || strpos($value, '.') !== false) return $value;
 
         // In the case where the developer specifies the properties and not returning
         // everything, we need to check whether the primaryKey is meant to be returned
@@ -126,7 +130,7 @@ class Grammar extends IlluminateGrammar {
     public function valufy($values)
     {
         // we'll only deal with arrays so let's turn it into one if it isn't
-        if ( ! is_array($values)) $values = (array) $values;
+        if ( ! is_array($values)) $values = [$values];
 
         // escape and wrap them with a quote.
         $values = array_map(function ($value)
@@ -137,6 +141,12 @@ class Grammar extends IlluminateGrammar {
             if (is_string($value))
             {
                 $value = "'" . addslashes($value) . "'";
+            }
+            // In order to support boolean value types and not have PHP convert them to their
+            // corresponding string values, we'll have to handle boolean values and add their literal string representation.
+            elseif (is_bool($value))
+            {
+                $value = ($value) ? 'true' : 'false';
             }
 
             return $value;
@@ -156,7 +166,7 @@ class Grammar extends IlluminateGrammar {
      * @param  boolean $related Tells whether this is a related node so that we append a 'with_' to label.
      * @return string
      */
-    public function modelAsNode($labels = null, $related = false)
+    public function modelAsNode($labels = null, $relation = null)
     {
         if (is_null($labels))
         {
@@ -169,7 +179,7 @@ class Grammar extends IlluminateGrammar {
         // When this is a related node we'll just prepend it with 'with_' that way we avoid
         // clashing node models in the cases like using recursive model relations.
         // @see https://github.com/Vinelab/NeoEloquent/issues/7
-        if ($related) $labels = 'with_'. $labels;
+        if ( ! is_null($relation)) $labels = 'with_'. $relation .'_'. $labels;
 
         return mb_strtolower($labels);
     }
@@ -199,6 +209,12 @@ class Grammar extends IlluminateGrammar {
         {
             $from = ( ! is_null($this->query)) ? $this->query->from : null;
             $column = $this->getIdReplacement('id('. $this->modelAsNode($from) .')');
+        }
+        // When it's a form of node.attribute we'll just remove the '.' so that
+        // we get a consistent form of binding key/value pairs.
+        elseif (strpos($column, '.'))
+        {
+            return str_replace('.', '', $column);
         }
 
         return $column;
@@ -232,6 +248,11 @@ class Grammar extends IlluminateGrammar {
         $properties = [];
         foreach ($bindings as $key => $value)
         {
+            // From the Neo4j docs:
+            //  "NULL is not a valid property value. NULLs can instead be modeled by the absence of a key."
+            // So we'll just ignore null keys if they occur.
+            if (is_null($value)) continue;
+
             $key   = $this->propertize($key);
             $value = $this->valufy($value);
             $properties[] = "$key: $value";

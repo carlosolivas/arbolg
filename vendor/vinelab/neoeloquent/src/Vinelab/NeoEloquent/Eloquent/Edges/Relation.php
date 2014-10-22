@@ -1,13 +1,12 @@
 <?php namespace Vinelab\NeoEloquent\Eloquent\Edges;
 
+use DateTime;
 use Carbon\Carbon;
-use Everyman\Neo4j\Path;
 use Everyman\Neo4j\Relationship;
 use Illuminate\Database\Eloquent\Collection;
 use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Vinelab\NeoEloquent\NoEdgeDirectionException;
-use Vinelab\NeoEloquent\UnknownDirectionException;
 
 abstract class Relation extends Delegate {
 
@@ -312,7 +311,9 @@ abstract class Relation extends Delegate {
         $relatedNode = ($this->isDirectionOut()) ? $this->end : $this->start;
         $attributes = array_merge(['id' => $relatedNode->getId()], $relatedNode->getProperties());
 
-        $this->related = $this->related->newFromBuilder($attributes, $exists = true);
+        // This is an existing relationship.
+        $exists = true;
+        $this->related = $this->related->newFromBuilder($attributes, $exists);
         $this->related->setConnection($this->related->getConnection());
     }
 
@@ -495,7 +496,7 @@ abstract class Relation extends Delegate {
      */
     public function exists()
     {
-        if ($this->relation and $this->relation->hasId())
+        if ($this->relation && $this->relation->hasId())
         {
             return true;
         }

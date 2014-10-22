@@ -79,7 +79,7 @@ abstract class Model extends IlluminateModel {
 
         // The label is accepted as an array for a convenience so we need to
         // convert it to a string separated by ':' following Neo4j's labels
-        if (is_array($label) and ! empty($label)) return $label;
+        if (is_array($label) && ! empty($label)) return $label;
 
         // since this is not an array, it is assumed to be a string
         // we check to see if it follows neo4j's labels naming (User:Fan)
@@ -211,7 +211,7 @@ abstract class Model extends IlluminateModel {
             $relation = $caller['function'];
         }
 
-        // FIXME: the $type should be the UPPERCASE of the relation not the foreign key.
+        // the $type should be the UPPERCASE of the relation not the foreign key.
         $type = $type ?: mb_strtoupper($relation);
 
         $instance = new $related;
@@ -420,7 +420,7 @@ abstract class Model extends IlluminateModel {
         // When the name and the type are specified we'll return a MorphedByOne
         // relationship with the given arguments since we know the kind of Model
         // and relationship type we're looking for.
-        if ($name and $type)
+        if ($name && $type)
         {
             // Determine the relation function name out of the back trace
             list(, $caller) = debug_backtrace(false);
@@ -467,8 +467,6 @@ abstract class Model extends IlluminateModel {
     {
         $query = static::query();
 
-        $instance = new static($attributes);
-
         return $query->createWith($attributes, $relations);
     }
     /**
@@ -501,5 +499,16 @@ abstract class Model extends IlluminateModel {
     public function addTimestamps()
     {
         $this->updateTimestamps();
+    }
+
+    public function getDirty()
+    {
+        $dirty = parent::getDirty();
+
+        // We need to remove the primary key from the dirty attributes since primary keys
+        // never change and when updating it shouldn't be part of the attribtues.
+        if (isset($dirty[$this->primaryKey])) unset($dirty[$this->primaryKey]);
+
+        return $dirty;
     }
 }

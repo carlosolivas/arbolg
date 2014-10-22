@@ -1,8 +1,8 @@
 <?php namespace Vinelab\NeoEloquent\Query;
 
-use Everyman\Neo4j\Node;
-use Everyman\Neo4j\Batch;
+use Closure;
 use Vinelab\NeoEloquent\Connection;
+use Illuminadte\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 use Vinelab\NeoEloquent\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Builder as IlluminateQueryBuilder;
@@ -132,11 +132,33 @@ class Builder extends IlluminateQueryBuilder {
      */
     public function update(array $values)
     {
-        $bindings = array_merge($values, $this->getBindings());
-
         $cypher = $this->grammar->compileUpdate($this, $values);
 
-        return $this->connection->update($cypher, $bindings);
+        $bindings = $this->getBindingsMergedWithValues($values);
+
+        $updated = $this->connection->update($cypher, $bindings);
+
+        return (isset($updated[0]) && isset($updated[0][0])) ? $updated[0][0] : 0;
+    }
+
+    /**
+     *  Bindings should have the keys postfixed with _update as used
+     *  in the CypherGrammar so that we differentiate them from
+     *  query bindings avoiding clashing values.
+     *
+     * @param  array $values
+     * @return array
+     */
+    protected function getBindingsMergedWithValues(array $values)
+    {
+        $bindings = [];
+
+        foreach ($values as $key => $value)
+        {
+            $bindings[$key .'_update'] = $value;
+        }
+
+        return array_merge($this->getBindings(), $bindings);
     }
 
     /**
@@ -186,7 +208,7 @@ class Builder extends IlluminateQueryBuilder {
 		// received when the method was called and pass it into the nested where.
 		if (is_array($column))
 		{
-			return $this->whereNested(function($query) use ($column)
+			return $this->whereNested(function(IlluminateQueryBuilder $query) use ($column)
 			{
 				foreach ($column as $key => $value)
 				{
@@ -243,11 +265,29 @@ class Builder extends IlluminateQueryBuilder {
 
         $property = $column;
 
-        if ($column == 'id') $column = 'id('. $this->modelAsNode() .')';
+        // When the column is an id we need to treat it as a graph db id and transform it
+        // into the form of id(n) and the typecast the value into int.
+        if ($column == 'id')
+        {
+            $column = 'id('. $this->modelAsNode() .')';
+            $value = intval($value);
+        }
+        // When it's been already passed in the form of NodeLabel.id we'll have to
+        // re-format it into id(NodeLabel)
+        elseif (preg_match('/^.*\.id$/', $column))
+        {
+            $parts = explode('.', $column);
+            $column = sprintf('%s(%s)', $parts[1], $parts[0]);
+            $value = intval($value);
+        }
+        // Also if the $column is already a form of id(n) we'd have to type-cast the value into int.
+        elseif (preg_match('/^id\(.*\)$/', $column)) $value = intval($value);
 
-		$this->wheres[] = compact('type', 'column', 'operator', 'value', 'boolean');
+        $binding = $this->prepareBindingColumn($column);
 
-        $property = $this->wrap($property);
+        $this->wheres[] = compact('type', 'binding', 'column', 'operator', 'value', 'boolean');
+
+        $property = $this->wrap($binding);
 
         if ( ! $value instanceof Expression)
         {
@@ -256,6 +296,33 @@ class Builder extends IlluminateQueryBuilder {
 
 		return $this;
 	}
+
+    /**
+     * Increment the value of an existing column on a where clause.
+     * Used to allow querying on the same attribute with different values.
+     *
+     * @param  string $column
+     * @return string
+     */
+    protected function prepareBindingColumn($column)
+    {
+        $count = $this->columnCountForWhereClause($column);
+        return ($count > 0) ? $column .'_'. ($count + 1) : $column;
+    }
+
+    /**
+     * Get the number of occurrences of a column in where clauses.
+     *
+     * @param  string $column
+     * @return int
+     */
+    protected function columnCountForWhereClause($column)
+    {
+        if (is_array($this->wheres))
+            return count(array_filter($this->wheres, function($where) use($column) {
+                return $where['column'] == $column;
+            }));
+    }
 
     /**
      * Add a "where in" clause to the query.
@@ -329,7 +396,9 @@ class Builder extends IlluminateQueryBuilder {
 
         if ($column == 'id') $column = 'id('. $this->modelAsNode() .')';
 
-        $this->wheres[] = compact('type', 'column', 'boolean');
+        $binding = $this->prepareBindingColumn($column);
+
+        $this->wheres[] = compact('type', 'column', 'boolean', 'binding');
 
         return $this;
     }
@@ -426,7 +495,9 @@ class Builder extends IlluminateQueryBuilder {
     {
         $cypher = $this->grammar->compileCreateWith($this, compact('model', 'related'));
 
-        return $this->connection->statement($cypher, [], $result = true);
+        // Indicate that we need the result returned as is.
+        $result = true;
+        return $this->connection->statement($cypher, [], $result);
     }
 
     /**
@@ -643,7 +714,8 @@ class Builder extends IlluminateQueryBuilder {
         if (is_array($value))
         {
             $key = array_keys($value)[0];
-            if (strpos($key, '.') != false)
+
+            if (strpos($key, '.') !== false)
             {
                 $binding = $value[$key];
                 unset($value[$key]);

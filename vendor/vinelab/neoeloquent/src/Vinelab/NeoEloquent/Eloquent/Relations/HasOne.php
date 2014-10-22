@@ -18,6 +18,11 @@ class HasOne extends HasOneOrMany {
     {
         foreach ($models as $model)
         {
+            // In the case of fetching nested relations, we will get an array
+            // with the first key being the model we need, and the other being
+            // the related model so we'll just take the first model out of the array.
+            if (is_array($model)) $model = reset($model);
+
             $model->setRelation($relation, null);
         }
 
@@ -114,7 +119,9 @@ class HasOne extends HasOneOrMany {
     {
         $model = ( ! is_null($model)) ? $model : $this->parent->{$this->relation};
 
-        return new EdgeOut($this->query, $this->parent, $model, $this->foreignKey, $attributes, $unique = true);
+       // Indicate a unique relation since this only involves one other model.
+        $unique = true;
+        return new EdgeOut($this->query, $this->parent, $model, $this->foreignKey, $attributes, $unique);
     }
 
     /**

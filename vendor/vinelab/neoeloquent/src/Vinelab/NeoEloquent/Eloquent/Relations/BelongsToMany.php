@@ -4,7 +4,6 @@ use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Vinelab\NeoEloquent\Eloquent\Edges\EdgeIn;
-use Vinelab\NeoEloquent\Eloquent\Edges\EdgeOut;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 
 class BelongsToMany extends HasOneOrMany {
@@ -43,23 +42,6 @@ class BelongsToMany extends HasOneOrMany {
         parent::__construct($query, $parent, $type, $key, $relation);
 
         $this->finder = $this->newFinder();
-    }
-
-    /**
-     * Initialize the relation on a set of models.
-     *
-     * @param  array   $models
-     * @param  string  $relation
-     * @return array
-     */
-    public function initRelation(array $models, $relation)
-    {
-        foreach ($models as $model)
-        {
-            $model->setRelation($relation, $this->related->newCollection());
-        }
-
-        return $models;
     }
 
     /**

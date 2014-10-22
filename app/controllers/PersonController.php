@@ -4,22 +4,30 @@ use App\Models\viewModels\Person;
 
 class PersonController extends BaseController
 {
+	/* Artificial login */
+	public function login()
+	{
+		Session::put('userLogged', 'Bart');
+		return Redirect::to('/tree');
+	}
 	public function get_all()
 	{
-
 		return $this->get('Person')->findAll();	
 	}
 	public function get_tree()
-	{
+	{	
 		return View::make('person.tree');
 	}
 
 	public function get_loadTreePersons()
 	{
-		$allPersons = $this->get('Person')->findAll();	
+		/* Session */
+		$userIdentifier = Session::get('userLogged');
+
+		$family = $this->get('Person')->getFamily($userIdentifier);		
 
 		$nodes = array();
-		foreach ($allPersons as $person) {	
+		foreach ($family as $person) {	
 			$personId = (string)$person->id;
 			$personName = $person->name;
 			$dataOfPerson = array("id" => $personId, "name" => $personName);
@@ -32,10 +40,13 @@ class PersonController extends BaseController
 
 	public function get_loadTreeRelations()
 	{
-		$allPersons = $this->get('Person')->findAll();	
+		/* Session */
+		$userIdentifier = Session::get('userLogged');
+
+		$family = $this->get('Person')->getFamily($userIdentifier);		
 
 		$relations = array();
-		foreach ($allPersons as $person) {
+		foreach ($family as $person) {
 			
 			foreach ($person->parents as $parent) {	
 				// Source is the parent of person					

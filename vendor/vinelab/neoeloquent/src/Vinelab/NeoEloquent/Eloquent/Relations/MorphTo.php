@@ -98,7 +98,7 @@ class MorphTo extends OneRelation {
 
         return array_map(function($match) use ($relation)
         {
-            if (isset($match[$relation]) and isset($match[$relation][0]))
+            if (isset($match[$relation]) && isset($match[$relation][0]))
             {
                 $match->setRelation($relation, $match[$relation][0]);
             }
@@ -119,7 +119,9 @@ class MorphTo extends OneRelation {
     {
         $model = ( ! is_null($model)) ? $model : $this->parent->{$this->relation};
 
-        return new EdgeOut($this->query, $this->parent, $model, $this->foreignKey, $attributes, $unique = true);
+        // Indicate a unique relationship since this involves one other model.
+        $unique = true;
+        return new EdgeOut($this->query, $this->parent, $model, $this->foreignKey, $attributes, $unique);
     }
 
 }

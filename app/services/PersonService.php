@@ -52,13 +52,13 @@ class PersonService extends BaseService
     }
 
     /**
-     * [findPersonByName description]
+     * Find person by identifier
      * @param  $name The name of the person to find
      * @return Person       
      */
-    public function findPersonByName($name)
+    public function findById($id)
     {
-        return Person::where('name', '=', $name)->firstOrFail();
+        return Person::where('name', '=', $id)->first();
     }
 
     /**
@@ -173,15 +173,74 @@ class PersonService extends BaseService
         $person->parents()->save($personToUnAsignLikeParent);                
     }
 
+     /**
+     * Get all the tree of Person
+     * @param  $id The id of the Person
+     * @return Persons   
+     */
+    public function getFamily($id)
+    {        
+        $person = Person::where('name', '=', $id)->first();  
+        $tree = array();
+        $tree[] = $person;
+
+        foreach ($person->parents as $parent) {
+            
+            /* Load Person's parents */
+            foreach ($this->getFamily($parent->name) as $value) {
+                $tree[] = $value;
+            }
+
+            /* Load Person's brothers */
+            foreach ($this->getBrothers($parent->name, $person->name) as $brother) {
+                /* Prevent the brother's duplicated */
+                $brotherAlreadyLoaded = false;
+                foreach ($tree as $brotherToCompare) {
+                   if ($brotherToCompare->name == $brother->name) {
+                       $brotherAlreadyLoaded = true;
+                   }
+                }
+                if (!$brotherAlreadyLoaded) {
+                    $tree[] = $brother;
+                }                    
+            }   
+        }
+
+        return $tree;
+    }   
+
+     /**
+     * Get all brothers of a Person deducing through the Person's parent
+     * @param  $parent: the Person's parent
+     * @param  $person: the Person to search his brothers
+     * @return Persons   
+     */
+    public function getBrothers($parent, $person)
+    {
+        $brothers = array();
+
+        foreach (Person::with('parents')->get() as $son)
+        {
+            if ($son->name != $person) {
+                foreach ($son->parents as $parentItem) {
+                    if ($parentItem->name == $parent) {
+                        $brothers[] = $son;
+                    }
+                }
+            }            
+        }
+
+        return $brothers;
+    }
+
+     /**
+     * Get all sons of a Person deducing through the Person's parent
+     * @param  $parent: the son's parent to search
+     * @return Persons   
+     */
     public function getSons($parent)
     {
         $sons = array();
-
-        /*$sons = Person::with(array('parents' => function($query) use ($parent)
-        {
-            $query->where('name', 'like', $parent);
-
-        }))->get();*/
 
         foreach (Person::with('parents')->get() as $son)
         {

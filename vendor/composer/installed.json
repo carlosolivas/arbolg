@@ -1734,65 +1734,6 @@
         ]
     },
     {
-        "name": "vinelab/neoeloquent",
-        "version": "v1.0.5",
-        "version_normalized": "1.0.5.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/Vinelab/NeoEloquent.git",
-            "reference": "7fa8ae7fca4f6137a020d463055369ca94f9c02c"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/Vinelab/NeoEloquent/zipball/7fa8ae7fca4f6137a020d463055369ca94f9c02c",
-            "reference": "7fa8ae7fca4f6137a020d463055369ca94f9c02c",
-            "shasum": ""
-        },
-        "require": {
-            "everyman/neo4jphp": "dev-master",
-            "illuminate/database": "4.2.*",
-            "illuminate/support": "4.2.*",
-            "nesbot/carbon": "~1.0",
-            "php": ">=5.4.0"
-        },
-        "require-dev": {
-            "mockery/mockery": "0.9.*",
-            "phpunit/phpunit": "4.0.*"
-        },
-        "time": "2014-07-15 14:00:41",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                "tests/TestCase.php"
-            ],
-            "psr-0": {
-                "Vinelab\\NeoEloquent\\": "src/"
-            },
-            "files": [
-                "src/Vinelab/NeoEloquent/helpers.php"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Abed Halawi",
-                "email": "abed.halawi@vinelab.com"
-            }
-        ],
-        "description": "Laravel wrapper for the Neo4j graph database REST interface",
-        "keywords": [
-            "database",
-            "graph",
-            "laravel",
-            "neo4j",
-            "neoeloquent"
-        ]
-    },
-    {
         "name": "laravelbook/ardent",
         "version": "dev-master",
         "version_normalized": "9999999-dev",
@@ -1963,6 +1904,113 @@
             "laravel",
             "localization",
             "php"
+        ]
+    },
+    {
+        "name": "vinelab/neo4jphp",
+        "version": "v0.1.1",
+        "version_normalized": "0.1.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Vinelab/neo4jphp.git",
+            "reference": "d7ae484bfcdcfec61d24b22b933b4dbc48d60eb0"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Vinelab/neo4jphp/zipball/d7ae484bfcdcfec61d24b22b933b4dbc48d60eb0",
+            "reference": "d7ae484bfcdcfec61d24b22b933b4dbc48d60eb0",
+            "shasum": ""
+        },
+        "require": {
+            "ext-curl": "*",
+            "php": ">=5.3.0"
+        },
+        "require-dev": {
+            "phing/phing": "2.6.*",
+            "phpunit/phpunit": "3.7.*",
+            "squizlabs/php_codesniffer": "1.5.*"
+        },
+        "time": "2014-10-19 16:07:08",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-0": {
+                "Everyman\\Neo4j": "lib/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Josh Adell",
+                "email": "josh.adell@gmail.com",
+                "homepage": "http://joshadell.com"
+            }
+        ],
+        "description": "Wrapper for the Neo4j graph database REST interface",
+        "homepage": "http://github.com/jadell/neo4jphp/wiki",
+        "keywords": [
+            "database",
+            "graph",
+            "neo4j"
+        ]
+    },
+    {
+        "name": "vinelab/neoeloquent",
+        "version": "v1.0.6",
+        "version_normalized": "1.0.6.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Vinelab/NeoEloquent.git",
+            "reference": "5651d65b008411421714d79edf76937277a58dcb"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Vinelab/NeoEloquent/zipball/5651d65b008411421714d79edf76937277a58dcb",
+            "reference": "5651d65b008411421714d79edf76937277a58dcb",
+            "shasum": ""
+        },
+        "require": {
+            "illuminate/database": "4.2.*",
+            "illuminate/support": "4.2.*",
+            "nesbot/carbon": "~1.0",
+            "php": ">=5.4.0",
+            "vinelab/neo4jphp": "0.1.*"
+        },
+        "require-dev": {
+            "mockery/mockery": "0.9.*",
+            "phpunit/phpunit": "4.2.*"
+        },
+        "time": "2014-10-19 16:37:36",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "tests/TestCase.php"
+            ],
+            "psr-0": {
+                "Vinelab\\NeoEloquent\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Abed Halawi",
+                "email": "abed.halawi@vinelab.com"
+            }
+        ],
+        "description": "Laravel wrapper for the Neo4j graph database REST interface",
+        "keywords": [
+            "database",
+            "graph",
+            "laravel",
+            "neo4j",
+            "neoeloquent"
         ]
     }
 ]

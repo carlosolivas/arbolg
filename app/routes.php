@@ -12,8 +12,8 @@
 */
 
 
-/*Route::group(array('prefix' => LaravelLocalization::setLocale()), function()
-{*/
+Route::group(array('prefix' => LaravelLocalization::setLocale()), function()
+{
     Route::get(
     '/',
     array('as' => 'home', 'uses' => 'HomeController@index'));
@@ -52,19 +52,15 @@
 
     Route::post('/addBrother','PersonController@post_addBrother');  
 
-    Route::get('/', array('before' => 'auth', function()
-    {
-        return View::make('index');
-    }));
-
-    
-    
-/*});*/
+});
 
 // Confide routes
 Route::get( 'user/create',                 'UserController@create');
 Route::post('user',                        'UserController@store');
-Route::get( 'login',                  'UserController@login');
+
+/*Route::get( 'login',                  'UserController@login');*/
+Route::get( 'login',                  'PersonController@login');
+
 Route::post('login',                  'UserController@do_login');
 Route::get( 'user/confirm/{code}',         'UserController@confirm');
 Route::get( 'user/forgot_password',        'UserController@forgot_password');

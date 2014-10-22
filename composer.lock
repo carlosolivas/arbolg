@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ff40d48c37c986ca6a169c8ea07a6722",
+    "hash": "fe6d1458d4deb9344e36c090ce9c31e6",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -1788,29 +1788,78 @@
             "time": "2014-09-23 05:25:11"
         },
         {
-            "name": "vinelab/neoeloquent",
-            "version": "v1.0.5",
+            "name": "vinelab/neo4jphp",
+            "version": "v0.1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Vinelab/NeoEloquent.git",
-                "reference": "7fa8ae7fca4f6137a020d463055369ca94f9c02c"
+                "url": "https://github.com/Vinelab/neo4jphp.git",
+                "reference": "d7ae484bfcdcfec61d24b22b933b4dbc48d60eb0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Vinelab/NeoEloquent/zipball/7fa8ae7fca4f6137a020d463055369ca94f9c02c",
-                "reference": "7fa8ae7fca4f6137a020d463055369ca94f9c02c",
+                "url": "https://api.github.com/repos/Vinelab/neo4jphp/zipball/d7ae484bfcdcfec61d24b22b933b4dbc48d60eb0",
+                "reference": "d7ae484bfcdcfec61d24b22b933b4dbc48d60eb0",
                 "shasum": ""
             },
             "require": {
-                "everyman/neo4jphp": "dev-master",
+                "ext-curl": "*",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phing/phing": "2.6.*",
+                "phpunit/phpunit": "3.7.*",
+                "squizlabs/php_codesniffer": "1.5.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Everyman\\Neo4j": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Josh Adell",
+                    "email": "josh.adell@gmail.com",
+                    "homepage": "http://joshadell.com"
+                }
+            ],
+            "description": "Wrapper for the Neo4j graph database REST interface",
+            "homepage": "http://github.com/jadell/neo4jphp/wiki",
+            "keywords": [
+                "database",
+                "graph",
+                "neo4j"
+            ],
+            "time": "2014-10-19 16:07:08"
+        },
+        {
+            "name": "vinelab/neoeloquent",
+            "version": "v1.0.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Vinelab/NeoEloquent.git",
+                "reference": "5651d65b008411421714d79edf76937277a58dcb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Vinelab/NeoEloquent/zipball/5651d65b008411421714d79edf76937277a58dcb",
+                "reference": "5651d65b008411421714d79edf76937277a58dcb",
+                "shasum": ""
+            },
+            "require": {
                 "illuminate/database": "4.2.*",
                 "illuminate/support": "4.2.*",
                 "nesbot/carbon": "~1.0",
-                "php": ">=5.4.0"
+                "php": ">=5.4.0",
+                "vinelab/neo4jphp": "0.1.*"
             },
             "require-dev": {
                 "mockery/mockery": "0.9.*",
-                "phpunit/phpunit": "4.0.*"
+                "phpunit/phpunit": "4.2.*"
             },
             "type": "library",
             "autoload": {
@@ -1819,10 +1868,7 @@
                 ],
                 "psr-0": {
                     "Vinelab\\NeoEloquent\\": "src/"
-                },
-                "files": [
-                    "src/Vinelab/NeoEloquent/helpers.php"
-                ]
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -1842,7 +1888,7 @@
                 "neo4j",
                 "neoeloquent"
             ],
-            "time": "2014-07-15 14:00:41"
+            "time": "2014-10-19 16:37:36"
         },
         {
             "name": "zizaco/confide",

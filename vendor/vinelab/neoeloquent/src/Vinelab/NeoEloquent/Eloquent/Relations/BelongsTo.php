@@ -1,8 +1,5 @@
 <?php namespace Vinelab\NeoEloquent\Eloquent\Relations;
 
-use Vinelab\NeoEloquent\Eloquent\Model;
-use Vinelab\NeoEloquent\Eloquent\Builder;
-use Illuminate\Database\Query\Expression;
 use Vinelab\NeoEloquent\Eloquent\Edges\EdgeIn;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 
@@ -106,7 +103,9 @@ class BelongsTo extends OneRelation {
     {
         $model = ( ! is_null($model)) ? $model : $this->parent->{$this->relation};
 
-        return new EdgeIn($this->query, $this->parent, $model, $this->foreignKey, $attributes, $unique = true);
+        // Indicate a unique relation since this only involves one other model.
+        $unique = true;
+        return new EdgeIn($this->query, $this->parent, $model, $this->foreignKey, $attributes, $unique);
     }
 
 }

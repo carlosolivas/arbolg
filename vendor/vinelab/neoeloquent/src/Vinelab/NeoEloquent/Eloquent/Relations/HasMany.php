@@ -3,26 +3,8 @@
 use Illuminate\Database\Eloquent\Collection;
 use Vinelab\NeoEloquent\Eloquent\Edges\EdgeOut;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
-use Illuminate\Database\Eloquent\Relations\HasMany as IlluminateHasMany;
 
 class HasMany extends HasOneOrMany {
-
-    /**
-     * Initialize the relation on a set of models.
-     *
-     * @param  array   $models
-     * @param  string  $relation
-     * @return array
-     */
-    public function initRelation(array $models, $relation)
-    {
-        foreach ($models as $model)
-        {
-            $model->setRelation($relation, $this->related->newCollection());
-        }
-
-        return $models;
-    }
 
     /**
      * Get the results of the relationship.
@@ -77,7 +59,7 @@ class HasMany extends HasOneOrMany {
         // Build the MATCH ()-[]->() Cypher clause.
         $this->query->matchOut($this->parent, $this->related, $this->relation, $this->foreignKey, $this->localKey, $this->parent->{$this->localKey});
         // Add WHERE clause over the parent node's matching keys [values...].
-        $this->query->whereIn($this->localKey, $this->getKeys($models));
+        $this->query->whereIn($this->localKey, $this->getKeys($models, $this->localKey));
     }
 
     /**

@@ -4,6 +4,7 @@ use Vinelab\NeoEloquent\Eloquent\Model;
 use Vinelab\NeoEloquent\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Vinelab\NeoEloquent\Eloquent\Edges\Finder;
+use Vinelab\NeoEloquent\Eloquent\Edges\Relation;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany as IlluminateHasOneOrMany;
@@ -61,10 +62,33 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
     {
         foreach ($models as $model)
         {
+            // In the case of fetching nested relations, we will get an array
+            // with the first key being the model we need, and the other being
+            // the related model so we'll just take the first model out of the array.
+            if (is_array($model)) $model = reset($model);
+
             $model->setRelation($relation, $this->related->newCollection());
         }
 
         return $models;
+    }
+
+    /**
+     * Get all of the primary keys for an array of models.
+     *
+     * @param  array   $models
+     * @param  string  $key
+     * @return array
+     */
+    protected function getKeys(array $models, $key = null)
+    {
+        return array_unique(array_values(array_map(function($value) use ($key)
+        {
+            if (is_array($value)) $value = reset($value);
+
+            return $key ? $value->getAttribute($key) : $value->getKey();
+
+        }, $models)));
     }
 
     /**
@@ -119,10 +143,15 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
          */
         foreach ($models as $model)
         {
-            $matched = $results->filter(function($result) use($parent, $relation, $model)
+            $matched = $results->filter(function($result) use($parent, $model)
             {
                 if ($result[$parent] instanceof Model)
                 {
+                    // In the case of fetching nested relations, we will get an array
+                    // with the first key being the model we need, and the other being
+                    // the related model so we'll just take the first model out of the array.
+                    if (is_array($model)) $model = reset($model);
+
                     return $model->getKey() == $result[$parent]->getKey();
                 }
             });
@@ -131,6 +160,11 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
             // Sometimes we have more than a match so we gotta catch them all!
             foreach ($matched as $match)
             {
+                // In the case of fetching nested relations, we will get an array
+                // with the first key being the model we need, and the other being
+                // the related model so we'll just take the first model out of the array.
+                if (is_array($model)) $model = reset($model);
+
                 if ($type == 'many')
                 {
                     $collection = $model->getRelation($relation);
@@ -261,11 +295,11 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
             // Tell the query that we only need the related model returned.
             $this->query->select($this->relation);
             // Set the parent node's placeholder as the RETURN key.
-            $this->query->getQuery()->from = array($parentNode);
+            $this->query->getQuery()->from = array($this->relation);
             // Build the MATCH ()-[]->() Cypher clause.
             $this->query->matchOut($this->parent, $this->related, $this->relation, $this->foreignKey, $this->localKey, $this->parent->{$this->localKey});
             // Add WHERE clause over the parent node's matching key = value.
-            $this->query->where($this->localKey, '=', $this->parent->{$this->localKey});
+            $this->query->where($parentNode .'.'. $this->localKey, '=', $this->parent->{$this->localKey});
         }
     }
 
@@ -356,8 +390,6 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
         // get them as collection
         if ($ids instanceof Collection) $ids = $ids->modelKeys();
 
-        // $this->attach($ids, [], $touch = false);
-
         // First we need to attach the relationships that do not exist
         // for this model so we'll spin throuhg the edges of this model
         // for the specified type regardless of the direction and create
@@ -366,7 +398,7 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
         // Let's fetch the existing edges first.
         $edges = $this->edges();
         // Collect the current related models IDs out of related models.
-        $current = array_map(function($edge){ return $edge->getRelated()->getKey(); }, $edges->toArray());
+        $current = array_map(function(Relation $edge){ return $edge->getRelated()->getKey(); }, $edges->toArray());
 
         $records = $this->formatSyncList($ids);
 
@@ -435,7 +467,6 @@ abstract class HasOneOrMany extends IlluminateHasOneOrMany implements RelationIn
      */
     public function updateEdge($id, array $properties)
     {
-        $related = $this->related->findOrFail($id);
         $edge = $this->finder->first($this->parent, $this->related->findOrFail($id), $this->type);
         $edge->fill($properties);
         return $edge->save();
