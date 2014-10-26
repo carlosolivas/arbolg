@@ -20,6 +20,6 @@ class User extends ConfideUser {
     }
 
     public function Person() {
-        return $this->hasOne('Person');
+        return $this->hasOne('s4h\core\Person');
     }
 }

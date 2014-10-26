@@ -1,46 +1,22 @@
 <?php
 
-use App\Models\viewModels\Person;
-
 class PersonController extends BaseController
 {
-	/* Artificial login */
-	public function login()
-	{
-		if (!Session::has('userLogged'))
-		{
-		    Session::put('userLogged', 'Bart');
-		}
-
-		Session::put('userLogged', 'Marge');
-		
-		return Redirect::to('/tree');
-	}
 	public function get_all()
 	{
-		return $this->get('Person')->findAll();	
+		return $this->get('NodePerson')->findAll();	
 	}
+
 	public function get_tree()
 	{
-		
 		return View::make('person.tree');
 	}
 
 	public function get_loadTreePersons()
 	{
-		/* Session */
-		$userIdentifier = Session::get('userLogged');
-
-		$family = $this->get('Person')->getAscendingFamily($userIdentifier);	
-		$descendingFamily = $this->get('Person')->getDescendingFamily($userIdentifier);	
-
-		/* Remove the first element because are the duplicated of the root (already was included in $family) */
-		array_shift($descendingFamily);
-		
-		/* Add the descending family to the complete array of family */
-		foreach ($descendingFamily as $descending) {
-			$family[] = $descending;
-		}	
+		$user = Auth::user();		
+		$personLogged = $user->Person->id;
+		$family = $this->get('NodePerson')->getFamily($personLogged);
 
 		$nodes = array();
 		foreach ($family as $person) {	
@@ -56,19 +32,9 @@ class PersonController extends BaseController
 
 	public function get_loadTreeRelations()
 	{
-		/* Session */
-		$userIdentifier = Session::get('userLogged');
-
-		$family = $this->get('Person')->getAscendingFamily($userIdentifier);	
-		$descendingFamily = $this->get('Person')->getDescendingFamily($userIdentifier);	
-
-		/* Remove the first element because are the duplicated of the root (already was included in $family) */
-		array_shift($descendingFamily);
-		
-		/* Add the descending family to the complete array of family */
-		foreach ($descendingFamily as $descending) {
-			$family[] = $descending;
-		}	
+		$user = Auth::user();		
+		$personLogged = $user->id;
+		$family = $this->get('NodePerson')->getFamily($personLogged);
 
 		$relations = array();
 		foreach ($family as $person) {
@@ -99,7 +65,7 @@ class PersonController extends BaseController
 	public function post_create()
 	{
 		try {
-			$this->get('Person')->create(Input::all());
+			$this->get('NodePerson')->create(Input::all());
 		}		
 		catch(App\Exceptions\ValidationException $e){
 			return Redirect::to('/create')
@@ -124,7 +90,7 @@ class PersonController extends BaseController
 		$son = Input::get('son');
 		$parent = Input::get('parent');
 
-		$this->get('Person')->addParent($son, $parent);
+		$this->get('NodePerson')->addParent($son, $parent);
 
 		return Redirect::to('/tree');
 	}

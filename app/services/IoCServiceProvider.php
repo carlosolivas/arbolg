@@ -8,9 +8,9 @@ class IoCServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->app->bind('PersonService', function() 
+        $this->app->bind('NodePersonService', function() 
         {
-            return new PersonService();
+            return new NodePersonService();
         });
     }
 }

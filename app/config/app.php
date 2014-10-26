@@ -125,6 +125,8 @@ return array(
 		'Vinelab\NeoEloquent\NeoEloquentServiceProvider',
 		'Mcamara\LaravelLocalization\LaravelLocalizationServiceProvider',
 		'Zizaco\Confide\ConfideServiceProvider',
+		's4h\core\CoreServiceProvider',
+		's4h\social\BackendServiceProvider',
 	),
 
 	/*

@@ -1,7 +1,15 @@
 $(function(){ // on dom ready
 
+// Global variables
 var initNodes;
 var initEdges;
+var currentMousePos;
+
+
+  $(document).mousemove(function(event) {
+      currentMousePos = event;
+  });
+
 
 // Load the initial nodes (Persons)
 $.ajax({
@@ -78,18 +86,49 @@ function initializeCytoscape()
       animationDuration: 1500,
       directed: true,
       avoidOverlap: true,
+      maximalAdjustments: 5, 
     }
 
   });
 
-  cy.on('tap', 'node', function(){
-   
+  cy.on('tap', 'node', function(){    
+    // Node's options menu
+    var dialog = $( "#menu-form" ).dialog({
+      autoOpen: false,
+      closeOnEscape: true,
+      open: function(event, ui) { 
+        $(".ui-widget-header").css('border','none');
+
+        $("#menu-form-message").text("Datos del nodo...");
+      },
+      draggable: false,
+      resizable: false,
+      show: {
+        effect: "scale",
+        duration: 200
+      },
+      width: 'auto',
+      modal: false,
+      buttons: {
+        'Agregar padre': function() {
+        },
+        'Agregar hermano': function() {
+        }
+      }
+    });
+
+    dialog.dialog({ position: { my: "left+30 center", at: "right center", of: currentMousePos } });
+    dialog.dialog( "open" );
+    
+    // Node's options menu
+
   });
 }
-
-
-
 }); // on dom ready
+
+
+
+
 
 
 

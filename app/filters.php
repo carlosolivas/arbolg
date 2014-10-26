@@ -33,6 +33,13 @@ App::after(function($request, $response)
 |
 */
 
+Route::filter('Confide', function()
+{
+    if (!Confide::user()) {
+    	return Redirect::to('login');
+    }
+});
+
 Route::filter('auth', function()
 {
 	if (Auth::guest())

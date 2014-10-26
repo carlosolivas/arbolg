@@ -8,8 +8,11 @@
 }
 </style>
 @section('content')
-    <div id='tree'>                            
-    </div>
+<div id='tree'>                            
+</div>
+<div id="menu-form" title='Menu'>
+	<div id='menu-form-message'> </div>
+</div>
 {{ HTML::script('assets/js/page-scripts/tree.js'); }}
 @stop
 

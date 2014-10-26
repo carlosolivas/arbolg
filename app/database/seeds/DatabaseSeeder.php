@@ -11,7 +11,26 @@ class DatabaseSeeder extends Seeder {
 	{
 		Eloquent::unguard();
 
-		// $this->call('UserTableSeeder');
+		$this->call('UsersTableSeeder');
 	}
 
+}
+
+class UsersTableSeeder extends Seeder {
+
+  public function run()
+  {
+    $user = new s4h\core\User;
+    $user->username = 'danielgarcia';
+    $user->email = 'daniel@gmail.com';
+    $user->password = 'Secret1234';
+    $user->password_confirmation = 'Secret1234';
+    $user->confirmation_code = md5(uniqid(mt_rand(), true));
+
+    if(! $user->save()) {
+      Log::info('Unable to create user '.$user->username, (array)$user->errors());
+    } else {
+      Log::info('Created user "'.$user->username.'" <'.$user->email.'>');
+    }
+  }
 }
