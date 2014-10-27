@@ -11,6 +11,13 @@
 |
 */
 
+Route::filter('Confide', function()
+{
+    if (!Confide::user()) {
+    	return Redirect::to('login');
+    }
+});
+
 App::before(function($request)
 {
 	//
@@ -32,13 +39,6 @@ App::after(function($request, $response)
 | integrates HTTP Basic authentication for quick, simple checking.
 |
 */
-
-Route::filter('Confide', function()
-{
-    if (!Confide::user()) {
-    	return Redirect::to('login');
-    }
-});
 
 Route::filter('auth', function()
 {

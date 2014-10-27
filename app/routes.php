@@ -17,11 +17,11 @@ Route::group(array("before" => 'Confide'), function()
     {
         Route::get(
         '/',
-        array('as' => 'home', 'uses' => 'HomeController@index'));
+        array('as' => 'home', 'uses' => 'PersonController@get_tree'));
 
          Route::get(
         '/all',
-        array('as' => 'all', 'uses' => 'PersonController@get_all'));
+        array('as' => 'all', 'uses' => 'PersonController@get_tree'));
 
         Route::get(
         '/tree',

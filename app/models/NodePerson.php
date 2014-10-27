@@ -16,4 +16,7 @@ class NodePerson extends \NeoEloquent
     {
         return $this->hasOne('App\Models\NodePerson', 'COUP');
     } 
+
+    protected $fillable = array('personId', 'ownerId');
+
 }
