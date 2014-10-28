@@ -35,6 +35,10 @@ Route::group(array("before" => 'Confide'), function()
         '/loadTreeRelations',
         array('as' => 'loadTreeRelations', 'uses' => 'PersonController@get_loadTreeRelations'));
 
+        Route::post(
+        '/saveParent',
+        array('as' => 'saveParent', 'uses' => 'PersonController@post_saveParent'));
+
         Route::get(
         '/create',
         array('as' => 'create', 'uses' => 'PersonController@get_create'));

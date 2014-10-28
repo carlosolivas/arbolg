@@ -24,7 +24,7 @@ class PersonController extends BaseController
 		if (!($this->get('NodePerson')->nodePersonExists($person->id))) {
 
 			/* Create the NodePerson for this user */
-			$this->get('NodePerson')->firstRegisterNodePerson($person->id);			
+			$this->get('NodePerson')->create($person->id,$person->id);			
 		}
 
 
@@ -54,7 +54,8 @@ class PersonController extends BaseController
 				"email" 		=> $person->email,				
 				"birthdate"	 	=> $person->date_of_birth,
 				"gender"		=> $person->sex,
-				"phone"			=> $person->cellphone
+				"phone"			=> $person->cellphone,
+				"fullname"		=> $person->name . " " . $person->lastname . " " . $person->mothersname
 				);
 
 			$data = array('data' => $dataOfPerson);
@@ -79,13 +80,13 @@ class PersonController extends BaseController
 
 			foreach ($person->parents as $nodeParent) {	
 
-				$person = $this->personRepository->getById($nodePerson->personId);
+				$parent = $this->personRepository->getById($nodeParent->personId);
 
 				// Source is the parent of person					
-				$source = (string)$person->id;
+				$source = (string)$parent->id;
 
 				// Target is the person 
-				$target = (string)$person->id;
+				$target = (string)$person->personId;
 
 				$dataParOfRelations = array("source" => $source, "target" => $target);
 				$data = array("data" => $dataParOfRelations);
@@ -97,6 +98,46 @@ class PersonController extends BaseController
 		return Response::json( $relations );	
 	}
 
+	public function post_saveParent()
+	{
+		try {
+			// Data of new Person
+			$input = Input::all();
+			$data = array(
+				'name' 			=> $input['name'], 
+				'lastname' 		=> $input['lastname'],
+				'mothersname' 	=> $input['mothersname'],
+				'birthdate' 	=> $input['dateOfBirth'],
+				'gender' 		=> $input['gender'],
+				'phone' 		=> $input['phone'],
+				'email'		    => 'test@gmail.com',
+				'user_id' 		=> null,
+				'role_id' 		=> 1,
+				'file_id'		=> null
+			);		
+
+			// Create a Person 
+			$newPersonId =  $this->personRepository->store($data);
+
+			// Create a NodePerson
+			$user = Auth::user();
+			$personLogged = $user->id;
+
+			$this->get('NodePerson')->create($newPersonId, $personLogged);
+
+			
+			// Add new Person as parent
+			$sonId = (int)$input['son'];
+			$parentId = $newPersonId;
+
+			$this->get('NodePerson')->addParent($sonId, $parentId);
+
+		} catch (Exception $e) {
+			return Response::json( false );
+		}
+		
+		return Response::json( true );
+	}
 	
 	public function get_create()
 	{

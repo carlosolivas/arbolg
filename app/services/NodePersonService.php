@@ -52,15 +52,6 @@ class NodePersonService extends BaseService
         return $existsAlready;
     }
 
-    /*
-    * Register a Person like NodePerson
-    */
-    public function firstRegisterNodePerson($personId)
-    {
-        $input = array('personId' => $personId, 'ownerId' => $personId);
-        $this->create($input);        
-    }
-
     /**
      * Get all the persons
      * @return Persons collection
@@ -76,20 +67,17 @@ class NodePersonService extends BaseService
      * @return Person       
      */
     public function findById($id)
-    {
-        return NodePerson::where('name', '=', $id)->first();
+    {        
+        return NodePerson::where('personId', '=', $id)->first();
     }
 
     /**
      * Create a new NodePerson
      */
-    public function create($input)
+    public function create($personId, $ownerId)
     {
         
-    	try {
-            
-            $personId = $input['personId'];
-            $ownerId = $input['ownerId'];            
+    	try {           
 
     		NodePerson::create([
                 'personId'          => $personId,
@@ -122,27 +110,16 @@ class NodePersonService extends BaseService
 
     public function addParent($son, $parent, $anonymousParent = false)
     {
-        $person = NodePerson::where('name', '=', $son)->firstOrFail();
-
+        $person = $this->findById($son);
         if ($person->parents()->count() < self::MAX_PARENTS_ALLOWED) {            
     
             if (!$anonymousParent) {                
-            $personToAsignLikeParent = NodePerson::where('name', '=', $parent)->firstOrFail();
+            $personToAsignLikeParent = $this->findById($parent);
 
-            $person->parents()->save($personToAsignLikeParent);    
+            $person->parents()->save($personToAsignLikeParent); 
+               
             } else {
-                /*$anonymousParent = Person::create([
-                'name'              => name, 
-                'lastName'          => lastName,
-                'mothersMaidenName' => mothersMaidenName,
-                'gender'            => gender,
-                'isDeceased'        => isDeceased,
-                'dateOfBirth'       => dateOfBirth,
-                'placeOfBirth'      => placeOfBirth,
-                'country'           => country,
-                'email'             => email,
-                'biography'         => biography
-                ]);*/
+                // Do something with anonymous parent
             }
                 
         }
