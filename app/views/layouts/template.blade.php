@@ -123,10 +123,7 @@
 
                     </li>
                     <li>
-                        <a href="/tree"><i class="fa fa-th-large"></i> <span class="nav-label">Todas las personas</span> </a>
-                        <a href="/create"><i class="fa fa-th-large"></i> <span class="nav-label">Crear persona</span> </a>
-                        <a href="/addParent"><i class="fa fa-th-large"></i> <span class="nav-label">Agregar hijo-padre</span> </a>
-
+                        <a href="/tree"><i class="fa fa-th-large"></i> <span class="nav-label">Todas las personas</span> </a>   
                     </li>
                     <li>
                         <a href="#"><i class="fa fa-bar-chart-o"></i> <span class="nav-label">Graphs</span><span class="fa arrow"></span></a>

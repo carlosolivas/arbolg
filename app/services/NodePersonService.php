@@ -39,6 +39,7 @@ class NodePersonService extends BaseService
 
     /**
     * Check if is the user's first login and create the NodePerson if it's
+    * @param int $personId The person id to verify if exists
     * @return true or false
     */
     public function nodePersonExists($personId)
@@ -54,7 +55,7 @@ class NodePersonService extends BaseService
 
     /**
      * Get all the persons
-     * @return Persons collection
+     * @return NodePersons collection
      */
     public function findAll() 
     {
@@ -63,16 +64,17 @@ class NodePersonService extends BaseService
 
     /**
      * Find person by identifier
-     * @param  $name The name of the person to find
+     * @param int $personId The id of the NodePerson to find
      * @return Person       
      */
-    public function findById($id)
+    public function findById($personId)
     {        
-        return NodePerson::where('personId', '=', $id)->first();
+        return NodePerson::where('personId', '=', $personId)->first();
     }
 
     /**
      * Create a new NodePerson
+     * @param $personId The id of the person to create the NodePerson
      */
     public function create($personId, $ownerId)
     {
@@ -111,8 +113,8 @@ class NodePersonService extends BaseService
     public function addParent($son, $parent, $anonymousParent = false)
     {
         $person = $this->findById($son);
-        if ($person->parents()->count() < self::MAX_PARENTS_ALLOWED) {            
-    
+        if ($this->canAddParents($person)) 
+        {                
             if (!$anonymousParent) {                
             $personToAsignLikeParent = $this->findById($parent);
 
@@ -120,8 +122,7 @@ class NodePersonService extends BaseService
                
             } else {
                 // Do something with anonymous parent
-            }
-                
+            }                
         }
     }
 
@@ -136,7 +137,7 @@ class NodePersonService extends BaseService
 
     /**
      * Get the family of Person
-     * @param  $id The id of the Person
+     * @param  $personId The id of the Person
      * @return Persons   
      */  
     public function getFamily($personId)
@@ -176,7 +177,7 @@ class NodePersonService extends BaseService
 
      /**
      * Get all sons of a Person deducing through the Person's parent
-     * @param  $parent: the son's parent to search
+     * @param  $parent The son's parent to search
      * @return Persons   
      */
     public function getSons($parent)
@@ -193,5 +194,22 @@ class NodePersonService extends BaseService
         }
 
         return $sons;
+    }
+
+    /**
+     * Check if the Person can have more Parents
+     * @param  $person The NodePerson to evaluate if can add Parents
+     * @return Bool   
+     */
+    public function canAddParents($person)
+    {
+        if ($person->parents()->count() < self::MAX_PARENTS_ALLOWED) 
+        {
+            return true;  
+        }
+        else
+        {
+            return false;
+        }
     }
 }

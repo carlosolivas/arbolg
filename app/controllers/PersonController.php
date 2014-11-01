@@ -6,27 +6,49 @@ class PersonController extends BaseController
 {
 	protected $personRepository;
 
+	/**
+     * General constants
+     */
+    const SON               = 1;
+    const COUP              = 2;
+
 	public function __construct(PersonRepositoryInterface $personRepository) 
 	{
         $this->personRepository = $personRepository;
 	}
 
-	/*public function get_all()
-	{
-		return $this->get('NodePerson')->findAll();	
-	}*/
 
+	/**
+     * This function check if the Person exists already in the graph model
+     * and create the view for the tree
+     * @return Node Persons   
+     */ 
 	public function get_tree()
 	{
-
 		$person = Auth::user()->Person;
 		/* Check if the NodePerson for this user wasn´t created yet */
 		if (!($this->get('NodePerson')->nodePersonExists($person->id))) {
 
 			/* Create the NodePerson for this user */
-			$this->get('NodePerson')->create($person->id,$person->id);			
-		}
+			$this->get('NodePerson')->create($person->id,$person->id);	
 
+			foreach ($person->getFamily()->Persons as $directFamiliar) 
+			{
+				/* If is not the same Person who are logged, and if is a son of this Person */
+				if ( $directFamiliar->id != $person->id && 
+					$directFamiliar->role_id == self::SON) {
+
+					/* Create the NodePerson for this direct familiar */
+					$this->get('NodePerson')->create($directFamiliar->id,$directFamiliar->id);
+
+					$sonId = $directFamiliar->id;
+					$parentId = $person->id;
+
+					/* Add as parent the logged Person */
+					$this->get('NodePerson')->addParent($sonId, $parentId);
+				}
+			}		
+		}
 
 		return View::make('person.tree');
 	}
@@ -45,6 +67,15 @@ class PersonController extends BaseController
 
 			$person = $this->personRepository->getById($nodePerson->personId);
 
+			// Check if can add more Parents
+			$canAddParents = $this->get('NodePerson')->canAddParents($nodePerson);	
+
+			// Set the root Node
+			$isRootNode = false;		
+			if ($nodePerson->personId == $personLogged) {
+				$isRootNode = true;
+			}
+
 			$personId = (string)$person->id;
 			$dataOfPerson = array(
 				"id" 			=> $personId, 
@@ -52,10 +83,12 @@ class PersonController extends BaseController
 				"lastname" 		=> $person->lastname,
 				"mothersname" 	=> $person->mothersname,
 				"email" 		=> $person->email,				
-				"birthdate"	 	=> $person->date_of_birth,
-				"gender"		=> $person->sex,
-				"phone"			=> $person->cellphone,
-				"fullname"		=> $person->name . " " . $person->lastname . " " . $person->mothersname
+				"birthdate"	 	=> $person->birthdate,
+				"gender"		=> $person->gender,
+				"phone"			=> $person->phone,
+				"fullname"		=> $person->name . " " . $person->lastname . " " . $person->mothersname,
+				"canAddParents"	=> $canAddParents,
+				"isRootNode"	=> $isRootNode
 				);
 
 			$data = array('data' => $dataOfPerson);
@@ -98,82 +131,71 @@ class PersonController extends BaseController
 		return Response::json( $relations );	
 	}
 
+	/**
+     * This function creates a Person, a NodePerson and relate this NodePerson with 
+     * the the corresponding son
+     * @return Json   
+     */ 
 	public function post_saveParent()
 	{
 		try {
+
 			// Data of new Person
-			$input = Input::all();
+			$input = Input::all();			
+			
+			// Converting the date of birth
+			$timestamp = strtotime($input['dateOfBirth']); 
+			$birthdate = date("Y-m-d H:i:s", $timestamp);
+
 			$data = array(
 				'name' 			=> $input['name'], 
 				'lastname' 		=> $input['lastname'],
 				'mothersname' 	=> $input['mothersname'],
-				'birthdate' 	=> $input['dateOfBirth'],
+				'birthdate' 	=> $birthdate,
 				'gender' 		=> $input['gender'],
 				'phone' 		=> $input['phone'],
 				'email'		    => 'test@gmail.com',
 				'user_id' 		=> null,
 				'role_id' 		=> 1,
 				'file_id'		=> null
-			);		
+			);	
 
-			// Create a Person 
-			$newPersonId =  $this->personRepository->store($data);
+		 	$rules = array(
+			 	'name' => 'required',
+	            'lastname' => 'required',
+	            'gender' => 'required',
+	            'birthdate' => 'date',
+	            'phone' => 'numeric'
+            );
 
-			// Create a NodePerson
-			$user = Auth::user();
-			$personLogged = $user->id;
+			$validation = Validator::make($data, $rules);	
 
-			$this->get('NodePerson')->create($newPersonId, $personLogged);
-
-			
-			// Add new Person as parent
+			// Check if son can add more Parents
 			$sonId = (int)$input['son'];
-			$parentId = $newPersonId;
+			$son = $this->get('NodePerson')->findById($sonId);		
 
-			$this->get('NodePerson')->addParent($sonId, $parentId);
+			if ($this->get('NodePerson')->canAddParents($son) && !($validation->fails())) {		
+			
+				// Create a Person 
+				$newPersonId =  $this->personRepository->store($data);
+
+				// Create a NodePerson
+				$user = Auth::user();
+				$personLogged = $user->Person->id;
+				$this->get('NodePerson')->create($newPersonId, $personLogged);
+				
+				// Add new Person as parent
+				$parentId = $newPersonId;
+				$this->get('NodePerson')->addParent($sonId, $parentId);
+
+				return Response::json( 'successful' );
+			}		
+			else {
+				return Response::json( $validation->messages()->all('- :message -') );
+			}
 
 		} catch (Exception $e) {
-			return Response::json( false );
-		}
-		
-		return Response::json( true );
-	}
-	
-	public function get_create()
-	{
-		return View::make('person.create');
-	}
-
-	public function post_create()
-	{
-		try {
-			$this->get('NodePerson')->create(Input::all());
+			return Response::json( $e->getMessage() );
 		}		
-		catch(App\Exceptions\ValidationException $e){
-			return Redirect::to('/create')
-                ->withErrors($e->getValidationErrors());
-		}
-		 catch (Exception $e) {
-			return Redirect::to('/create')
-			->withErrors((new Illuminate\Support\MessageBag)
-                ->add('error', $e->getMessage()));
-		}
-
-		return Redirect::to('/tree');
-	}
-
-	public function get_addParent()
-	{
-		return View::make('person.addParent');
-	}
-
-	public function post_addParent()
-	{
-		$son = Input::get('son');
-		$parent = Input::get('parent');
-
-		$this->get('NodePerson')->addParent($son, $parent);
-
-		return Redirect::to('/tree');
 	}
 }

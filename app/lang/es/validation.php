@@ -115,7 +115,21 @@ return array(
 */
 
 'attributes' => array(
-    'username' => 'usuario',
-    'password' => 'contraseña'
+    'username' 				=> 'usuario',
+    'password' 				=> 'contraseña',
+    'name'	   				=> 'Nombre',
+	"lastname"				=> 'Apellido',
+	"mothersname"			=> 'Apellido materno',
+	"gender"				=> 'Género',
+	"birthdate"				=> 'Fecha de Nacimiento',
+	"email"					=> 'E-mail',
+	"male"					=> 'Masculino',
+	"female"				=> 'Femenino',		
+	"isDeceased"			=> '¿Ha fallecido?',
+	"placeOfBirth"			=> 'Lugar de nacimiento',
+	"country"				=> 'País',
+	"biography"				=> 'Biografía',
+	"son"					=> 'Hijo/a',
+	"parent"				=> 'Padre/Madre'
 ),
 );

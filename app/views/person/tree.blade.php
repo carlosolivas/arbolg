@@ -1,5 +1,5 @@
 @extends('layouts.template')
-<title>Todas las personas</title>
+<title>Árbol genealógico</title>
  <!-- Tree script -->
 <style>
 #tree{
@@ -56,28 +56,29 @@
  	
 </div>
 
-<div id="addParent-form" title='Agregar padre' style="display: none">
-	<div id='addParent-form-message'>
-
-	  	<input type="text" name="name" id="newPerson_name" class="form-control" placeholder="Nombre">
+<div id="addDirectFamiliarDialog-form" title='Agregar padre' style="display: none">
+	<div id='addDirectFamiliarDialog-form-message'>
+		
+			<input type="text" name="name" id="newPerson_name" class="form-control" placeholder="Nombre*">
 	 
-	  	<input type="text" name="lastname" id="newPerson_lastname" class="form-control" placeholder="Apellido">  	      
-	 
-	  	<input type="text" name="mothersname" id="newPerson_mothersname" class="form-control" placeholder="Apellido materno">   
+		  	<input type="text" name="lastname" id="newPerson_lastname" class="form-control" placeholder="Apellido*">  	      
+		 
+		  	<input type="text" name="mothersname" id="newPerson_mothersname" class="form-control" placeholder="Apellido materno">   
 
-	 	<div class="input-group">
-			<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-			<input type="text" id="newPerson_dateOfBirth" class="form-control datePicker" placeholder="Fecha de Nacimiento"> 
-		</div>  	
-	      
-		<select id="newPerson_gender" class="form-control">
-			<option default disable>Sexo</option>
-			<option value="1">Masculino</option>
-			<option value="2">Femenino</option>
-		</select>	       
+		 	<div class="input-group">
+				<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+				<input type="text" id="newPerson_dateOfBirth" class="form-control datePicker" placeholder="Fecha de Nacimiento"> 
+			</div>  	
+		      
+			<select id="newPerson_gender" class="form-control">
+				<option default disable value="">Sexo*</option>
+				<option value="1">Masculino</option>
+				<option value="2">Femenino</option>
+			</select>	       
 
-	  	<input type="text" name="phone" id="newPerson_phone" class="form-control" placeholder="Teléfono">       
- 		
+		  	<input type="text" name="phone" id="newPerson_phone" class="form-control" placeholder="Teléfono">   
+		  	<span class="help-block m-b-none" id="validationBlockMessage">(*) Campos obligatorios</span> 	  	
+			
 	</div>
 </div>
 {{ HTML::script('assets/js/page-scripts/tree.js'); }}

@@ -17,11 +17,7 @@ Route::group(array("before" => 'Confide'), function()
     {
         Route::get(
         '/',
-        array('as' => 'home', 'uses' => 'PersonController@get_tree'));
-
-         Route::get(
-        '/all',
-        array('as' => 'all', 'uses' => 'PersonController@get_tree'));
+        array('as' => 'home', 'uses' => 'PersonController@get_tree'));         
 
         Route::get(
         '/tree',
@@ -38,25 +34,6 @@ Route::group(array("before" => 'Confide'), function()
         Route::post(
         '/saveParent',
         array('as' => 'saveParent', 'uses' => 'PersonController@post_saveParent'));
-
-        Route::get(
-        '/create',
-        array('as' => 'create', 'uses' => 'PersonController@get_create'));
-
-        Route::post('/create','PersonController@post_create');
-
-        Route::get(
-        '/addParent',
-        array('as' => 'addParent', 'uses' => 'PersonController@get_addParent'));
-
-        Route::post('/addParent','PersonController@post_addParent');
-
-        Route::get(
-        '/addBrother',
-        array('as' => 'addBrother', 'uses' => 'PersonController@get_addBrother'));
-
-        Route::post('/addBrother','PersonController@post_addBrother');  
-
     });
 });
 
