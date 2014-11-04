@@ -26,4 +26,9 @@ class BaseController extends Controller {
     {
         return App::make($servicePrefix . 'Service');
     } 
+
+    public function error()
+    {
+    	return View::make('500')->with("error", Session::get('error'));
+    }
 }

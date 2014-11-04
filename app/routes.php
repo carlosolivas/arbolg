@@ -17,7 +17,7 @@ Route::group(array("before" => 'Confide'), function()
     { 
         Route::get(
         '/',
-        array('as' => 'home', 'uses' => 'PersonController@get_tree'));         
+        array('as' => 'home', 'uses' => 'PersonController@get_tree'));
 
         Route::get(
         '/tree',

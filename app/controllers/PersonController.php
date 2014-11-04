@@ -27,6 +27,7 @@ class PersonController extends BaseController
 	public function get_tree()
 	{
 		try {
+
 			$person = Auth::user()->Person;
 
 			/* Check if the NodePerson for this user wasn´t created yet */
@@ -52,6 +53,9 @@ class PersonController extends BaseController
 					}
 				}
 
+				/* The NodePerson of logged Person */
+				$nodePersonLogged = $this->get('NodePerson')->findById($person->id);
+
 				foreach ($directFamiliars as $directFamiliar) 
 				{
 					/* If is not the same Person who are logged */
@@ -71,7 +75,6 @@ class PersonController extends BaseController
 								$this->get('NodePerson')->addParent($sonId, $parentId);
 
 								/* Add as parent the coup of logged Person */
-								$nodePersonLogged = $this->get('NodePerson')->findById($person->id);
 								if ($nodePersonLogged->coup != null) {
 									$this->get('NodePerson')->addParent($sonId, $nodePersonLogged->coup->personId);
 								}
@@ -94,9 +97,9 @@ class PersonController extends BaseController
 								$this->get('NodePerson')->addParent($sonId, $parentId);
 
 								/* Unite the parents if already have loaded 2 of them */
-								if ($person->parents()->count() == 2) {
-									foreach ($person->parents() as $parent) {
-										foreach ($person->parents() as $otherParent) {
+								if ($nodePersonLogged->parents()->count() == 2) {
+									foreach ($nodePersonLogged->parents as $parent) {
+										foreach ($nodePersonLogged->parents as $otherParent) {
 											if ($parent->personId != $otherParent->personId) {
 												$this->get('NodePerson')->addCoup($parent->personId, $otherParent->personId);
 											}
@@ -108,8 +111,8 @@ class PersonController extends BaseController
 
 								$sonId = $directFamiliar->id;
 
-								foreach ($person->parents() as $parentOfLoggedPerson) {
-									$parentId = $parentOfLoggedPerson->id;
+								foreach ($nodePersonLogged->parents as $parentOfLoggedPerson) {
+									$parentId = $parentOfLoggedPerson->personId;
 
 									/* Add as parent the parent of logged person, and as son
 									the current direct familiar */
@@ -124,6 +127,7 @@ class PersonController extends BaseController
 			return View::make('person.tree');
 			
 		} catch (Exception $e) {
+			/*return Redirect::to('error')->with('error', $e);*/
 			return $e;
 		}		
 	}
