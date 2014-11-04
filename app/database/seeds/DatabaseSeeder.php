@@ -21,8 +21,8 @@ class UsersTableSeeder extends Seeder {
   public function run()
   {
     $user = new s4h\core\User;
-    $user->username = 'danielgarcia';
-    $user->email = 'daniel@gmail.com';
+    $user->username = 'homerosimpson';
+    $user->email = 'homero@gmail.com';
     $user->password = 'Secret1234';
     $user->password_confirmation = 'Secret1234';
     $user->confirmation_code = md5(uniqid(mt_rand(), true));

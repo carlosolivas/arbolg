@@ -14,7 +14,7 @@
 Route::group(array("before" => 'Confide'), function()
 {
     Route::group(array('prefix' => LaravelLocalization::setLocale()), function()
-    {
+    { 
         Route::get(
         '/',
         array('as' => 'home', 'uses' => 'PersonController@get_tree'));         

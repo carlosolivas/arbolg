@@ -92,24 +92,6 @@ class NodePersonService extends BaseService
     	}
     }
 
-    public function addBrother($brother, $brotherToAssign)
-    {
-        $person = NodePerson::where('name', '=', $brother)->firstOrFail();
-
-        $personToAsignLikeBrother = NodePerson::where('name', '=', $brotherToAssign)->firstOrFail();
-
-        $person->brothers()->save($personToAsignLikeBrother);
-    }
-
-    public function removeBrother($broter, $brotherToUnAssign)
-    {
-        $person = NodePerson::where('name', '=', $broter)->firstOrFail();
-
-        $personToUnAsignLikeBrother = NodePerson::where('name', '=', $brotherToUnAssign)->firstOrFail();
-
-        $person->brothers()->detach($personToUnAsignLikeBrother);
-    }
-
     public function addParent($son, $parent, $anonymousParent = false)
     {
         $person = $this->findById($son);
@@ -125,6 +107,16 @@ class NodePersonService extends BaseService
             }                
         }
     }
+
+    public function addCoup($root, $coup)
+    {
+        $personToAddCoup = $this->findById($root);               
+                        
+        $personToAsignLikeCoup = $this->findById($coup);
+
+        $personToAddCoup->coup()->save($personToAsignLikeCoup);
+    }
+    
 
     public function removeParent($son, $parent)
     {

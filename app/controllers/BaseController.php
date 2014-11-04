@@ -26,5 +26,4 @@ class BaseController extends Controller {
     {
         return App::make($servicePrefix . 'Service');
     } 
-
 }
