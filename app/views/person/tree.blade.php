@@ -13,27 +13,27 @@
 <div id="menu-form" title='Menu' style="display: none">
 		 
 	 <div class="input-group m-b">
-	    <span class="input-group-addon"><b>Nombre</b></span>			    
+	    <span class="input-group-addon"><b> {{{ Lang::get('titles.name') }}}</b></span>			    
 		<input type="text" id="personDetailName" class="form-control" disabled="true">
 	</div>
 	
 	<div class="input-group m-b"> 
-	    <span class="input-group-addon"><b>Apellido</b></span>
+	    <span class="input-group-addon"><b>{{{ Lang::get('titles.lastName') }}}</b></span>
     	<input type="text" id="personDetailLastName" class="form-control" disabled="true">       
     </div>              
     
 	<div class="input-group m-b"> 
-	     <span class="input-group-addon"><b>Apellido materno</b></span>		    
+	     <span class="input-group-addon"><b>{{{ Lang::get('titles.mothersMaidenName') }}}</b></span>  
     	<input type="text" id="personDetailMothersName" class="form-control" disabled="true">
     </div>
 
 	<div class="input-group m-b"> 
-	   <span class="input-group-addon"><b>Email</b></span>		   
+	   <span class="input-group-addon"><b>{{{ Lang::get('titles.email') }}}</b></span>	  
     	<input type="text" id="personDetailEmail" class="form-control" disabled="true"> 
     </div>
 
 	<div class="input-group m-b"> 
-	    <span class="input-group-addon"><b>Nació</b></span>
+	    <span class="input-group-addon"><b>{{{ Lang::get('titles.birth') }}}</b></span>
 	    	<div class="input-group">
 	    		<input type="text" id="personDetailBirthDate" class="form-control datePicker" disabled="true"> 
 	    	</div>	        
@@ -42,13 +42,13 @@
 	<div class="input-group m-b"> 
 	    <span class="input-group-addon"><b>Sexo</b></span>    
 	    	<select id="personDetailGender" disabled="true" class="form-control m-b">
-	    		<option value="1">Masculino</option>
-	    		<option value="2">Femenino</option>
+	    		<option value="1">{{{ Lang::get('titles.mae') }}}</option>
+	    		<option value="2">{{{ Lang::get('titles.female') }}}</option>
 	    	</select>	        
     </div>   
 	 
 	<div class="input-group m-b"> 
-	    <span class="input-group-addon"><b>Teléfono</b></span>    
+	    <span class="input-group-addon"><b>{{{ Lang::get('titles.phone') }}}</b></span>    
 	    <div class="col-lg-10">
 	    	<input type="text" id="personDetailPhone" class="form-control" disabled="true">         
     	</div>  	
@@ -59,7 +59,8 @@
 <div id="addDirectFamiliarDialog-form" title='Agregar padre' style="display: none">
 	<div id='addDirectFamiliarDialog-form-message'>
 		
-			<input type="text" name="name" id="newPerson_name" class="form-control" placeholder="Nombre*">
+			<input type="text" name="name" id="newPerson_name" class="form-control" 
+			placeholder="Nombre">
 	 
 		  	<input type="text" name="lastname" id="newPerson_lastname" class="form-control" placeholder="Apellido*">  	      
 		 

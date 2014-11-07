@@ -16,6 +16,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use App\Models\NodePerson;
 
 class NodePersonService extends BaseService 
@@ -23,13 +24,7 @@ class NodePersonService extends BaseService
     /**
     * Queries
     */
-    const GET_ALL_FAMILY = 'MATCH (person:Person)<-[:PARENT*0..]->(parents)
-                            WHERE person.personId = "ROOT"
-                            RETURN parents';
-
-    const GET_NODE_PERSON_BY_PERSON_ID = 'MATCH (person:NodePerson)
-                            WHERE person.personId = "ROOT"
-                            RETURN person';
+    const GET_ALL_FAMILY = 'MATCH (n:NodePerson {personId: ROOT})-[r*]-(p) RETURN DISTINCT p';
 
     /**
      * General constants
@@ -45,11 +40,10 @@ class NodePersonService extends BaseService
     public function nodePersonExists($personId)
     {
         $existsAlready = false;
-        $query = str_replace("ROOT", $personId, self::GET_NODE_PERSON_BY_PERSON_ID);
-         foreach (NodePerson::query($query)->get() as $person) {
+        $node = NodePerson::where('personId','=',$personId)->first();
+        if ($node != null) {
             $existsAlready = true;
         }
-
         return $existsAlready;
     }
 
@@ -135,12 +129,21 @@ class NodePersonService extends BaseService
     public function getFamily($personId)
     {
         $family = array();
-        $query = str_replace("ROOT", $personId, self::GET_ALL_FAMILY);
         
-        foreach (NodePerson::query($query)->get() as $familiar) {
-            $family[] = $familiar;
+        $query = str_replace("ROOT", $personId, self::GET_ALL_FAMILY);        
+         
+        $result = DB::connection('neo4j')->select($query);
+        
+        foreach ($result as $item) {
+            $personId = $item->current()->getProperties('personId');
+            $person = $this->findById($personId);
+
+            if ($person != null) {
+                $family[] = $person;
+            }
         }
-        return $family;
+
+        return $family;             
     }       
 
      /**
@@ -172,20 +175,41 @@ class NodePersonService extends BaseService
      * @param  $parent The son's parent to search
      * @return Persons   
      */
-    public function getSons($parent)
+    public function getSons($parentId)
     {
         $sons = array();
 
         foreach (NodePerson::with('parents')->get() as $son)
         {
             foreach ($son->parents as $parentItem) {
-                if ($parentItem->name == $parent) {
+                if ($parentItem->personId == $parentId) {
                     array_push($sons,$son);
                 }
             }
         }
 
         return $sons;
+    }
+
+    /**
+     * Return if the person has sons
+     * @param  personId
+     * @return Bool   
+     */
+    public function hasSons($personId)
+    {
+        $hasSons = false;
+
+        foreach (NodePerson::with('parents')->get() as $son)
+        {
+            foreach ($son->parents as $parentItem) {
+                if ($parentItem->personId == $personId) {
+                    $hasSons = true;
+                }
+            }
+        }
+
+       return $hasSons;
     }
 
     /**

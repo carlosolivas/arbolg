@@ -109,7 +109,7 @@ function initializeCytoscape()
       /*roots: rootNodes,*/
       animationDuration: 1500,
       directed: true,
-      avoidOverlap: true,
+      avoidOverlap: false,
       maximalAdjustments: 10
     }
 

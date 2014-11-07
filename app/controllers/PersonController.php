@@ -28,7 +28,7 @@ class PersonController extends BaseController
 	{
 		try {
 
-			$person = Auth::user()->Person;
+			$person = Auth::user()->Person;	
 
 			/* Check if the NodePerson for this user wasn´t created yet */
 			if (!($this->get('NodePerson')->nodePersonExists($person->id))) {
@@ -127,8 +127,7 @@ class PersonController extends BaseController
 			return View::make('person.tree');
 			
 		} catch (Exception $e) {
-			/*return Redirect::to('error')->with('error', $e);*/
-			return $e;
+			return Redirect::to('error')->with('error', $e);			
 		}		
 	}
 
@@ -138,77 +137,65 @@ class PersonController extends BaseController
      */  
 	public function get_loadTreePersons()
 	{
-		$user = Auth::user();		
+		$user = Auth::user();
 		$personLogged = $user->Person->id;
 		$family = $this->get('NodePerson')->getFamily($personLogged);
 		$nodes = array();
-		foreach ($family as $nodePerson) {	
-
+		foreach ($family as $nodePerson) {
 			$person = $this->personRepository->getById($nodePerson->personId);
-
 			// Check if can add more Parents
-			$canAddParents = $this->get('NodePerson')->canAddParents($nodePerson);	
-
+			$canAddParents = $this->get('NodePerson')->canAddParents($nodePerson);
 			// Set the root Node
-			$isRootNode = false;		
+			$isRootNode = false;
 			if ($nodePerson->personId == $personLogged) {
 				$isRootNode = true;
 			}
-
 			$personId = (string)$person->id;
 			$dataOfPerson = array(
-				"id" 			=> $personId, 
-				"name" 			=> $person->name, 
-				"lastname" 		=> $person->lastname,
-				"mothersname" 	=> $person->mothersname,
-				"email" 		=> $person->email,				
-				"birthdate"	 	=> $person->birthdate,
-				"gender"		=> $person->gender,
-				"phone"			=> $person->phone,
-				"fullname"		=> $person->name . " " . $person->lastname . " " . $person->mothersname,
+				"id" => $personId,
+				"name" => $person->name,
+				"lastname" => $person->lastname,
+				"mothersname" => $person->mothersname,
+				"email" => $person->email,
+				"birthdate"	=> $person->birthdate,
+				"gender"	=> $person->gender,
+				"phone"	=> $person->phone,
+				"fullname"	=> $person->name . " " . $person->lastname . " " . $person->mothersname,
 				"canAddParents"	=> $canAddParents,
 				"isRootNode"	=> $isRootNode
-				);
-
+			);
 			$data = array('data' => $dataOfPerson);
 			array_push($nodes, $data);
 		}
-		
-		return Response::json( $nodes );		
+		return Response::json( $nodes );
 	}
-
+	
 	/**
-     * Get the relations between the Person's familiars
-     * @return Node Persons   
-     */ 
+	* Get the relations between the Person's familiars
+	* @return Node Persons
+	*/
 	public function get_loadTreeRelations()
 	{
-		$user = Auth::user();		
-		$personLogged = $user->id;
+		$user = Auth::user();
+		$personLogged = $user->Person->id;
 		$family = $this->get('NodePerson')->getFamily($personLogged);
-
+		
 		$relations = array();
-		foreach ($family as $person) {			
-
-			foreach ($person->parents as $nodeParent) {	
-
+		foreach ($family as $person) {
+			foreach ($person->parents as $nodeParent) {
 				$parent = $this->personRepository->getById($nodeParent->personId);
-
-				// Source is the parent of person					
+				// Source is the parent of person
 				$source = (string)$parent->id;
-
-				// Target is the person 
+				// Target is the person
 				$target = (string)$person->personId;
-
 				$dataParOfRelations = array("source" => $source, "target" => $target);
 				$data = array("data" => $dataParOfRelations);
-
 				array_push($relations, $data);
 			}
 		}
-
-		return Response::json( $relations );	
+		return Response::json( $relations );
 	}
+
 
 	/**
      * This function creates a Person, a NodePerson and relate this NodePerson with 

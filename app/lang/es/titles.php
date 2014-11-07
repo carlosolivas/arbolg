@@ -20,6 +20,8 @@ return array(
 	"country"				=> 'País',
 	"biography"				=> 'Biografía',
 	"son"					=> 'Hijo/a',
-	"parent"				=> 'Padre/Madre'
+	"parent"				=> 'Padre/Madre',
+	"birth"					=> 'Nació?',
+	"phone"					=> 'Teléfono'
 
 );
