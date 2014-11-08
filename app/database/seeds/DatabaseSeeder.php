@@ -20,7 +20,7 @@ class UsersTableSeeder extends Seeder {
 
   public function run()
   {
-    /*$user = new s4h\core\User;
+    $user = new s4h\core\User;
     $user->username = 'bartsimpson';
     $user->email = 'bart@gmail.com';
     $user->password = 'Secret1234';
@@ -44,7 +44,7 @@ class UsersTableSeeder extends Seeder {
       Log::info('Unable to create user '.$user->username, (array)$user->errors());
     } else {
       Log::info('Created user "'.$user->username.'" <'.$user->email.'>');
-    }*/
+    }
 
     $user = new s4h\core\User;
     $user->username = 'milhouse';
