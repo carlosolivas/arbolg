@@ -18,6 +18,6 @@ class User extends ConfideUser {
 	}
 
 	public function Person() {
-		return $this->hasOne('s4h\core\Person');
+		return $this->belongsTo('s4h\core\Person', 'person_id', 'id');
 	}
 }
