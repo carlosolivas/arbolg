@@ -13,4 +13,8 @@ class Family extends \Eloquent {
     protected $fillable = [];
 
     protected $table = 'families';
+
+    public function Suburb() {
+        return $this->belongsTo('s4h\core\Suburb');
+    }
 } 
