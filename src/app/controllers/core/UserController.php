@@ -5,6 +5,7 @@ use s4h\core\CountryRepositoryInterface;
 use s4h\core\PersonRepositoryInterface;
 use s4h\core\SuburbRepositoryInterface;
 use s4h\social\GroupRepositoryInterface;
+
 /*
 |--------------------------------------------------------------------------
 | Confide Controller Template
@@ -29,8 +30,8 @@ class UserController extends BaseController {
         PersonRepositoryInterface $person,
         CountryRepositoryInterface $country,
         SuburbRepositoryInterface $suburb,
-        GroupRepositoryInterface $group
-    ) {
+        GroupRepositoryInterface $group) {
+
 		$this->user = $user;
         $this->role = $role;
         $this->person = $person;
@@ -82,11 +83,9 @@ class UserController extends BaseController {
 	 * Displays the login form
 	 *
 	 */
-	public function login() {
+	public function login() {	
 		if (Confide::user()) {
-			// If user is logged, redirect to internal
-			// page, change it to '/admin', '/dashboard' or something
-			return Redirect::to('/');
+			return Redirect::to('/tree');
 		} else {
 			//return View::make(Config::get('confide::login_form'));
 			return View::make('login/index');
@@ -112,8 +111,9 @@ class UserController extends BaseController {
 		if (Confide::logAttempt($input, Config::get('confide::signup_confirm'))) {
 			// Verificamos si debemos de enviarlo al wizard de registro
 			// Antes de mandarlo a la ruta deseada
-			$person = Auth::user()->Person;
 
+			$person = Auth::user()->Person;
+			
             if ($person->name = '') {
 				// Si no tiene registro en la tabla userdetails
 				return Redirect::to('/confirm');
@@ -226,7 +226,7 @@ class UserController extends BaseController {
 	public function logout() {
 		Confide::logout();
 
-		return Redirect::to('/');
+		return Redirect::to('login');
 	}
 
 	/**

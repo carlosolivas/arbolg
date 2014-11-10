@@ -48,9 +48,13 @@
     
     <!-- Styles -->
     {{ HTML::style('assets/css/style.css'); }}
+
+    <!-- jQuery UI -->
+    {{ HTML::style('assets/css/jquery-ui.min.css'); }}
     
     <!-- Mainly scripts -->
     {{ HTML::script('assets/js/jquery-1.10.2.js'); }}
+    {{ HTML::script('assets/js/jquery-ui.min.js'); }}
     {{ HTML::script('assets/js/bootstrap.min.js'); }}
     {{ HTML::script('assets/js/plugins/metisMenu/jquery.metisMenu.js'); }}
     
@@ -82,6 +86,10 @@
     
     <!-- Jquery preimage -->
     {{ HTML::script('assets/js/plugins/preimage/preimage.js'); }}
+
+    <!-- Cytoscape -->
+    {{ HTML::script('assets/js/cytoscape.js'); }}
+
     
 @yield('head')
 </head>
@@ -99,14 +107,14 @@
                             <img alt="image" class="img-circle" src="{{ asset('assets/img/profile_small.jpg') }}">
                              </span>
                             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                            <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">Amelia Smith</strong>
-                             </span> <span class="text-muted text-xs block">Art Director <b class="caret"></b></span> </span> </a>
+                            <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">{{ Confide::User()->username }}</strong>
+                             </span> <span class="text-muted text-xs block"> <b class="caret"></b></span> </span> </a>
                             <ul class="dropdown-menu animated fadeInRight m-t-xs">
                                 <li><a href="profile.html">Profile</a></li>
                                 <li><a href="contacts.html">Contacts</a></li>
                                 <li><a href="mailbox.html">Mailbox</a></li>
                                 <li class="divider"></li>
-                                <li><a href="login.html">Logout</a></li>
+                                <li><a href="user/logout">Logout</a></li>
                             </ul>
                         </div>
                         <div class="logo-element">
@@ -115,10 +123,8 @@
 
                     </li>
                     <li>
-                        <a href="index.html"><i class="fa fa-th-large"></i> <span class="nav-label">Dashboard</span> </a>
-
+                        <a href="/tree"><i class="fa fa-th-large"></i> <span class="nav-label">Todas las personas</span> </a>   
                     </li>
-
                     <li>
                         <a href="#"><i class="fa fa-bar-chart-o"></i> <span class="nav-label">Graphs</span><span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
@@ -260,7 +266,7 @@
                         <li>
                             <div class="dropdown-messages-box">
                                 <a href="profile.html" class="pull-left">
-                                    <img alt="image" class="img-circle" src="img/a7.jpg">
+                                    <img alt="image" class="img-circle" src="assets/img/a7.jpg">
                                 </a>
                                 <div class="media-body">
                                     <small class="pull-right">46h ago</small>
@@ -273,7 +279,7 @@
                         <li>
                             <div class="dropdown-messages-box">
                                 <a href="profile.html" class="pull-left">
-                                    <img alt="image" class="img-circle" src="img/a4.jpg">
+                                    <img alt="image" class="img-circle" src="assets/img/a4.jpg">
                                 </a>
                                 <div class="media-body ">
                                     <small class="pull-right text-navy">5h ago</small>
@@ -286,7 +292,7 @@
                         <li>
                             <div class="dropdown-messages-box">
                                 <a href="profile.html" class="pull-left">
-                                    <img alt="image" class="img-circle" src="img/profile.jpg">
+                                    <img alt="image" class="img-circle" src="assets/img/profile.jpg">
                                 </a>
                                 <div class="media-body ">
                                     <small class="pull-right">23h ago</small>

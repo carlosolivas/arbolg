@@ -6,4 +6,4 @@ composer.lock
 .env.php
 .DS_Store
 Thumbs.db
-/vendor/filp/whoops/docs
+/vendor/filp/whoops/docs/API

@@ -15,4 +15,20 @@ class BaseController extends Controller {
 		}
 	}
 
+	 /**
+     * Get a new instance of the specified service
+     *
+     * @param string $serviceName The service name
+     *
+     * @return Service
+     */
+    protected function get($servicePrefix) 
+    {
+        return App::make($servicePrefix . 'Service');
+    } 
+
+    public function error()
+    {
+    	return View::make('500')->with("error", Session::get('error'));
+    }
 }
