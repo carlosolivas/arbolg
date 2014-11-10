@@ -14,7 +14,7 @@ class Person extends \Eloquent {
 	}
 
 	public function User() {
-		return $this->belongsTo('User', 'user_id', 'id');
+		return $this->hasOne('s4h\core\User', 'user_id', 'id');
 	}
 
 	public function Groups() {

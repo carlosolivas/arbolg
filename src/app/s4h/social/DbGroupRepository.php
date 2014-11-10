@@ -2,6 +2,13 @@
 namespace s4h\social;
 
 class DbGroupRepository implements GroupRepositoryInterface {
+    protected $file;
+
+    public function __construct(\s4h\core\FileRepositoryInterface $file)
+    {
+        $this->file = $file;
+    }
+
 	public function getAll() {
 		return Group::all();
 	}
@@ -25,10 +32,12 @@ class DbGroupRepository implements GroupRepositoryInterface {
 	}
 
 	public function createFamily($data) {
-		//Add family Avatar
-		//TODO
-		$file_id = 26;
-
+        //store family's avatar
+        if (isset($data['photo'])) {
+            $file_id = $file->store($data['photo']);
+        } else {
+            $file_id = 26;
+        }
 		//Create the base group
 		$group = new Group;
 		$group->GroupName = $data['name'];
@@ -40,9 +49,8 @@ class DbGroupRepository implements GroupRepositoryInterface {
 		$group->save();
 
 		//Create the family specific object
-		$family = new s4h\core\Family;
+		$family = new Family;
 		$family->name = $data['name'];
-		$family->user_id = \Auth::user()->id;
 		$family->group_id = $group->id;
 		$family->countrie_id = $data['country_id'];
 		$family->zipcode_id = $data['zipcode_id'];
@@ -59,7 +67,7 @@ class DbGroupRepository implements GroupRepositoryInterface {
 
 	public function addGroupMember($groupId, $personId, $admin) {
 		$group = $this->get($groupId);
-		$group->Persons()->attach($personId, array('admin' => $admin));
+		$group->Persons()->attach($personId, array('admin'=>$admin, 'role_id'=>1));
 	}
 
     public function getGroupMembers($groupId) {

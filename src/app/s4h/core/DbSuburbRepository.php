@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: carlosolivas
- * Date: 16/10/14
- * Time: 00:13
+ * Date: 27/10/14
+ * Time: 11:09
  */
 
 namespace s4h\core;
@@ -18,7 +18,7 @@ class DbSuburbRepository implements SuburbRepositoryInterface {
     public function getCity($suburbId)
     {
         $suburb = Suburb::find($suburbId);
-        $city = City::find($suburb->id);
+        return $suburb->City;
     }
 
     /**
@@ -28,7 +28,8 @@ class DbSuburbRepository implements SuburbRepositoryInterface {
      */
     public function getZipcode($suburbId)
     {
-        return Suburb::find($suburbId)->Zipcode;
+        $suburb = Suburb::find($suburbId);
+        return $suburb->ZipCode;
     }
 
     public function getSuburbsByZipCodeId($zipcodeid)

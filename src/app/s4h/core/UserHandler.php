@@ -16,7 +16,7 @@ class UserHandler {
 		$personId = $this->person->store(array(
 			'user_id' => $user->id,
 			'role_id' => 0,
-			'file_id' => 0,
+			'file_id' => 25,
 			'name' => '',
 			'lastname' => '',
 			'mothersname' => '',
@@ -36,6 +36,8 @@ class UserHandler {
 			'numberint' => '',
 			'numberext' => '',
 			'phone' => '',
+            'user_id' => $user->id,
+            'file_id' => 26
 		));
 
 		//Add the Person to the Family

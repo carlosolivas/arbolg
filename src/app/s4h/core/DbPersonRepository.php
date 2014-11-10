@@ -17,14 +17,14 @@ class DbPersonRepository implements PersonRepositoryInterface
 		if (isset($data['photo'])) {
 			$file_id = $file->store($data['photo']);
 		} else {
-
-			$file_id = 0;
+			$file_id = 25;
 		}
 		//Store Person in the DB
-		$p = new Person();
-		$p->user_id = $data['user_id'];
-		$p->role_id = $data['role_id'];
-		$p->file_id = $data['file_id'];
+        if (isset($data['id']))
+            $p = Person::findOrNew($data['id']);
+        else
+		    $p = new Person();
+		$p->file_id = $file_id;
 		$p->name = $data['name'];
 		$p->lastname = $data['lastname'];
 		$p->mothersname = $data['mothersname'];
