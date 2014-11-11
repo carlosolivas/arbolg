@@ -109,8 +109,8 @@ function initializeCytoscape()
       /*roots: rootNodes,*/
       animationDuration: 1500,
       directed: true,
-      avoidOverlap: false,
-      maximalAdjustments: 10
+      avoidOverlap: true,
+      maximalAdjustments: 100
     }
 
   });
@@ -190,10 +190,13 @@ function initializeCytoscape()
           addDirectFamiliarDialog.dialog( "open" );
          }
        },
-        "addBrother" : {
-         text: "Agregar hermano",
-         id: "addBrother",
-         class: "btn btn-sm btn-primary"
+        "extendTree" : {
+         text: "Extender árbol desde aquí",
+         id: "extendTree",
+         class: "btn btn-sm btn-primary",
+         click: function()          {
+          window.location = /extendTree/ +  parseInt(personDetail_id);
+        }
        },
        "closeMenu" : {
          text: "Cerrar",

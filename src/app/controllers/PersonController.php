@@ -140,64 +140,118 @@ class PersonController extends BaseController
      */  
 	public function get_loadTreePersons()
 	{
-		$user = Auth::user();
+		$user = Auth::user();		
 		$personLogged = $user->Person->id;
 		$family = $this->get('NodePerson')->getFamily($personLogged);
 		$nodes = array();
-		foreach ($family as $nodePerson) {
+		foreach ($family as $nodePerson) {	
+
 			$person = $this->personRepository->getById($nodePerson->personId);
+
 			// Check if can add more Parents
-			$canAddParents = $this->get('NodePerson')->canAddParents($nodePerson);
+			$canAddParents = $this->get('NodePerson')->canAddParents($nodePerson);	
+
 			// Set the root Node
-			$isRootNode = false;
+			$isRootNode = false;		
 			if ($nodePerson->personId == $personLogged) {
 				$isRootNode = true;
 			}
+
 			$personId = (string)$person->id;
 			$dataOfPerson = array(
-				"id" => $personId,
-				"name" => $person->name,
-				"lastname" => $person->lastname,
-				"mothersname" => $person->mothersname,
-				"email" => $person->email,
-				"birthdate"	=> $person->birthdate,
-				"gender"	=> $person->gender,
-				"phone"	=> $person->phone,
-				"fullname"	=> $person->name . " " . $person->lastname . " " . $person->mothersname,
+				"id" 			=> (string)$personId, 
+				"name" 			=> $person->name, 
+				"lastname" 		=> $person->lastname,
+				"mothersname" 	=> $person->mothersname,
+				"email" 		=> $person->email,				
+				"birthdate"	 	=> $person->birthdate,
+				"gender"		=> $person->gender,
+				"phone"			=> $person->phone,
+				"fullname"		=> $person->name . " " . $person->lastname . " " . $person->mothersname,
 				"canAddParents"	=> $canAddParents,
 				"isRootNode"	=> $isRootNode
-			);
-			$data = array('data' => $dataOfPerson);
-			array_push($nodes, $data);
-		}
+				);
 
-		return Response::json( $nodes );
-	}
-	
-	/**
-	* Get the relations between the Person's familiars
-	* @return Node Persons
-	*/
-	public function get_loadTreeRelations()
-	{
-		$user = Auth::user();
-		$personLogged = $user->Person->id;
-		$family = $this->get('NodePerson')->getFamily($personLogged);
-		
-		$relations = array();
-		foreach ($family as $person) {
-			foreach ($person->parents as $nodeParent) {
-				$parent = $this->personRepository->getById($nodeParent->personId);
-				// Source is the parent of person
-				$source = (string)$parent->id;
-				// Target is the person
-				$target = (string)$person->personId;
-				$dataParOfRelations = array("source" => $source, "target" => $target);
-				$data = array("data" => $dataParOfRelations);
-				array_push($relations, $data);
+			$css = array('shape' => 'rectangle');	
+			$data = array('data' => $dataOfPerson, 'css' => $css);			
+			array_push($nodes, $data);
+
+			if ($this->get('NodePerson')->hasSons($personId)) {
+
+				/* c_id indicates there is the connector node for this NodePerson */
+				$conectorNode = array(
+					"id" 			=> 'c_' . (string)$personId, 
+					"name" 			=> ''
+					);	
+
+				$css = array('height' => 10, 'width' => 10);		
+
+				$data = array('data' => $conectorNode, 'css' => $css);
+				array_push($nodes, $data);
 			}
 		}
-		return Response::json( $relations );
+		
+		return Response::json( $nodes );		
+	}
+
+	/**
+     * Get the relations between the Person's familiars
+     * @return Node Persons   
+     */ 
+	public function get_loadTreeRelations()
+	{
+		$user = Auth::user();		
+		$personLogged = $user->id;
+		$family = $this->get('NodePerson')->getFamily($personLogged);
+
+		$relations = array();
+		foreach ($family as $person) {			
+
+			foreach ($person->parents as $nodeParent) {	
+
+				/*$parent = $this->personRepository->getById($nodeParent->personId);*/
+
+				/* Check if the connection between the node parent and his connector wasn't already added */
+				$relationAlreadyAdded = false;
+
+				foreach ($relations as $data) {
+
+					if (($data["data"]['source'] == (string)$nodeParent->personId) && ($data["data"]['target'] == ('c_' . (string)$nodeParent->personId))) {
+						$relationAlreadyAdded = true;
+					}
+				}
+
+				if (!$relationAlreadyAdded) {
+
+					// Source is the parent of person					
+					$source = (string)$nodeParent->personId;
+
+					// Target is the connector
+					$target = 'c_' . (string)$nodeParent->personId;
+
+					$dataParOfRelations = array("source" => $source, "target" => $target);
+					$data = array("data" => $dataParOfRelations);
+
+					array_push($relations, $data);
+
+				}			
+
+				// Source is the connector
+				$source = 'c_' . (string)$nodeParent->personId;
+
+				// Target is the person
+				$target = (string)$person->personId;
+
+				$dataParOfRelations = array("source" => $source, "target" => $target);
+				$data = array("data" => $dataParOfRelations);
+
+				array_push($relations, $data);	
+										
+							
+			}
+		}
+
+		return Response::json( $relations );	
 	}
 
 
@@ -271,11 +325,12 @@ class PersonController extends BaseController
 	/**
      * This function return the view and the corresponding options to send a tree extension request 
      * the the corresponding son
+     * @param id The id of the connnection NodePerson from extends the tree
      * @return View
      */ 
 	public function get_extendTree($id)
 	{
-		$connectionNode = $this->personRepository->getById($id);
+		$connectionPerson = $this->personRepository->getById($id);
 
 		/* Get the the avalable Persons to connect */
 		/* Simulation of Van Houten  family are available*/
@@ -295,28 +350,36 @@ class PersonController extends BaseController
 		return View::make('person.extendTree')->with("connectionNode" , $connectionPerson )->with("availablePersons", $availablePersons);
 	}
 
+	/**
+     * The function wich manages the request
+     * @param id The id of the NodePerson to connect
+     * @return View
+     */ 
 	public function get_sendRequest($id)
 	{
+		if (is_string($id)) {
+			$id = (int)$id;
+		}
 		$connectionPersonId = (int)Session::get('connectionPersonId');
 		$connectionPerson = $this->get('NodePerson')->findById($connectionPersonId);
 
-		$personToConnect = $this->personRepository->getById($id);
+		$nodePersonToConnect = $this->get('NodePerson')->findById($id);
 
 		/* Connect with Distribution module */
 
 		/* Simulating  that the Person to connect discard his tree */
 
 		/* Deleting parents */
-		if ($personToConnect->parents != null) {
-			foreach ($personToConnect->parents as $parent) {
-				$this->get('NodePerson')->removeParent($personToConnect->id, $parent->personId);
+		if ($nodePersonToConnect->parents != null) {
+			foreach ($nodePersonToConnect->parents as $parent) {
+				$this->get('NodePerson')->removeParent($nodePersonToConnect->personId, $parent->personId);
 			}
 		}		
 
 		/* New parents */
 		foreach ($connectionPerson->parents as $parent) {
 
-			$this->get('NodePerson')->addParent($personToConnect->id, $parent->personId);
+			$this->get('NodePerson')->addParent($nodePersonToConnect->personId, $parent->personId);
 		}
 
 		return Redirect::to('/tree');

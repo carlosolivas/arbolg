@@ -123,7 +123,7 @@
 
                     </li>
                     <li>
-                        <a href="/tree"><i class="fa fa-th-large"></i> <span class="nav-label">Todas las personas</span> </a>   
+                        <a href="/tree"><i class="fa fa-th-large"></i> <span class="nav-label">{{{Lang::get('titles.tree')}}}</span> </a>   
                     </li>
                     <li>
                         <a href="#"><i class="fa fa-bar-chart-o"></i> <span class="nav-label">Graphs</span><span class="fa arrow"></span></a>

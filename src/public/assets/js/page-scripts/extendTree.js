@@ -11,7 +11,9 @@ $(function() {
 
       if (confirm($("#sendRequestQuestion").text()) == true) {
         window.location = /sendRequest/ + idOfDropped;       
-      } 
+      } else {
+         $( ".toAssign" ).animate({left:0,top:0});     
+      }
     }
   });  
 

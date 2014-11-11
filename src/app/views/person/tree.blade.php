@@ -42,7 +42,7 @@
 	<div class="input-group m-b"> 
 	    <span class="input-group-addon"><b>Sexo</b></span>    
 	    	<select id="personDetailGender" disabled="true" class="form-control m-b">
-	    		<option value="1">{{{ Lang::get('titles.mae') }}}</option>
+	    		<option value="1">{{{ Lang::get('titles.male') }}}</option>
 	    		<option value="2">{{{ Lang::get('titles.female') }}}</option>
 	    	</select>	        
     </div>   
@@ -73,8 +73,8 @@
 		      
 			<select id="newPerson_gender" class="form-control">
 				<option default disable value="">Sexo*</option>
-				<option value="1">Masculino</option>
-				<option value="2">Femenino</option>
+				<option value="1">{{{ Lang::get('titles.male') }}}</option>
+				<option value="2">{{{ Lang::get('titles.female') }}}</option>
 			</select>	       
 
 		  	<input type="text" name="phone" id="newPerson_phone" class="form-control" placeholder="Teléfono">   

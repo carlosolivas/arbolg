@@ -243,13 +243,18 @@ class NodePersonService extends BaseService
      */
     public function canAddParents($person)
     {
-        if ($person->parents()->count() < self::MAX_PARENTS_ALLOWED) 
-        {
-            return true;  
+        if ($person->parents != null) {
+           if ($person->parents()->count() < self::MAX_PARENTS_ALLOWED) 
+            {
+                return true;  
+            }
+            else
+            {
+                return false;
+            }
+        } else{
+            return true;
         }
-        else
-        {
-            return false;
-        }
+        
     }
 }

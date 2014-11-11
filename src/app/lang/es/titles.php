@@ -25,7 +25,8 @@ return array(
 	"phone"					=> 'Teléfono',
 
 	"dropHere" 				=> 'Arrastre aquí para conectar con: ',
-	"sendRequests"			=> 'Se enviarán las solicitudes a los Usuarios conectados. ¿ Desea continuar ? : ',
-	"continue"				=> 'Si, enviar Solicitudes!'
+	"sendRequests"			=> 'Se enviarán las solicitudes a los usuarios que intenta conectar. ¿ Desea continuar ? : ',
+	"continue"				=> 'Si, enviar Solicitudes!',
+	"tree"					=> 'Árbol familiar'
 
 );
