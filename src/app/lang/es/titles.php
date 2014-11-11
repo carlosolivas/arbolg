@@ -22,6 +22,10 @@ return array(
 	"son"					=> 'Hijo/a',
 	"parent"				=> 'Padre/Madre',
 	"birth"					=> 'Nació?',
-	"phone"					=> 'Teléfono'
+	"phone"					=> 'Teléfono',
+
+	"dropHere" 				=> 'Arrastre aquí para conectar con: ',
+	"sendRequests"			=> 'Se enviarán las solicitudes a los Usuarios conectados. ¿ Desea continuar ? : ',
+	"continue"				=> 'Si, enviar Solicitudes!'
 
 );

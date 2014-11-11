@@ -108,6 +108,20 @@ class NodePersonService extends BaseService
     }
 
     /**
+     * REmove parent to a NodePerson
+     * @param int $sonId The id of the son
+     * @param int $parentId The id of the parent
+     */
+    public function removeParent($sonId, $parentId)
+    {
+        $person = Person::where('personId', '=', $sonId)->first();    
+    
+        $personToUnAsignLikeParent = Person::where('personId', '=', $parent)->first();
+
+        $person->parents()->detach($personToUnAsignLikeParent);                
+    }
+
+    /**
      * Add couple to a NodePerson
      * @param int $root The id of the person
      * @param int $couple The id of the couple

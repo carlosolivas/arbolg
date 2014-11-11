@@ -22,16 +22,16 @@ class PersonController extends BaseController
 	/**
      * This function check if the Person exists already in the graph model
      * and create the view for the tree
-     * @return Node Persons   
+     * @return View   
      */ 
 	public function get_tree()
 	{
 		try {
 
-			$person = Auth::user()->Person;	
+			$person = Auth::user()->Person;
 
 			/* Check if the NodePerson for this user wasn´t created yet */
-			if (!($this->get('NodePerson')->nodePersonExists($person->id))) {
+			if (!($this->get('NodePerson')->nodePersonExists($person->id))) {				
 
 				/* Create the NodePerson for this user */
 				$this->get('NodePerson')->create($person->id,$person->id);	
@@ -56,72 +56,75 @@ class PersonController extends BaseController
 				/* The NodePerson of logged Person */
 				$nodePersonLogged = $this->get('NodePerson')->findById($person->id);
 
-				foreach ($directFamiliars as $directFamiliar) 
-				{
-					/* If is not the same Person who are logged */
-					if ( $directFamiliar->id != $person->id) {
+				if ( $nodePersonLogged != null ) {				
+				
+					foreach ($directFamiliars as $directFamiliar) 
+					{
+						/* If is not the same Person who are logged */
+						if ( $directFamiliar->id != $person->id) {
 
-						/* Create the NodePerson for this direct familiar */
-						$this->get('NodePerson')->create($directFamiliar->id,$directFamiliar->id);
+							/* Create the NodePerson for this direct familiar */
+							$this->get('NodePerson')->create($directFamiliar->id,$directFamiliar->id);
 
-						/* Now we check the role of the logged Person and we infer how relate it to
-						the direct familiar */
-						if ($person->role_id == self::FATHER || $person->role_id == self::MOTHER) {
-							if ($directFamiliar->role_id == self::SON) {
-								$sonId = $directFamiliar->id;
-								$parentId = $person->id;
+							/* Now we check the role of the logged Person and we infer how relate it to
+							the direct familiar */
+							if ($person->role_id == self::FATHER || $person->role_id == self::MOTHER) {
+								if ($directFamiliar->role_id == self::SON) {
+									$sonId = $directFamiliar->id;
+									$parentId = $person->id;
 
-								/* Add as parent the logged Person */
-								$this->get('NodePerson')->addParent($sonId, $parentId);
-
-								/* Add as parent the coup of logged Person */
-								if ($nodePersonLogged->coup != null) {
-									$this->get('NodePerson')->addParent($sonId, $nodePersonLogged->coup->personId);
-								}
-							}
-
-							if ($directFamiliar->role_id == self::FATHER || $directFamiliar->role_id == self::MOTHER) {
-								$coupId = $directFamiliar->id;
-								/* Add as the coup the logged Person and vice versa */
-								$this->get('NodePerson')->addCoup($person->id, $coupId);
-								$this->get('NodePerson')->addCoup($directFamiliar->id, $person->id);
-							}	
-						}
-
-						if ($person->role_id == self::SON) {
-							if ($directFamiliar->role_id == self::FATHER || $directFamiliar->role_id == self::MOTHER) {
-								$sonId = $person->id;
-								$parentId = $directFamiliar->id;
-
-								/* Add as son the logged Person */
-								$this->get('NodePerson')->addParent($sonId, $parentId);
-
-								/* Unite the parents if already have loaded 2 of them */
-								if ($nodePersonLogged->parents()->count() == 2) {
-									foreach ($nodePersonLogged->parents as $parent) {
-										foreach ($nodePersonLogged->parents as $otherParent) {
-											if ($parent->personId != $otherParent->personId) {
-												$this->get('NodePerson')->addCoup($parent->personId, $otherParent->personId);
-											}
-										}
-									}								
-								}
-							}
-							if ($directFamiliar->role_id == self::SON) {
-
-								$sonId = $directFamiliar->id;
-
-								foreach ($nodePersonLogged->parents as $parentOfLoggedPerson) {
-									$parentId = $parentOfLoggedPerson->personId;
-
-									/* Add as parent the parent of logged person, and as son
-									the current direct familiar */
+									/* Add as parent the logged Person */
 									$this->get('NodePerson')->addParent($sonId, $parentId);
-								}							
+
+									/* Add as parent the coup of logged Person */
+									if ($nodePersonLogged->coup != null) {
+										$this->get('NodePerson')->addParent($sonId, $nodePersonLogged->coup->personId);
+									}
+								}
+
+								if ($directFamiliar->role_id == self::FATHER || $directFamiliar->role_id == self::MOTHER) {
+									$coupId = $directFamiliar->id;
+									/* Add as the coup the logged Person and vice versa */
+									$this->get('NodePerson')->addCoup($person->id, $coupId);
+									$this->get('NodePerson')->addCoup($directFamiliar->id, $person->id);
+								}	
 							}
-						}									
-					}
-				}		
+
+							if ($person->role_id == self::SON) {
+								if ($directFamiliar->role_id == self::FATHER || $directFamiliar->role_id == self::MOTHER) {
+									$sonId = $person->id;
+									$parentId = $directFamiliar->id;
+
+									/* Add as son the logged Person */
+									$this->get('NodePerson')->addParent($sonId, $parentId);
+
+									/* Unite the parents if already have loaded 2 of them */
+									if ($nodePersonLogged->parents()->count() == 2) {
+										foreach ($nodePersonLogged->parents as $parent) {
+											foreach ($nodePersonLogged->parents as $otherParent) {
+												if ($parent->personId != $otherParent->personId) {
+													$this->get('NodePerson')->addCoup($parent->personId, $otherParent->personId);
+												}
+											}
+										}								
+									}
+								}
+								if ($directFamiliar->role_id == self::SON) {
+
+									$sonId = $directFamiliar->id;
+
+									foreach ($nodePersonLogged->parents as $parentOfLoggedPerson) {
+										$parentId = $parentOfLoggedPerson->personId;
+
+										/* Add as parent the parent of logged person, and as son
+										the current direct familiar */
+										$this->get('NodePerson')->addParent($sonId, $parentId);
+									}							
+								}
+							}									
+						}
+					}	
+				}	
 			}
 
 			return View::make('person.tree');
@@ -167,6 +170,7 @@ class PersonController extends BaseController
 			$data = array('data' => $dataOfPerson);
 			array_push($nodes, $data);
 		}
+
 		return Response::json( $nodes );
 	}
 	
@@ -199,8 +203,7 @@ class PersonController extends BaseController
 
 	/**
      * This function creates a Person, a NodePerson and relate this NodePerson with 
-     * the the corresponding son
-     * @return Json   
+     * @return Json with the request status
      */ 
 	public function post_saveParent()
 	{
@@ -263,5 +266,59 @@ class PersonController extends BaseController
 		} catch (Exception $e) {
 			return Response::json( $e->getMessage() );
 		}		
+	}
+
+	/**
+     * This function return the view and the corresponding options to send a tree extension request 
+     * the the corresponding son
+     * @return View
+     */ 
+	public function get_extendTree($id)
+	{
+		$connectionNode = $this->personRepository->getById($id);
+
+		/* Get the the avalable Persons to connect */
+		/* Simulation of Van Houten  family are available*/
+		$rootPerson = $this->personRepository->getById(8); // Milhouse
+		$availablePersons = array();
+
+		foreach ($rootPerson->getFamily()->Persons as $p) {
+			$fullname = $p->name . " " . $p->lastname . " " . $p->mothersname;
+			$personItem = array('id' => $p->id, 
+				'fullname' => $fullname);
+
+			$availablePersons[] = $personItem;
+		}
+
+		Session::put('connectionPersonId', $connectionPerson->id);
+
+		return View::make('person.extendTree')->with("connectionNode" , $connectionPerson )->with("availablePersons", $availablePersons);
+	}
+
+	public function get_sendRequest($id)
+	{
+		$connectionPersonId = (int)Session::get('connectionPersonId');
+		$connectionPerson = $this->get('NodePerson')->findById($connectionPersonId);
+
+		$personToConnect = $this->personRepository->getById($id);
+
+		/* Connect with Distribution module */
+
+		/* Simulating  that the Person to connect discard his tree */
+
+		/* Deleting parents */
+		if ($personToConnect->parents != null) {
+			foreach ($personToConnect->parents as $parent) {
+				$this->get('NodePerson')->removeParent($personToConnect->id, $parent->personId);
+			}
+		}		
+
+		/* New parents */
+		foreach ($connectionPerson->parents as $parent) {
+
+			$this->get('NodePerson')->addParent($personToConnect->id, $parent->personId);
+		}
+
+		return Redirect::to('/tree');
 	}
 }

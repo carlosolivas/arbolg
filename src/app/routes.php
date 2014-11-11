@@ -10,6 +10,7 @@
 | and give it the Closure to execute when that URI is requested.
 |
 */
+Route::pattern('id', '[0-9]+');
 
 Route::group(array("before" => 'Confide'), function()
 {
@@ -34,6 +35,15 @@ Route::group(array("before" => 'Confide'), function()
         Route::post(
         '/saveParent',
         array('as' => 'saveParent', 'uses' => 'PersonController@post_saveParent'));
+
+        Route::get(
+        '/extendTree/{id}',
+        array('as' => 'extendTree', 'uses' => 'PersonController@get_extendTree'));
+
+         Route::get(
+        '/sendRequest/{id}',
+        array('as' => 'sendRequest', 'uses' => 'PersonController@get_sendRequest'));
+        
     });
 });
 
