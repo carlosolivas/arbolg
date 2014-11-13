@@ -1,5 +1,6 @@
 $(function(){ // on dom ready
 
+
 // Plugins configuration
 $('.datePicker').datepicker({
     format: 'dd/mm/yyyy',
@@ -144,6 +145,14 @@ function initializeCytoscape()
     var personDetail_fullname = this.data('fullname');    
     var personDetail_canAddParents = this.data('canAddParents');
 
+    /* Connect functionalities */   
+
+    $(".toAssignButton").click(function(){
+      window.location = /sendRequest/ + parseInt(personDetail_id) + "/" + parseInt(this.id);      
+    });
+
+    /* End Connect functionalities */
+
     // Familiar option selected
     var optionSelected = 0;
 
@@ -194,8 +203,14 @@ function initializeCytoscape()
          text: "Extender árbol desde aquí",
          id: "extendTree",
          class: "btn btn-sm btn-primary",
-         click: function()          {
-          window.location = /extendTree/ +  parseInt(personDetail_id);
+         click: function() {
+
+          /* slide */
+          $( this ).dialog().parent().hide("scale",200);
+          $("#suggesteds").show('slide');
+          /* slide */
+
+          /*window.location = /extendTree/ +  parseInt(personDetail_id);*/
         }
        },
        "closeMenu" : {
@@ -306,7 +321,7 @@ function initializeCytoscape()
        }
       }    
     });   
-    addDirectFamiliarDialog.dialog({ position: { my: "left+30 bottom", at: "right bottom", of: currentMousePos } }); 
+    addDirectFamiliarDialog.dialog({ position: { my: "left+30 bottom", at: "right bottom", of: currentMousePos } });     
 
     // Open the menu dialog when the user 'on tap' a node
     menuDialog.dialog( "open" );
@@ -397,4 +412,16 @@ function setValidationBlockMessage(fieldsCompleted)
     $("#validationBlockMessage").addClass( "alert-danger" );
   }
 }
+
+/* Suggested functionalities */
+$(document).on('mouseenter', '.toAssign', function () {
+    $(this).find(":button").show('slide');
+}).on('mouseleave', '.toAssign', function () {
+    $(this).find(":button").hide('slide');
+});
+
+$("#closeSuggesteds").click(function(){
+  $("#suggesteds").hide('slide');
+  $("html, body").animate({ scrollTop: 1 }, "slow");
+})
                     

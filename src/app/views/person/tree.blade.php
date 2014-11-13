@@ -2,12 +2,45 @@
 <title>Árbol genealógico</title>
  <!-- Tree script -->
 <style>
-#tree{
-  height: 100%;
-  width: 100%;
-}
+
+	#suggesteds{
+	  height: 20%;
+	  border: 3px solid #2f4050 !important;
+	}
+	#tree{
+	  height: 100%;
+	  width: 100%;
+	}
+	.toAssign { width: 100px; height: 100px; padding: 0.5em; float: left; margin: 10px 10px 10px 10px; }
+
+  	.ui-widget-header{
+	  	background: none !important;
+	  	color: gray !important;
+		border: 3px solid #2f4050 !important;
+  	}
+
+  .ui-widget-content{
+	  	background: white !important;
+	  	color: gray !important;
+		border: 3px solid #2f4050 !important;
+  }
+  .closebtn{
+  	margin-left: 99% !important;
+  }
 </style>
 @section('content')
+<div id="suggesteds" hidden>
+	@foreach ($suggestedPersons as $person)
+		<div class="ui-widget-content toAssign" personData= {{{ $person['fullname'] }}}>
+	  		<h4>{{{ $person['fullname'] }}}</h4>
+	  		<button class="btn btn-primary btn-xs toAssignButton" type="button" style="display: none" 
+	  		id= {{{ $person['id'] }}} >
+	  			<strong>{{{ Lang::get('titles.connect') }}}</strong>
+	  		</button>
+		</div>
+	@endforeach	
+	<button class="btn btn-warning btn-circle closebtn" type="button" id="closeSuggesteds"><i class="fa fa-times"></i></button>
+</div>
 <div id='tree'>                            
 </div>
 <div id="menu-form" title='Menu' style="display: none">

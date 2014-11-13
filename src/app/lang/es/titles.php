@@ -27,6 +27,10 @@ return array(
 	"dropHere" 				=> 'Arrastre aquí para conectar con: ',
 	"sendRequests"			=> 'Se enviarán las solicitudes a los usuarios que intenta conectar. ¿ Desea continuar ? : ',
 	"continue"				=> 'Si, enviar Solicitudes!',
-	"tree"					=> 'Árbol familiar'
+	"tree"					=> 'Árbol familiar',
+	"connect"				=> 'Conectar',
+	"close"					=> 'Cerrar',
+	"addParent"				=> 'Agregar Padre',
+	"addMother"				=> 'Agregar Madre'
 
 );

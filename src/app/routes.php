@@ -41,7 +41,7 @@ Route::group(array("before" => 'Confide'), function()
         array('as' => 'extendTree', 'uses' => 'PersonController@get_extendTree'));
 
          Route::get(
-        '/sendRequest/{id}',
+        '/sendRequest/{fromId}/{toId}',
         array('as' => 'sendRequest', 'uses' => 'PersonController@get_sendRequest'));
         
     });

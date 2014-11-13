@@ -28,6 +28,22 @@ class PersonController extends BaseController
 	{
 		try {
 
+			/* Suggesteds */
+			
+			$rootPerson = $this->personRepository->getById(8); // Milhouse
+			$suggestedPersons = array();
+
+			foreach ($rootPerson->getFamily()->Persons as $p) {
+				$fullname = $p->name . " " . $p->lastname . " " . $p->mothersname;
+				$personItem = array('id' => $p->id, 
+					'fullname' => $fullname);
+
+				$suggestedPersons[] = $personItem;
+			}
+
+			/**/
+			
+
 			$person = Auth::user()->Person;
 
 			/* Check if the NodePerson for this user wasn´t created yet */
@@ -127,7 +143,7 @@ class PersonController extends BaseController
 				}	
 			}
 
-			return View::make('person.tree');
+			return View::make('person.tree')->with('suggestedPersons', $suggestedPersons);
 			
 		} catch (Exception $e) {
 			return Redirect::to('error')->with('error', $e);			
@@ -355,15 +371,20 @@ class PersonController extends BaseController
      * @param id The id of the NodePerson to connect
      * @return View
      */ 
-	public function get_sendRequest($id)
+	public function get_sendRequest($fromId, $toId)
 	{
-		if (is_string($id)) {
-			$id = (int)$id;
+		if (is_string($fromId)) {
+			$fromId = (int)$fromId;
 		}
-		$connectionPersonId = (int)Session::get('connectionPersonId');
-		$connectionPerson = $this->get('NodePerson')->findById($connectionPersonId);
 
-		$nodePersonToConnect = $this->get('NodePerson')->findById($id);
+		if (is_string($toId)) {
+			$toId = (int)$toId;
+		}
+
+		/*$connectionPersonId = (int)Session::get('connectionPersonId');*/
+		$connectionPerson = $this->get('NodePerson')->findById($fromId);
+
+		$nodePersonToConnect = $this->get('NodePerson')->findById($toId);
 
 		/* Connect with Distribution module */
 
@@ -376,8 +397,86 @@ class PersonController extends BaseController
 			}
 		}		
 
+		 /* Check if nodePersonToConnect has father and mothers  */
+
+        $nodePersonToConnectHasFather = false;
+        $nodePersonToConnectHasMother = false;
+        if ($connectionPerson->parents != null) {
+              foreach ($connectionPerson->parents as $parent) {
+				$person = $this->personRepository->getById($parent->personId);
+
+				if ($person != null && $person->gender == 1) {
+					$nodePersonToConnectHasFather = true;
+				}	
+				
+				if ($person != null && $person->gender == 2) {
+					$nodePersonToConnectHasMother = true;
+				}			
+			}
+        }
+
+        /* Create nodePersonToConnect parent's */
+        if (!$nodePersonToConnectHasFather) {
+
+        	/* Father creation */
+
+            $father = array(
+				'name' 			=> Lang::get('titles.addParent'), 
+				'lastname' 		=> ' ',
+				'mothersname' 	=> ' ',
+				'birthdate' 	=> '',
+				'gender' 		=> 1,
+				'phone' 		=> '',
+				'email'		    => '',
+				'user_id' 		=> null,
+				'role_id' 		=> 1,
+				'file_id'		=> null
+			);
+
+			// Create a Person 
+			$newPersonId =  $this->personRepository->store($father);
+
+			// Create a NodePerson
+			$this->get('NodePerson')->create($newPersonId, $connectionPerson->personId);
+			
+			// Add new Person as parent
+			$parentId = $newPersonId;
+			$this->get('NodePerson')->addParent($connectionPerson->personId, $parentId);
+		}
+
+		if (!$nodePersonToConnectHasMother) {
+
+			/* Mother creation */
+
+			 $mother = array(
+				'name' 			=> Lang::get('titles.addMother'), 
+				'lastname' 		=> ' ',
+				'mothersname' 	=> ' ',
+				'birthdate' 	=> '',
+				'gender' 		=> 2,
+				'phone' 		=> '',
+				'email'		    => '',
+				'user_id' 		=> null,
+				'role_id' 		=> 1,
+				'file_id'		=> null
+			);
+
+			// Create a Person 
+			$newPersonId =  $this->personRepository->store($mother);
+
+			// Create a NodePerson
+			$this->get('NodePerson')->create($newPersonId, $connectionPerson->personId);
+			
+			// Add new Person as parent
+			$parentId = $newPersonId;
+			$this->get('NodePerson')->addParent($connectionPerson->personId, $parentId);
+		}        
+
+		// Get again nodePersonToConnect to update the relations
+		$connectionPerson = $this->get('NodePerson')->findById($connectionPerson->personId);
+
 		/* New parents */
-		foreach ($connectionPerson->parents as $parent) {
+		foreach ($connectionPerson->parents as $parent) {	
 
 			$this->get('NodePerson')->addParent($nodePersonToConnect->personId, $parent->personId);
 		}
