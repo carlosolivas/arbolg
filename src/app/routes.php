@@ -43,6 +43,10 @@ Route::group(array("before" => 'Confide'), function()
          Route::get(
         '/sendRequest/{fromId}/{toId}',
         array('as' => 'sendRequest', 'uses' => 'PersonController@get_sendRequest'));
+
+         Route::post(
+        '/updatePersonData',
+        array('as' => 'updatePersonData', 'uses' => 'PersonController@post_updatePersonData'));
         
     });
 });

@@ -126,9 +126,9 @@ function initializeCytoscape()
        }     
     }
 
-    if ( $( "#addDirectFamiliarDialog-form" ).dialog() != null && $( "#addDirectFamiliarDialog-form" ).dialog() != undefined) {
-      if ($( "#addDirectFamiliarDialog-form" ).dialog("isOpen")) {
-         $( "#addDirectFamiliarDialog-form" ).dialog("close");
+    if ( $( "#familiarDialog-form" ).dialog() != null && $( "#familiarDialog-form" ).dialog() != undefined) {
+      if ($( "#familiarDialog-form" ).dialog("isOpen")) {
+         $( "#familiarDialog-form" ).dialog("close");
          setValidationBlockMessage();
        }     
     }
@@ -144,6 +144,7 @@ function initializeCytoscape()
     var personDetail_phone = this.data('phone');
     var personDetail_fullname = this.data('fullname');    
     var personDetail_canAddParents = this.data('canAddParents');
+    var canBeUpdatedByLoggedUser =  this.data('canAddParents');
 
     /* Connect functionalities */   
 
@@ -182,27 +183,55 @@ function initializeCytoscape()
       modal: false,
       title: 'Menu de ' + personDetail_fullname,
       buttons:{
+         "updateData" : {
+         text: "Editar",
+         id: "updateData",
+         class: (canBeUpdatedByLoggedUser ? "btn btn-primary btn-xs" : "btn btn-default btn-xs"),
+         click: function(){
+
+          if (!canBeUpdatedByLoggedUser) {
+            return false;
+          }
+
+          optionSelected = getFamiliarOptionsToAdd().UPDATEDATA;
+          $( this ).dialog().parent().hide("scale",200);
+
+          // If has real data loaded (is not an auxiliar node for create brohers)
+          if (personDetail_lastname.trim().length > 0)
+          {
+            $("#newPerson_name").val(personDetail_name);
+            $("#newPerson_lastname").val(personDetail_lastname);
+            $("#newPerson_mothersname").val(personDetail_mothersname);
+            $("#newPerson_dateOfBirth").val(personDetail_birthdate);
+            $("#newPerson_gender").val(personDetail_gender); 
+            $("#newPerson_phone").val(personDetail_phone);   
+          }         
+
+          familiarDialog.dialog('option','title', getTitleForDialog(optionSelected) + personDetail_fullname);
+          familiarDialog.dialog( "open" );
+         }
+       },
         "addParent" : {
          text: "Agregar padre",
          id: "addParent",
-         class: "btn btn-sm btn-primary",
+         class: "btn btn-primary btn-xs",
          click: function(){
           if (!personDetail_canAddParents) {
             return false;
           }
           else {
           optionSelected = getFamiliarOptionsToAdd().PARENT;
-          $( this ).dialog().parent().hide("scale",200);
-          }
+          $( this ).dialog().parent().hide("scale",200);  
+          }        
 
-          addDirectFamiliarDialog.dialog('option','title', getTitleForDialog(optionSelected) + personDetail_fullname);
-          addDirectFamiliarDialog.dialog( "open" );
+          familiarDialog.dialog('option','title', getTitleForDialog(optionSelected) + personDetail_fullname);
+          familiarDialog.dialog( "open" );
          }
-       },
+       },      
         "extendTree" : {
          text: "Extender árbol desde aquí",
          id: "extendTree",
-         class: "btn btn-sm btn-primary",
+         class: "btn btn-primary btn-xs",
          click: function() {
 
           /* slide */
@@ -216,7 +245,7 @@ function initializeCytoscape()
        "closeMenu" : {
          text: "Cerrar",
          id: "closeMenu",
-         class: "btn btn-sm btn-white",
+         class: "btn btn-success btn-xs",
          click: function(){
            $( this ).dialog( "close" );
          }
@@ -225,8 +254,8 @@ function initializeCytoscape()
     }); 
     menuDialog.dialog({ position: { my: "left+30 bottom+30 center", at: "right bottom", of: currentMousePos } }); 
     
-    // Dialog for create a parent
-    var addDirectFamiliarDialog = $( "#addDirectFamiliarDialog-form" ).dialog({
+    // Dialog for create a familiar and manage the data edition of them and the person logged
+    var familiarDialog = $( "#familiarDialog-form" ).dialog({
       autoOpen: false,
       open: function(event, ui) { 
         $(".ui-widget-header").css('border','none');
@@ -245,12 +274,12 @@ function initializeCytoscape()
         "Save" : {
          text: "Guardar",
          id: "saveFamiliar",
-         class: "btn btn-sm btn-primary",
+         class: "btn btn-primary btn-xs",
          click: function(){
           if (addFamiliar_completeFields()) 
           {
               // Fields of new Person
-            var newPerson_sonId = personDetail_id; 
+            var selectedPersonId = personDetail_id; 
             var newPerson_name = $("#newPerson_name").val();
             var newPerson_lastname = $("#newPerson_lastname").val();
             var newPerson_mothersname = $("#newPerson_mothersname").val(); 
@@ -263,7 +292,8 @@ function initializeCytoscape()
               type: "post",
               url: getUrlForSaveFamiliar(optionSelected),
               data: { 
-                son: newPerson_sonId,
+                id: selectedPersonId, // Used when editing data of the Person
+                son: selectedPersonId, // Used when adding parent to Person
                 name: newPerson_name,
                 lastname: newPerson_lastname,
                 mothersname: newPerson_mothersname,
@@ -309,8 +339,15 @@ function initializeCytoscape()
        "Cancel" : {
          text: "Cancelar",
          id: "cancelSaveFamiliar",
-         class: "btn btn-sm btn-white",
+         class: "btn btn-success btn-xs",
          click: function(){
+
+          $("#newPerson_name").val("");
+          $("#newPerson_lastname").val("");
+          $("#newPerson_mothersname").val(""); 
+          $("#newPerson_dateOfBirth").val("");
+          $("#newPerson_gender").val("");
+          $("#newPerson_phone").val("");        
 
            // Reset the validation block message to original status
            setValidationBlockMessage();
@@ -321,7 +358,7 @@ function initializeCytoscape()
        }
       }    
     });   
-    addDirectFamiliarDialog.dialog({ position: { my: "left+30 bottom", at: "right bottom", of: currentMousePos } });     
+    familiarDialog.dialog({ position: { my: "left+30 bottom", at: "right bottom", of: currentMousePos } });     
 
     // Open the menu dialog when the user 'on tap' a node
     menuDialog.dialog( "open" );
@@ -343,6 +380,9 @@ function getTitleForDialog(optionSelected)
         break;
      case options.COUP:
         title = 'Agregar pareja a: ';
+        break;
+    case options.UPDATEDATA:
+        title = 'Actualizar datos a: ';
         break;
     default:
         title = 'Agregar familiar a: ';
@@ -367,6 +407,9 @@ function getUrlForSaveFamiliar(optionSelected)
      case options.COUP:
         url = '#';
         break;
+    case options.UPDATEDATA:
+      url = '/updatePersonData';
+      break;
     default:
         url = '#';
         break;  
@@ -379,7 +422,8 @@ function getFamiliarOptionsToAdd()
   var options = {
       PARENT: 1,
       SON: 2,
-      COUP: 3
+      COUP: 3,
+      UPDATEDATA: 4
     };
 
     return options;

@@ -12,4 +12,6 @@ return array(
 	'user_must_login'				=> 'Debe identificarse para ingresar al sitio.',
 
 	'error_on_create_person'		=> 'Hubo un error mientras se intentaba guardar los datos de la persona',
+	"cannotUpdateData"				=> 'No tiene permiso para editar los datos de esta persona'
+
 );

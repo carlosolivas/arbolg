@@ -89,8 +89,8 @@
  	
 </div>
 
-<div id="addDirectFamiliarDialog-form" title='Agregar padre' style="display: none">
-	<div id='addDirectFamiliarDialog-form-message'>
+<div id="familiarDialog-form" title='Agregar padre' style="display: none">
+	<div id='familiarDialog-form-message'>
 		
 			<input type="text" name="name" id="newPerson_name" class="form-control" 
 			placeholder="Nombre">

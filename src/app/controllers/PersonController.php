@@ -173,6 +173,9 @@ class PersonController extends BaseController
 				$isRootNode = true;
 			}
 
+			// Check if the logged person can update his data
+			$canBeUpdatedByLoggedUser = $nodePerson->ownerId == $personLogged;			
+
 			$personId = (string)$person->id;
 			$dataOfPerson = array(
 				"id" 			=> (string)$personId, 
@@ -185,7 +188,8 @@ class PersonController extends BaseController
 				"phone"			=> $person->phone,
 				"fullname"		=> $person->name . " " . $person->lastname . " " . $person->mothersname,
 				"canAddParents"	=> $canAddParents,
-				"isRootNode"	=> $isRootNode
+				"isRootNode"	=> $isRootNode,
+				"canBeUpdatedByLoggedUser"	=> $canBeUpdatedByLoggedUser
 				);
 
 			$css = array('shape' => 'rectangle');	
@@ -415,6 +419,10 @@ class PersonController extends BaseController
 			}
         }
 
+        // Logged Person
+		$user = Auth::user();		
+		$personLoggedId = $user->Person->id;	
+
         /* Create nodePersonToConnect parent's */
         if (!$nodePersonToConnectHasFather) {
 
@@ -436,8 +444,8 @@ class PersonController extends BaseController
 			// Create a Person 
 			$newPersonId =  $this->personRepository->store($father);
 
-			// Create a NodePerson
-			$this->get('NodePerson')->create($newPersonId, $connectionPerson->personId);
+			// Create a NodePerson (the owner is the logged User)
+			$this->get('NodePerson')->create($newPersonId, $personLoggedId);
 			
 			// Add new Person as parent
 			$parentId = $newPersonId;
@@ -464,8 +472,8 @@ class PersonController extends BaseController
 			// Create a Person 
 			$newPersonId =  $this->personRepository->store($mother);
 
-			// Create a NodePerson
-			$this->get('NodePerson')->create($newPersonId, $connectionPerson->personId);
+			// Create a NodePerson (the owner is the logged User)
+			$this->get('NodePerson')->create($newPersonId, $personLoggedId);
 			
 			// Add new Person as parent
 			$parentId = $newPersonId;
@@ -482,5 +490,70 @@ class PersonController extends BaseController
 		}
 
 		return Redirect::to('/tree');
+	}
+
+	function post_updatePersonData()
+	{
+		try {
+
+			// Logged Person
+			$user = Auth::user();		
+			$personLoggedId = $user->Person->id;
+
+			// Data of new Person
+			$input = Input::all();		
+
+			$personId = (int)$input['id'];	
+
+			$personToUpdateData = $this->get('NodePerson')->findById($personId);
+
+			// Check if the Person exists and if the logged user can be edit it
+			if ($personToUpdateData != null && $personToUpdateData->ownerId == $personLoggedId) {
+
+				// Converting the date of birth
+				$timestamp = strtotime($input['dateOfBirth']); 
+				$birthdate = date("Y-m-d H:i:s", $timestamp);
+
+				$data = array(
+					'id'			=> $input['id'],
+					'name' 			=> $input['name'], 
+					'lastname' 		=> $input['lastname'],
+					'mothersname' 	=> $input['mothersname'],
+					'birthdate' 	=> $birthdate,
+					'gender' 		=> $input['gender'],
+					'phone' 		=> $input['phone'],
+					'email'		    => 'test@gmail.com',
+					'user_id' 		=> null,
+					'role_id' 		=> 1,
+					'file_id'		=> null
+				);	
+
+			 	$rules = array(
+				 	'name' => 'required',
+		            'lastname' => 'required',
+		            'gender' => 'required',
+		            'birthdate' => 'date',
+		            'phone' => 'numeric'
+	            );
+
+				$validation = Validator::make($data, $rules);
+
+				if (!($validation->fails())) {		
+			
+					// Edition a Person 
+					$this->personRepository->store($data);
+
+					return Response::json( 'successful' );
+				}		
+				else {
+					return Response::json( $validation->messages()->all('- :message -') );
+				}
+			} else{
+				return Response::json( Lang::get('messages.cannotUpdateData') );
+			}
+
+		} catch (Exception $e) {
+			return Response::json( $e->getMessage() );
+		}		
 	}
 }
