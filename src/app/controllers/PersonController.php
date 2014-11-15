@@ -183,7 +183,7 @@ class PersonController extends BaseController
 				"lastname" 		=> $person->lastname,
 				"mothersname" 	=> $person->mothersname,
 				"email" 		=> $person->email,				
-				"birthdate"	 	=> $person->birthdate,
+				"birthdate"	 	=> $this->formatDate($person->birthdate, $toSpanishFormat = true),
 				"gender"		=> $person->gender,
 				"phone"			=> $person->phone,
 				"fullname"		=> $person->name . " " . $person->lastname . " " . $person->mothersname,
@@ -287,8 +287,7 @@ class PersonController extends BaseController
 			$input = Input::all();			
 			
 			// Converting the date of birth
-			$timestamp = strtotime($input['dateOfBirth']); 
-			$birthdate = date("Y-m-d H:i:s", $timestamp);
+			$birthdate =  $this->formatDate($input['dateOfBirth']);
 
 			$data = array(
 				'name' 			=> $input['name'], 
@@ -511,8 +510,7 @@ class PersonController extends BaseController
 			if ($personToUpdateData != null && $personToUpdateData->ownerId == $personLoggedId) {
 
 				// Converting the date of birth
-				$timestamp = strtotime($input['dateOfBirth']); 
-				$birthdate = date("Y-m-d H:i:s", $timestamp);
+				$birthdate = $this->formatDate($input['dateOfBirth']);
 
 				$data = array(
 					'id'			=> $input['id'],
@@ -555,5 +553,28 @@ class PersonController extends BaseController
 		} catch (Exception $e) {
 			return Response::json( $e->getMessage() );
 		}		
+	}
+
+	/* Utilities */
+
+	/**
+     * The function wich manages the date format
+     * @param date The date to format
+     * @param toSpanishFormat Indicates if the return value must be in spanish format
+     * @return Date
+     */ 
+	public function formatDate($date, $toSpanishFormat = false)
+	{
+		if ($toSpanishFormat) {
+			$birthdate = date("d-m-Y", strtotime($date));
+			$birthdate = str_replace('-', '/', $birthdate);
+
+			return $birthdate;
+		}
+
+		$date = str_replace('/', '-', $date);
+		$birthdate = date('Y-m-d', strtotime($date));	
+
+		return $birthdate;
 	}
 }
