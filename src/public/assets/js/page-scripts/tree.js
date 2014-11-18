@@ -133,6 +133,13 @@ function initializeCytoscape()
        }     
     }
 
+    if ( $( "#extendTree-form" ).dialog() != null && $( "#extendTree-form" ).dialog() != undefined) {
+      if ($( "#extendTree-form" ).dialog("isOpen")) {
+          $("#extendTree-form").html("");
+          $( "#extendTree-form" ).dialog("close");
+       }     
+    }
+
     // Data of selected node
     var personDetail_id = this.data('id');
     var personDetail_name = this.data('name');
@@ -144,15 +151,7 @@ function initializeCytoscape()
     var personDetail_phone = this.data('phone');
     var personDetail_fullname = this.data('fullname');    
     var personDetail_canAddParents = this.data('canAddParents');
-    var canBeUpdatedByLoggedUser =  this.data('canAddParents');
-
-    /* Connect functionalities */   
-
-    $(".toAssignButton").click(function(){
-      window.location = /sendRequest/ + parseInt(personDetail_id) + "/" + parseInt(this.id);      
-    });
-
-    /* End Connect functionalities */
+    var canBeUpdatedByLoggedUser =  this.data('canAddParents');   
 
     // Familiar option selected
     var optionSelected = 0;
@@ -234,12 +233,32 @@ function initializeCytoscape()
          class: "btn btn-primary btn-xs",
          click: function() {
 
-          /* slide */
-          $( this ).dialog().parent().hide("scale",200);
-          $("#suggesteds").show('slide');
-          /* slide */
+          $.ajax({
+            type: "get",
+            url: "/loadSuggesteds/" + parseInt(personDetail_id)
+            }).done(function( json ) {
+               json.forEach(function(person) {
+                var div = "<div class='connectWithSuggested onHoverShow'><h4>fullnameToReplace</h4>"
+                        + "<button " 
+                        +  "class='btn btn-primary btn-xs connectWithSuggestedBtn' " 
+                        +    "type='button' style='display: none' " 
+                        +    "id=idToReplace > "
+                        +    "<strong>Conectar</strong> "
+                        +  "</button> "
+                  + "</div>";
+                div = div.replace("idToReplace",person.id);
+                div = div.replace("fullnameToReplace", person.fullname);
+                $("#extendTree-form").append(div);               
+              });
 
-          /*window.location = /extendTree/ +  parseInt(personDetail_id);*/
+               /* Register on click */
+               $(".connectWithSuggestedBtn").click(function(){
+                  window.location = /sendRequest/ + parseInt(personDetail_id) + "/" + parseInt(this.id);      
+              });
+          });
+
+          $( this ).dialog().parent().hide("scale",200);
+          suggestedsDialog.dialog("open");          
         }
        },
        "closeMenu" : {
@@ -247,6 +266,7 @@ function initializeCytoscape()
          id: "closeMenu",
          class: "btn btn-success btn-xs",
          click: function(){
+          $("#extendTree-form").html("");
            $( this ).dialog( "close" );
          }
        }
@@ -360,6 +380,36 @@ function initializeCytoscape()
     });   
     familiarDialog.dialog({ position: { my: "left+30 bottom", at: "right bottom", of: currentMousePos } });     
 
+    /* Dialog for suggesteds persons to connect */
+    var suggestedsDialog = $("#extendTree-form").dialog({
+      autoOpen: false,
+      open: function(event, ui) { 
+        $(".ui-widget-header").css('border','none');
+        $(".ui-dialog-titlebar-close").hide(); 
+        
+      },
+      draggable: false,
+      resizable: false,
+      show: {
+        effect: "scale",
+        duration: 200
+      },
+      modal: false,
+      title: 'Sugeridos',
+      buttons: {
+        "Cancel" : {
+         text: "Cancelar",
+         id: "cancelSuggesteds",
+         class: "btn btn-success btn-xs",
+         click: function(){
+           $( this ).dialog( "close" );   
+           $( "#menu-form" ).dialog().parent().show("scale",200);
+         }
+       }
+      }
+    });
+    suggestedsDialog.dialog({ position: { my: "left+30 bottom", at: "right bottom", of: currentMousePos } }); 
+
     // Open the menu dialog when the user 'on tap' a node
     menuDialog.dialog( "open" );
   });
@@ -458,9 +508,9 @@ function setValidationBlockMessage(fieldsCompleted)
 }
 
 /* Suggested functionalities */
-$(document).on('mouseenter', '.toAssign', function () {
+$(document).on('mouseenter', '.onHoverShow', function () {
     $(this).find(":button").show('slide');
-}).on('mouseleave', '.toAssign', function () {
+}).on('mouseleave', '.onHoverShow', function () {
     $(this).find(":button").hide('slide');
 });
 

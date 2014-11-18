@@ -31,6 +31,8 @@ return array(
 	"connect"				=> 'Conectar',
 	"close"					=> 'Cerrar',
 	"addParent"				=> 'Agregar Padre',
-	"addMother"				=> 'Agregar Madre'			
+	"addMother"				=> 'Agregar Madre',
+	"accept"				=> 'Aceptar',
+	"suggesteds"			=> 'Sugeridos'		
 
 );

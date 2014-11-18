@@ -40,6 +40,10 @@ Route::group(array("before" => 'Confide'), function()
         '/extendTree/{id}',
         array('as' => 'extendTree', 'uses' => 'PersonController@get_extendTree'));
 
+        Route::get(
+        '/loadSuggesteds/{id}',
+        array('as' => 'loadSuggesteds', 'uses' => 'PersonController@get_loadSuggesteds'));
+
          Route::get(
         '/sendRequest/{fromId}/{toId}',
         array('as' => 'sendRequest', 'uses' => 'PersonController@get_sendRequest'));

@@ -156,122 +156,63 @@ class PersonController extends BaseController
      */  
 	public function get_loadTreePersons()
 	{
-		$user = Auth::user();		
+		$user = Auth::user();
 		$personLogged = $user->Person->id;
 		$family = $this->get('NodePerson')->getFamily($personLogged);
 		$nodes = array();
-		foreach ($family as $nodePerson) {	
-
+		foreach ($family as $nodePerson) {
 			$person = $this->personRepository->getById($nodePerson->personId);
-
 			// Check if can add more Parents
-			$canAddParents = $this->get('NodePerson')->canAddParents($nodePerson);	
-
+			$canAddParents = $this->get('NodePerson')->canAddParents($nodePerson);
 			// Set the root Node
-			$isRootNode = false;		
+			$isRootNode = false;
 			if ($nodePerson->personId == $personLogged) {
 				$isRootNode = true;
 			}
-
-			// Check if the logged person can update his data
-			$canBeUpdatedByLoggedUser = $nodePerson->ownerId == $personLogged;			
-
 			$personId = (string)$person->id;
 			$dataOfPerson = array(
-				"id" 			=> (string)$personId, 
-				"name" 			=> $person->name, 
-				"lastname" 		=> $person->lastname,
-				"mothersname" 	=> $person->mothersname,
-				"email" 		=> $person->email,				
-				"birthdate"	 	=> $this->formatDate($person->birthdate, $toSpanishFormat = true),
-				"gender"		=> $person->gender,
-				"phone"			=> $person->phone,
-				"fullname"		=> $person->name . " " . $person->lastname . " " . $person->mothersname,
+				"id" => $personId,
+				"name" => $person->name,
+				"lastname" => $person->lastname,
+				"mothersname" => $person->mothersname,
+				"email" => $person->email,
+				"birthdate"	=> $person->birthdate,
+				"gender"	=> $person->gender,
+				"phone"	=> $person->phone,
+				"fullname"	=> $person->name . " " . $person->lastname . " " . $person->mothersname,
 				"canAddParents"	=> $canAddParents,
-				"isRootNode"	=> $isRootNode,
-				"canBeUpdatedByLoggedUser"	=> $canBeUpdatedByLoggedUser
-				);
-
-			$css = array('shape' => 'rectangle');	
-			$data = array('data' => $dataOfPerson, 'css' => $css);			
+				"isRootNode"	=> $isRootNode
+			);
+			$data = array('data' => $dataOfPerson);
 			array_push($nodes, $data);
-
-			if ($this->get('NodePerson')->hasSons($personId)) {
-
-				/* c_id indicates there is the connector node for this NodePerson */
-				$conectorNode = array(
-					"id" 			=> 'c_' . (string)$personId, 
-					"name" 			=> ''
-					);	
-
-				$css = array('height' => 10, 'width' => 10);		
-
-				$data = array('data' => $conectorNode, 'css' => $css);
-				array_push($nodes, $data);
-			}
 		}
-		
-		return Response::json( $nodes );		
+		return Response::json( $nodes );
 	}
-
+	
 	/**
-     * Get the relations between the Person's familiars
-     * @return Node Persons   
-     */ 
+	* Get the relations between the Person's familiars
+	* @return Node Persons
+	*/
 	public function get_loadTreeRelations()
 	{
-		$user = Auth::user();		
-		$personLogged = $user->id;
+		$user = Auth::user();
+		$personLogged = $user->Person->id;
 		$family = $this->get('NodePerson')->getFamily($personLogged);
-
+		
 		$relations = array();
-		foreach ($family as $person) {			
-
-			foreach ($person->parents as $nodeParent) {	
-
-				/*$parent = $this->personRepository->getById($nodeParent->personId);*/
-
-				/* Check if the connection between the node parent and his connector wasn't already added */
-				$relationAlreadyAdded = false;
-
-				foreach ($relations as $data) {
-
-					if (($data["data"]['source'] == (string)$nodeParent->personId) && ($data["data"]['target'] == ('c_' . (string)$nodeParent->personId))) {
-						$relationAlreadyAdded = true;
-					}
-				}
-
-				if (!$relationAlreadyAdded) {
-
-					// Source is the parent of person					
-					$source = (string)$nodeParent->personId;
-
-					// Target is the connector
-					$target = 'c_' . (string)$nodeParent->personId;
-
-					$dataParOfRelations = array("source" => $source, "target" => $target);
-					$data = array("data" => $dataParOfRelations);
-
-					array_push($relations, $data);
-
-				}			
-
-				// Source is the connector
-				$source = 'c_' . (string)$nodeParent->personId;
-
+		foreach ($family as $person) {
+			foreach ($person->parents as $nodeParent) {
+				$parent = $this->personRepository->getById($nodeParent->personId);
+				// Source is the parent of person
+				$source = (string)$parent->id;
 				// Target is the person
 				$target = (string)$person->personId;
-
 				$dataParOfRelations = array("source" => $source, "target" => $target);
 				$data = array("data" => $dataParOfRelations);
-
-				array_push($relations, $data);	
-										
-							
+				array_push($relations, $data);
 			}
 		}
-
-		return Response::json( $relations );	
+		return Response::json( $relations );
 	}
 
 
@@ -491,6 +432,11 @@ class PersonController extends BaseController
 		return Redirect::to('/tree');
 	}
 
+
+	/**
+	* This function update the data of person
+	* @return Json with the request status
+	*/
 	function post_updatePersonData()
 	{
 		try {
@@ -553,6 +499,31 @@ class PersonController extends BaseController
 		} catch (Exception $e) {
 			return Response::json( $e->getMessage() );
 		}		
+	}
+
+	/**
+	* Tis function return the suggested persons to connect
+	* @param id The id of the person to search suggested familiars
+	* @return Json with suggested familiars
+	*/
+	public function get_loadSuggesteds($id)
+	{
+		/* Suggesteds */
+			
+			$rootPerson = $this->personRepository->getById(8); // Milhouse
+			$suggestedPersons = array();
+
+			foreach ($rootPerson->getFamily()->Persons as $p) {
+				$fullname = $p->name . " " . $p->lastname . " " . $p->mothersname;
+				$personItem = array('id' => $p->id, 
+					'fullname' => $fullname);
+
+				$suggestedPersons[] = $personItem;
+			}
+
+			/**/
+
+			return Response::json($suggestedPersons);
 	}
 
 	/* Utilities */

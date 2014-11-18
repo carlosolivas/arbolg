@@ -3,13 +3,18 @@
  <!-- Tree script -->
 <style>
 
-	#suggesteds{
+	#requests{
 	  height: 20%;
 	  border: 3px solid #2f4050 !important;
 	}
 	#tree{
 	  height: 100%;
 	  width: 100%;
+	}
+
+	.connectWithSuggested{
+		 border: 3px solid #2f4050;
+		 width: 100px; height: 100px; padding: 0.5em; float: left; margin: 10px 10px 10px 10px;
 	}
 	.toAssign { width: 100px; height: 100px; padding: 0.5em; float: left; margin: 10px 10px 10px 10px; }
 
@@ -29,13 +34,13 @@
   }
 </style>
 @section('content')
-<div id="suggesteds" hidden>
+<div id="requests">
 	@foreach ($suggestedPersons as $person)
-		<div class="ui-widget-content toAssign" personData= {{{ $person['fullname'] }}}>
+		<div class="ui-widget-content toAssign onHoverShow" personData= {{{ $person['fullname'] }}}>
 	  		<h4>{{{ $person['fullname'] }}}</h4>
-	  		<button class="btn btn-primary btn-xs toAssignButton" type="button" style="display: none" 
+	  		<button class="btn btn-primary btn-xs" type="button" style="display: none" 
 	  		id= {{{ $person['id'] }}} >
-	  			<strong>{{{ Lang::get('titles.connect') }}}</strong>
+	  			<strong>{{{ Lang::get('titles.accept') }}}</strong>
 	  		</button>
 		</div>
 	@endforeach	
@@ -114,6 +119,11 @@
 		  	<span class="help-block m-b-none" id="validationBlockMessage">(*) Campos obligatorios</span> 	  	
 			
 	</div>
+</div>
+
+<div id="extendTree-form" title= {{{ Lang::get('titles.suggesteds') }}} style="display: none">
+	
+	
 </div>
 {{ HTML::script('assets/js/page-scripts/tree.js'); }}
 @stop
