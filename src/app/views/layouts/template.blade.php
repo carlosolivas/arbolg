@@ -248,12 +248,13 @@
         <div id="page-wrapper" class="gray-bg">
         <div class="row border-bottom">
         <nav class="navbar navbar-static-top  " role="navigation" style="margin-bottom: 0">
-        <div class="navbar-header">
-            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
-            <form role="search" class="navbar-form-custom" method="post" action="#">
-                            <div class="input-group" style="margin-top:13px;"><input type="text" class="form-control" placeholder="{{ Lang::get('menu.search') }}" name="top-search" id="top-search"> <span class="input-group-btn"> <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button> </span></div>
-                        </form>
-        </div>
+        <div class="navbar-header" style="padding-left: 15px; padding-top: 5px">
+            {{ Form::open(array('url' => '/invitation', 'method' => 'get')) }}
+                <button type="submit" class="btn btn-info btn-lg btn-rounded">
+                    {{{ Lang::get('titles.invitations') }}}
+                </button>
+            {{ Form::close() }}            
+            </div>
             <ul class="nav navbar-top-links navbar-right">
                 <li>
                     <span class="m-r-sm text-muted welcome-message">Welcome to INSPINIA+ Admin Theme.</span>

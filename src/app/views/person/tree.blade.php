@@ -1,10 +1,11 @@
 @extends('layouts.template')
-<title>Árbol genealógico</title>
+<title>{{{Lang::get("titles.tree")}}}</title>
  <!-- Tree script -->
 <style>
 
 	#requests{
 	  height: 20%;
+	  min-height: 120px;
 	  border: 3px solid #2f4050 !important;
 	}
 	#tree{

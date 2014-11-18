@@ -33,6 +33,10 @@ return array(
 	"addParent"				=> 'Agregar Padre',
 	"addMother"				=> 'Agregar Madre',
 	"accept"				=> 'Aceptar',
-	"suggesteds"			=> 'Sugeridos'		
+	"suggesteds"			=> 'Sugeridos',
+	"invitations"			=> 'Invitar a otras personas a unirse a mi árbol',
+	"invitation"			=> 'Invitación',
+	"connectionPoint"		=> 'Conexión',
+	"sendInvitation"		=> 'Enviar invitación'
 
 );

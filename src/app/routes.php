@@ -38,19 +38,23 @@ Route::group(array("before" => 'Confide'), function()
 
         Route::get(
         '/extendTree/{id}',
-        array('as' => 'extendTree', 'uses' => 'PersonController@get_extendTree'));
-
-        Route::get(
-        '/loadSuggesteds/{id}',
-        array('as' => 'loadSuggesteds', 'uses' => 'PersonController@get_loadSuggesteds'));
-
-         Route::get(
-        '/sendRequest/{fromId}/{toId}',
-        array('as' => 'sendRequest', 'uses' => 'PersonController@get_sendRequest'));
+        array('as' => 'extendTree', 'uses' => 'PersonController@get_extendTree'));        
 
          Route::post(
         '/updatePersonData',
         array('as' => 'updatePersonData', 'uses' => 'PersonController@post_updatePersonData'));
+
+         Route::get(
+        '/loadSuggesteds/{id}',
+        array('as' => 'loadSuggesteds', 'uses' => 'JoinController@get_loadSuggesteds'));
+
+         Route::get(
+        '/sendRequest/{fromId}/{toId}',
+        array('as' => 'sendRequest', 'uses' => 'JoinController@get_sendRequest'));
+
+        Route::get(
+        '/invitation',
+        array('as' => 'invitation', 'uses' => 'JoinController@get_makeInvitation'));
         
     });
 });
