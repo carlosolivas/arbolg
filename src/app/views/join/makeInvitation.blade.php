@@ -13,20 +13,24 @@
 
         <div class="form-group">
           {{Form::label('connection', Lang::get('titles.connectionPoint'))}} 
-          	<select class="form-control m-b">
+          	<select class="form-control m-b" required>
 			    @foreach($connectionNodes as $person)
-			    	<option value="{{ $person->id }}">{{ $person->name }}</option>
+			    	<option value="{{ $person->id }} ">
+              {{ $person->name }} {{ $person->lastname }} {{ $person->mothersname }}
+            </option>
 			    @endforeach
 			</select>
         </div>
 
          <div class="form-group">
           {{Form::label('email', Lang::get('titles.email'))}} 
-          {{Form::email('email', null, array('class' => 'form-control'))}}
+          {{Form::email('email', null, array('class' => 'form-control', 'required' => 'required'))}}
         </div>
 
           {{Form::submit(Lang::get('titles.sendInvitation'), 
           	array('class' => 'btn btn-primary'))}}
+
+          <a href="/tree" class="btn btn-success">{{{Lang::get('titles.cancel')}}}</a>
 
       {{ Form::close() }}
     </div>

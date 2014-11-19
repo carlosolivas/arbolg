@@ -169,6 +169,9 @@ class PersonController extends BaseController
 			if ($nodePerson->personId == $personLogged) {
 				$isRootNode = true;
 			}
+			// Check if the logged person can update his data
+			$canBeUpdatedByLoggedUser = $nodePerson->ownerId == $personLogged;
+			
 			$personId = (string)$person->id;
 			$dataOfPerson = array(
 				"id" => $personId,
@@ -176,12 +179,13 @@ class PersonController extends BaseController
 				"lastname" => $person->lastname,
 				"mothersname" => $person->mothersname,
 				"email" => $person->email,
-				"birthdate"	=> $person->birthdate,
+				"birthdate"	=> $this->formatDate($person->birthdate, $toSpanishFormat = true),
 				"gender"	=> $person->gender,
 				"phone"	=> $person->phone,
 				"fullname"	=> $person->name . " " . $person->lastname . " " . $person->mothersname,
 				"canAddParents"	=> $canAddParents,
-				"isRootNode"	=> $isRootNode
+				"isRootNode"	=> $isRootNode,
+				"canBeUpdatedByLoggedUser"	=> $canBeUpdatedByLoggedUser
 			);
 			$data = array('data' => $dataOfPerson);
 			array_push($nodes, $data);

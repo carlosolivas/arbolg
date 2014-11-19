@@ -37,6 +37,7 @@ return array(
 	"invitations"			=> 'Invitar a otras personas a unirse a mi árbol',
 	"invitation"			=> 'Invitación',
 	"connectionPoint"		=> 'Conexión',
-	"sendInvitation"		=> 'Enviar invitación'
+	"sendInvitation"		=> 'Enviar invitación',
+	"cancel"				=> 'Cancelar'
 
 );

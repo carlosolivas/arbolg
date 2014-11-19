@@ -1,0 +1,33 @@
+#cy {
+   min-width: 400px;
+   min-height: 600px;
+   width: 100%;
+   height: 100%;
+}
+
+#requests{
+  height: 20%;
+  min-height: 120px;
+  border: 3px solid #2f4050 !important;
+}
+
+.connectWithSuggested{
+	 border: 3px solid #2f4050;
+	 width: 100px; height: 100px; padding: 0.5em; float: left; margin: 10px 10px 10px 10px;
+}
+.toAssign { width: 100px; height: 100px; padding: 0.5em; float: left; margin: 10px 10px 10px 10px; }
+
+	.ui-widget-header{
+  	background: none !important;
+  	color: gray !important;
+	border: 3px solid #2f4050 !important;
+	}
+
+.ui-widget-content{
+  	background: white !important;
+  	color: gray !important;
+	border: 3px solid #2f4050 !important;
+}
+.closebtn{
+	margin-left: 99% !important;
+}

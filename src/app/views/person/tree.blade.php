@@ -1,39 +1,9 @@
 @extends('layouts.template')
 <title>{{{Lang::get("titles.tree")}}}</title>
- <!-- Tree script -->
-<style>
 
-	#requests{
-	  height: 20%;
-	  min-height: 120px;
-	  border: 3px solid #2f4050 !important;
-	}
-	#tree{
-	  height: 100%;
-	  width: 100%;
-	}
+{{ HTML::style('assets/css/plugins/cytoscape/cytoscape.js-panzoom.css'); }}
+{{ HTML::style('assets/css/plugins/cytoscape/style.css'); }}
 
-	.connectWithSuggested{
-		 border: 3px solid #2f4050;
-		 width: 100px; height: 100px; padding: 0.5em; float: left; margin: 10px 10px 10px 10px;
-	}
-	.toAssign { width: 100px; height: 100px; padding: 0.5em; float: left; margin: 10px 10px 10px 10px; }
-
-  	.ui-widget-header{
-	  	background: none !important;
-	  	color: gray !important;
-		border: 3px solid #2f4050 !important;
-  	}
-
-  .ui-widget-content{
-	  	background: white !important;
-	  	color: gray !important;
-		border: 3px solid #2f4050 !important;
-  }
-  .closebtn{
-  	margin-left: 99% !important;
-  }
-</style>
 @section('content')
 <div id="requests">
 	@foreach ($suggestedPersons as $person)
@@ -47,7 +17,7 @@
 	@endforeach	
 	<button class="btn btn-warning btn-circle closebtn" type="button" id="closeSuggesteds"><i class="fa fa-times"></i></button>
 </div>
-<div id='tree'>                            
+<div id='cy'>                            
 </div>
 <div id="menu-form" title='Menu' style="display: none">
 		 
@@ -123,9 +93,12 @@
 </div>
 
 <div id="extendTree-form" title= {{{ Lang::get('titles.suggesteds') }}} style="display: none">
-	
-	
+		
 </div>
+
+{{ HTML::script('assets/js/page-scripts/dagre.js'); }}
+{{ HTML::script('assets/js/page-scripts/cytoscape.js-panzoom.js'); }}
 {{ HTML::script('assets/js/page-scripts/tree.js'); }}
+{{ HTML::script('assets/js/page-scripts/arbolizr.js'); }}
 @stop
 

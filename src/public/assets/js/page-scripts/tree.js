@@ -1,3 +1,6 @@
+var cy;
+var graph;
+
 $(function(){ // on dom ready
 
 
@@ -52,11 +55,11 @@ function loadNodesAndRelations()
 loadNodesAndRelations();
 
 // cy is an instance of Cytoscape, so cy is a graph
-var cy;
+
 function initializeCytoscape()
 {
-  cy = cytoscape({
-    container: document.getElementById('tree'),
+  cy = graph =  cytoscape({
+    container: document.getElementById('cy'),
 
     style: [
             {
@@ -64,13 +67,17 @@ function initializeCytoscape()
               css: {
                 'content': 'data(fullname)',
                 'text-valign': 'center',
-                'text-halign': 'center'
+                'text-halign': 'center',
+                'font-size': '5px'
               }
             },
             {
               selector: 'edge',
               css: {
                 'width': 6,
+                'line-color': '#ffaaaa',
+                'target-arrow-color': '#ffaaaa',
+                'display': 'none'
               }
             },
             {
@@ -103,18 +110,66 @@ function initializeCytoscape()
     },
 
     layout: {
-      name: 'breadthfirst',
-      fit: true,
-      animate: true,
-      padding: 100,
-      /*roots: rootNodes,*/
-      animationDuration: 1500,
-      directed: true,
-      avoidOverlap: true,
-      maximalAdjustments: 100
-    }
+      name: 'dagre',
+      animate: false,
+      padding: 10,
+      rankSep: 60, // separación entre niveles
+      edgeSep: 0,
+      rankDir: 'TB',
+      stop: function () {drawRelations()},
+    },
+
+
+    // initial viewport state:
+    //
+    //fit: true,
+    //zoom: 1,
+    pan: { x: 0, y: 0 },  
+    
+    //
+    // interaction options:
+    //
+    minZoom: 1e-1,
+    maxZoom: 1e1,
+    zoomingEnabled: true,
+    userZoomingEnabled: true,
+    panningEnabled: true,
+    userPanningEnabled: false,
+    //selectionType: (isTouchDevice ? 'additive' : 'single'),
+    autolock: false,
+    autoungrabify: true,
+    autounselectify: false,
+
+    // 
+    // rendering options
+    //
+    headless: false,
+    styleEnabled: true,
+    hideEdgesOnViewport: true,
+    hideLabelsOnViewport: false,
+    textureOnViewport: false,
+    motionBlur: false,
+    wheelSensitivity: 1,
+    pixelRatio: 1,
 
   });
+
+
+  cy.on('zoom', null, null, function(evt){
+    if(canvasContext) {
+      drawRelations();
+    }
+  });
+
+  cy.on('pan', null, null, function(evt){
+    if(canvasContext) {
+      drawRelations();
+    }
+  });  
+
+  cy.panzoom({
+   panDistance: 100,
+  }); 
 
   // On click of node 
   cy.on('tap', 'node', function(){    
@@ -151,7 +206,7 @@ function initializeCytoscape()
     var personDetail_phone = this.data('phone');
     var personDetail_fullname = this.data('fullname');    
     var personDetail_canAddParents = this.data('canAddParents');
-    var canBeUpdatedByLoggedUser =  this.data('canAddParents');   
+    var canBeUpdatedByLoggedUser =  this.data('canBeUpdatedByLoggedUser');   
 
     // Familiar option selected
     var optionSelected = 0;
