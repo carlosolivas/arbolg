@@ -9,18 +9,7 @@
     </div>
 
     <div class="panel-body">
-      {{ Form::open(array('role' => 'form')) }}        
-
-        <div class="form-group">
-          {{Form::label('connection', Lang::get('titles.connectionPoint'))}} 
-          	<select class="form-control m-b" required>
-			    @foreach($connectionNodes as $person)
-			    	<option value="{{ $person->id }} ">
-              {{ $person->name }} {{ $person->lastname }} {{ $person->mothersname }}
-            </option>
-			    @endforeach
-			</select>
-        </div>
+      {{ Form::open(array('role' => 'form')) }}
 
          <div class="form-group">
           {{Form::label('email', Lang::get('titles.email'))}} 

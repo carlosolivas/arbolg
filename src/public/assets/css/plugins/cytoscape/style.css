@@ -5,7 +5,7 @@
    height: 100%;
 }
 
-#requests{
+#readyToConnect{
   height: 20%;
   min-height: 120px;
   border: 3px solid #2f4050 !important;
@@ -26,7 +26,7 @@
 .ui-widget-content{
   	background: white !important;
   	color: gray !important;
-	border: 3px solid #2f4050 !important;
+	border: 3px solid #2f4050;
 }
 .closebtn{
 	margin-left: 99% !important;

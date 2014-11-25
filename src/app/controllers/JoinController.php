@@ -134,9 +134,9 @@ class JoinController extends BaseController
 	}
 
 	/**
-	* Tis function return the suggested persons to connect
-	* @param id The id of the person to search suggested familiars
-	* @return Json with suggested familiars
+	* Tis function return the ready to connect persons
+	* @param id The id of the person to search ready to connect familiars
+	* @return Json with ready to connect familiars
 	*/
 	public function get_loadSuggesteds($id)
 	{
@@ -164,19 +164,7 @@ class JoinController extends BaseController
 	 */
 	public function get_makeInvitation()
 	{
-		$user = Auth::user();
-		$personId = $user->person->id;
-		$familiars = $this->get('NodePerson')->getFamily($personId);
-
-		$connectionNodes = array();
-		foreach ($familiars as $nodePerson) {
-			$person = $this->personRepository->getById($nodePerson->personId);
-			if ($person != null) {
-				$connectionNodes[] = $person;
-			}
-		}
-
-		return View::make('join.makeInvitation')->with('connectionNodes', $connectionNodes);
+		return View::make('join.makeInvitation');
 	}
 
 	public function post_makeInvitation()

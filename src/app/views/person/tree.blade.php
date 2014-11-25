@@ -5,17 +5,15 @@
 {{ HTML::style('assets/css/plugins/cytoscape/style.css'); }}
 
 @section('content')
-<div id="requests">
+<div id="readyToConnect">
+	<div class="ui-widget-content toAssign" style="border: 3px solid #1ab394; text-align: center;">
+	  		<p>{{{ Lang::get('titles.readyToConnect') }}}</p>
+	</div>
 	@foreach ($suggestedPersons as $person)
-		<div class="ui-widget-content toAssign onHoverShow" personData= {{{ $person['fullname'] }}}>
+		<div class="ui-widget-content toAssign">
 	  		<h4>{{{ $person['fullname'] }}}</h4>
-	  		<button class="btn btn-primary btn-xs" type="button" style="display: none" 
-	  		id= {{{ $person['id'] }}} >
-	  			<strong>{{{ Lang::get('titles.accept') }}}</strong>
-	  		</button>
 		</div>
 	@endforeach	
-	<button class="btn btn-warning btn-circle closebtn" type="button" id="closeSuggesteds"><i class="fa fa-times"></i></button>
 </div>
 <div id='cy'>                            
 </div>
@@ -94,6 +92,33 @@
 
 <div id="extendTree-form" title= {{{ Lang::get('titles.suggesteds') }}} style="display: none">
 		
+</div>
+
+
+<!-- Modal for sent request -->
+<div class="modal fade" id="sentRequestsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title">{{{ Lang::get('titles.sentRequests') }}}</h4>
+      </div>
+      <div class="modal-body">
+      	@if ($sentRequests == null || $sentRequests->count() == 0)
+      		<div style="text-align: center">
+      			<h2>{{{ Lang::get('titles.noSentRequests') }}}</h2>
+      		</div>
+      	@endif
+      	@if ($sentRequests != null && $sentRequests->count() > 0)
+	        @foreach ($sentRequests as $request)
+				<div class="ui-widget-content toAssign">
+			  		<h4>{{{ $request['person'] }}}</h4>
+				</div>
+			@endforeach	
+		@endif
+      </div>
+    </div>
+  </div>
 </div>
 
 {{ HTML::script('assets/js/page-scripts/dagre.js'); }}

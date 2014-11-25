@@ -249,11 +249,16 @@
         <div class="row border-bottom">
         <nav class="navbar navbar-static-top  " role="navigation" style="margin-bottom: 0">
         <div class="navbar-header" style="padding-left: 15px; padding-top: 5px">
+            
             {{ Form::open(array('url' => '/invitation', 'method' => 'get')) }}
                 <button type="submit" class="btn btn-info btn-lg btn-rounded">
                     {{{ Lang::get('titles.invitations') }}}
                 </button>
-            {{ Form::close() }}            
+            {{ Form::close() }}  
+            <button type="button" class="btn btn-primary btn-lg btn-rounded" data-toggle="modal" data-target="#sentRequestsModal">
+              {{{ Lang::get('titles.sentRequests')}}}
+            </button>
+                     
             </div>
             <ul class="nav navbar-top-links navbar-right">
                 <li>

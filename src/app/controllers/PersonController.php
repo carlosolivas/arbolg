@@ -13,7 +13,7 @@ class PersonController extends BaseController
     const MOTHER    = 2;
     const SON       = 3;
 
-	public function __construct(PersonRepositoryInterface $personRepository) 
+	public function __construct(PersonRepositoryInterface $personRepository)
 	{
         $this->personRepository = $personRepository;
 	}
@@ -22,35 +22,57 @@ class PersonController extends BaseController
 	/**
      * This function check if the Person exists already in the graph model
      * and create the view for the tree
-     * @return View   
-     */ 
+     * @return View
+     */
 	public function get_tree()
 	{
-		try {
+		try
+		{
 
-			/* Suggesteds */
-			
-			$rootPerson = $this->personRepository->getById(8); // Milhouse
 			$suggestedPersons = array();
+			$readyToConnectPersons = array();
+			$sentRequests = array();
+			/* Suggesteds */
+			/*$rootPerson = $this->personRepository->getById(8); // Milhouse			
+			$suggestedPersons = array();
+			$readyToConnectPersons = array();
+			$sentRequests = array();
 
-			foreach ($rootPerson->getFamily()->Persons as $p) {
-				$fullname = $p->name . " " . $p->lastname . " " . $p->mothersname;
-				$personItem = array('id' => $p->id, 
-					'fullname' => $fullname);
+			if ($rootPerson != null) {
 
-				$suggestedPersons[] = $personItem;
-			}
+				$suggestedPersons = array();
+				$readyToConnectPersons = array();
+				$sentRequests = array();
+
+				foreach ($rootPerson->getFamily()->Persons as $p) {
+					$fullname = $p->name . " " . $p->lastname . " " . $p->mothersname;
+					$personItem = array('id' => $p->id,
+						'fullname' => $fullname);
+
+					$suggestedPersons[] = $personItem;
+					$readyToConnectPersons[] = $personItem;
+				}
+			}*/		
 
 			/**/
-			
+
 
 			$person = Auth::user()->Person;
+			
 
 			/* Check if the NodePerson for this user wasn´t created yet */
-			if (!($this->get('NodePerson')->nodePersonExists($person->id))) {				
+			if (!($this->get('NodePerson')->nodePersonExists($person->id))) {
+				
 
 				/* Create the NodePerson for this user */
-				$this->get('NodePerson')->create($person->id,$person->id);	
+				$this->get('NodePerson')->create($person->id,$person->id);
+
+				if ($person->getFamily() == null) {
+					
+					return View::make('person.tree')->with('suggestedPersons', $suggestedPersons)
+						->with('readyToConnectPersons', $readyToConnectPersons)->with('sentRequests', $sentRequests);
+
+				}
 
 				/* Sort the familiars: first the parents and then the sons */
 				$directFamiliars = array();
@@ -60,7 +82,7 @@ class PersonController extends BaseController
 					if ($directFamiliar->role_id == self::FATHER || $directFamiliar->role_id == self::MOTHER) {
 						array_push($directFamiliars, $directFamiliar);
 					}
-				}
+				}				
 
 				/* Then the sons */
 				foreach ($person->getFamily()->Persons as $directFamiliar) {
@@ -72,9 +94,9 @@ class PersonController extends BaseController
 				/* The NodePerson of logged Person */
 				$nodePersonLogged = $this->get('NodePerson')->findById($person->id);
 
-				if ( $nodePersonLogged != null ) {				
-				
-					foreach ($directFamiliars as $directFamiliar) 
+				if ( $nodePersonLogged != null ) {
+
+					foreach ($directFamiliars as $directFamiliar)
 					{
 						/* If is not the same Person who are logged */
 						if ( $directFamiliar->id != $person->id) {
@@ -103,7 +125,7 @@ class PersonController extends BaseController
 									/* Add as the coup the logged Person and vice versa */
 									$this->get('NodePerson')->addCoup($person->id, $coupId);
 									$this->get('NodePerson')->addCoup($directFamiliar->id, $person->id);
-								}	
+								}
 							}
 
 							if ($person->role_id == self::SON) {
@@ -122,7 +144,7 @@ class PersonController extends BaseController
 													$this->get('NodePerson')->addCoup($parent->personId, $otherParent->personId);
 												}
 											}
-										}								
+										}
 									}
 								}
 								if ($directFamiliar->role_id == self::SON) {
@@ -135,30 +157,34 @@ class PersonController extends BaseController
 										/* Add as parent the parent of logged person, and as son
 										the current direct familiar */
 										$this->get('NodePerson')->addParent($sonId, $parentId);
-									}							
+									}
 								}
-							}									
+							}
 						}
-					}	
-				}	
+					}
+				}
 			}
 
-			return View::make('person.tree')->with('suggestedPersons', $suggestedPersons);
-			
+			return View::make('person.tree')->with('suggestedPersons', $suggestedPersons)
+			->with('readyToConnectPersons', $readyToConnectPersons)->with('sentRequests', $sentRequests);
+
 		} catch (Exception $e) {
-			return Redirect::to('error')->with('error', $e);			
-		}		
+			return Redirect::to('error')->with('error', $e);
+		}
 	}
 
 	/**
      * Get the family of Person
-     * @return Node Persons   
-     */  
+     * @return Node Persons
+     */
 	public function get_loadTreePersons()
 	{
 		$user = Auth::user();
+
 		$personLogged = $user->Person->id;
+
 		$family = $this->get('NodePerson')->getFamily($personLogged);
+		
 		$nodes = array();
 		foreach ($family as $nodePerson) {
 			$person = $this->personRepository->getById($nodePerson->personId);
@@ -171,7 +197,7 @@ class PersonController extends BaseController
 			}
 			// Check if the logged person can update his data
 			$canBeUpdatedByLoggedUser = $nodePerson->ownerId == $personLogged;
-			
+
 			$personId = (string)$person->id;
 			$dataOfPerson = array(
 				"id" => $personId,
@@ -187,12 +213,18 @@ class PersonController extends BaseController
 				"isRootNode"	=> $isRootNode,
 				"canBeUpdatedByLoggedUser"	=> $canBeUpdatedByLoggedUser
 			);
-			$data = array('data' => $dataOfPerson);
+
+			$photo = array('background-image' => $person->Photo->fileURL,
+					"background-fit" => 'cover');
+
+
+			$data = array('data' => $dataOfPerson, 'css' => $photo);
+
 			array_push($nodes, $data);
 		}
 		return Response::json( $nodes );
 	}
-	
+
 	/**
 	* Get the relations between the Person's familiars
 	* @return Node Persons
@@ -202,7 +234,7 @@ class PersonController extends BaseController
 		$user = Auth::user();
 		$personLogged = $user->Person->id;
 		$family = $this->get('NodePerson')->getFamily($personLogged);
-		
+
 		$relations = array();
 		foreach ($family as $person) {
 			foreach ($person->parents as $nodeParent) {
@@ -221,21 +253,21 @@ class PersonController extends BaseController
 
 
 	/**
-     * This function creates a Person, a NodePerson and relate this NodePerson with 
+     * This function creates a Person, a NodePerson and relate this NodePerson with
      * @return Json with the request status
-     */ 
+     */
 	public function post_saveParent()
 	{
 		try {
 
 			// Data of new Person
-			$input = Input::all();			
-			
+			$input = Input::all();
+
 			// Converting the date of birth
 			$birthdate =  $this->formatDate($input['dateOfBirth']);
 
 			$data = array(
-				'name' 			=> $input['name'], 
+				'name' 			=> $input['name'],
 				'lastname' 		=> $input['lastname'],
 				'mothersname' 	=> $input['mothersname'],
 				'birthdate' 	=> $birthdate,
@@ -245,7 +277,7 @@ class PersonController extends BaseController
 				'user_id' 		=> null,
 				'role_id' 		=> 1,
 				'file_id'		=> null
-			);	
+			);
 
 		 	$rules = array(
 			 	'name' => 'required',
@@ -255,35 +287,35 @@ class PersonController extends BaseController
 	            'phone' => 'numeric'
             );
 
-			$validation = Validator::make($data, $rules);	
+			$validation = Validator::make($data, $rules);
 
 			// Check if son can add more Parents
 			$sonId = (int)$input['son'];
-			$son = $this->get('NodePerson')->findById($sonId);		
+			$son = $this->get('NodePerson')->findById($sonId);
 
-			if ($this->get('NodePerson')->canAddParents($son) && !($validation->fails())) {		
-			
-				// Create a Person 
+			if ($this->get('NodePerson')->canAddParents($son) && !($validation->fails())) {
+
+				// Create a Person
 				$newPersonId =  $this->personRepository->store($data);
 
 				// Create a NodePerson
 				$user = Auth::user();
 				$personLogged = $user->Person->id;
 				$this->get('NodePerson')->create($newPersonId, $personLogged);
-				
+
 				// Add new Person as parent
 				$parentId = $newPersonId;
 				$this->get('NodePerson')->addParent($sonId, $parentId);
 
 				return Response::json( 'successful' );
-			}		
+			}
 			else {
 				return Response::json( $validation->messages()->all('- :message -') );
 			}
 
 		} catch (Exception $e) {
 			return Response::json( $e->getMessage() );
-		}		
+		}
 	}
 
 	/**
@@ -295,13 +327,13 @@ class PersonController extends BaseController
 		try {
 
 			// Logged Person
-			$user = Auth::user();		
+			$user = Auth::user();
 			$personLoggedId = $user->Person->id;
 
 			// Data of new Person
-			$input = Input::all();		
+			$input = Input::all();
 
-			$personId = (int)$input['id'];	
+			$personId = (int)$input['id'];
 
 			$personToUpdateData = $this->get('NodePerson')->findById($personId);
 
@@ -313,7 +345,7 @@ class PersonController extends BaseController
 
 				$data = array(
 					'id'			=> $input['id'],
-					'name' 			=> $input['name'], 
+					'name' 			=> $input['name'],
 					'lastname' 		=> $input['lastname'],
 					'mothersname' 	=> $input['mothersname'],
 					'birthdate' 	=> $birthdate,
@@ -323,7 +355,7 @@ class PersonController extends BaseController
 					'user_id' 		=> null,
 					'role_id' 		=> 1,
 					'file_id'		=> null
-				);	
+				);
 
 			 	$rules = array(
 				 	'name' => 'required',
@@ -335,13 +367,13 @@ class PersonController extends BaseController
 
 				$validation = Validator::make($data, $rules);
 
-				if (!($validation->fails())) {		
-			
-					// Edition a Person 
+				if (!($validation->fails())) {
+
+					// Edition a Person
 					$this->personRepository->store($data);
 
 					return Response::json( 'successful' );
-				}		
+				}
 				else {
 					return Response::json( $validation->messages()->all('- :message -') );
 				}
@@ -351,7 +383,7 @@ class PersonController extends BaseController
 
 		} catch (Exception $e) {
 			return Response::json( $e->getMessage() );
-		}		
+		}
 	}
 
 	/* Utilities */
@@ -361,7 +393,7 @@ class PersonController extends BaseController
      * @param date The date to format
      * @param toSpanishFormat Indicates if the return value must be in spanish format
      * @return Date
-     */ 
+     */
 	public function formatDate($date, $toSpanishFormat = false)
 	{
 		if ($toSpanishFormat) {
@@ -372,7 +404,7 @@ class PersonController extends BaseController
 		}
 
 		$date = str_replace('/', '-', $date);
-		$birthdate = date('Y-m-d', strtotime($date));	
+		$birthdate = date('Y-m-d', strtotime($date));
 
 		return $birthdate;
 	}

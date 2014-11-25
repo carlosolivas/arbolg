@@ -38,6 +38,10 @@ return array(
 	"invitation"			=> 'Invitación',
 	"connectionPoint"		=> 'Conexión',
 	"sendInvitation"		=> 'Enviar invitación',
-	"cancel"				=> 'Cancelar'
+	"cancel"				=> 'Cancelar',
+	"sentRequests"			=> 'Solicitudes enviadas',
+	"acceptConnection"		=> 'Aceptar conexión',
+	"readyToConnect"		=> 'Listos para unirse',
+	"noSentRequests"		=> 'No hay solicitudes enviadas pendientes de confirmación'
 
 );

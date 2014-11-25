@@ -167,6 +167,11 @@ class NodePersonService extends BaseService
             }
         }
 
+        /* If doesn't have family, return the single node of Person */
+        if (count($family) == 0) {
+            $family[] = $this->findById($personId);
+        }
+
         return $family;             
     }       
 
