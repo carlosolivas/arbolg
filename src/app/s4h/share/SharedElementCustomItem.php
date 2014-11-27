@@ -28,8 +28,8 @@ class SharedElementCustomItem {
     protected $html;
 
     /**
-     * @param $name
-     * @param $html
+     * @param $name : Name of the custom item, this must match the HTML name
+     * @param $html : HTML code to create the custom item
      */
 
     function __construct($name, $html)
@@ -39,6 +39,7 @@ class SharedElementCustomItem {
     }
 
     /**
+     * Gets the name of the custom item, this must match the HTML name
      * @return mixed
      */
     public function getName()
@@ -47,6 +48,7 @@ class SharedElementCustomItem {
     }
 
     /**
+     * Gets the HTML code to create the custom item
      * @return mixed
      */
     public function getHtml()

@@ -27,10 +27,11 @@ class SharedElement {
 
     function __construct()
     {
-        $customElements = array();
+
     }
 
     /**
+     * Gets the Id of the Sahred element
      * @return mixed
      */
     public function getElementId()
@@ -39,6 +40,7 @@ class SharedElement {
     }
 
     /**
+     * Sets the Id of the Sahred element
      * @param mixed $elementId
      */
     public function setElementId($elementId)
@@ -47,6 +49,7 @@ class SharedElement {
     }
 
     /**
+     * Gets the message to display when sharing
      * @return mixed
      */
     public function getMessage()
@@ -55,6 +58,7 @@ class SharedElement {
     }
 
     /**
+     * Sets the message to display when sharing
      * @param mixed $message
      */
     public function setMessage($message)
@@ -63,6 +67,7 @@ class SharedElement {
     }
 
     /**
+     * Gets the class name of the shared object
      * @return mixed
      */
     public function getClassName()
@@ -71,6 +76,7 @@ class SharedElement {
     }
 
     /**
+     * Sets the class name of the shared object
      * @param mixed $moduleId
      */
     public function setClassName($moduleId)
@@ -79,6 +85,7 @@ class SharedElement {
     }
 
     /**
+     * Gets the Id of the person sharing the object
      * @return mixed
      */
     public function getPersonId()
@@ -87,6 +94,7 @@ class SharedElement {
     }
 
     /**
+     * Sets the Id of the person sharing the object
      * @param mixed $personId
      */
     public function setPersonId($personId)
@@ -95,6 +103,7 @@ class SharedElement {
     }
 
     /**
+     * Gets the type of sharing
      * @return mixed
      */
     public function getType()
@@ -103,7 +112,7 @@ class SharedElement {
     }
 
     /**
-     * Type of sharing
+     * Sets the type of sharing
      * @param $type
      */
     public function setType($type)
@@ -112,6 +121,7 @@ class SharedElement {
     }
 
     /**
+     * Gets the URL of the shared element
      * @return mixed
      */
     public function getUrl()
@@ -120,6 +130,7 @@ class SharedElement {
     }
 
     /**
+     * Sets the URL of the shared element
      * @param mixed $url
      */
     public function setUrl($url)
@@ -137,6 +148,7 @@ class SharedElement {
     }
 
     /**
+     * Gets the SharedElement list of items.
      * @return mixed
      */
     public function getCustomElements()
@@ -145,6 +157,7 @@ class SharedElement {
     }
 
     /**
+     * Sets the SharedElement list of items.
      * @param mixed $customElements
      */
     public function setCustomElements(array $customElements)
@@ -162,6 +175,7 @@ class SharedElement {
     }
 
     /**
+     * Gets the list of persons whom the object is shared with
      * @return array
      */
     public function getSharedWith()
@@ -170,6 +184,7 @@ class SharedElement {
     }
 
     /**
+     * Sets the list of persons whom the object is shared with
      * @param array $sharedWith
      */
     public function setSharedWith($sharedWith)

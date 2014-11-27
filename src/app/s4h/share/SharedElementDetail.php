@@ -34,6 +34,7 @@ class SharedElementDetail {
     }
 
     /**
+     * Gets the Id of the element
      * @return mixed
      */
     public function getId()
@@ -42,6 +43,7 @@ class SharedElementDetail {
     }
 
     /**
+     * Sets the Id of the element
      * @param mixed $id
      */
     public function setId($id)
@@ -50,6 +52,7 @@ class SharedElementDetail {
     }
 
     /**
+     * Gets the Id of the Group whom the element is shared
      * @return mixed
      */
     public function getGroupId()
@@ -58,6 +61,7 @@ class SharedElementDetail {
     }
 
     /**
+     * Sets the Id of the Group whom the element is shared
      * @param mixed $group_id
      */
     public function setGroupId($group_id)
@@ -66,6 +70,7 @@ class SharedElementDetail {
     }
 
     /**
+     * Gets the Id of the Person whom the element is shared
      * @return mixed
      */
     public function getPersonId()
@@ -74,6 +79,7 @@ class SharedElementDetail {
     }
 
     /**
+     * Sets the Id of the Person whom the element is shared
      * @param mixed $person_id
      */
     public function setPersonId($person_id)
@@ -82,6 +88,7 @@ class SharedElementDetail {
     }
 
     /**
+     * Gets the status of the sharing process
      * @return mixed
      */
     public function getStatus()
@@ -90,6 +97,7 @@ class SharedElementDetail {
     }
 
     /**
+     * Sets the status of the sharing process
      * @param mixed $status
      */
     public function setStatus($status)
