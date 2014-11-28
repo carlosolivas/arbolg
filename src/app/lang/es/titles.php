@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 return array(
 
@@ -14,7 +14,7 @@ return array(
 	"dateOfBirth"			=> 'Fecha de Nacimiento',
 	"email"					=> 'E-mail',
 	"male"					=> 'Masculino',
-	"female"				=> 'Femenino',		
+	"female"				=> 'Femenino',
 	"isDeceased"			=> '¿Ha fallecido?',
 	"placeOfBirth"			=> 'Lugar de nacimiento',
 	"country"				=> 'País',
@@ -27,7 +27,7 @@ return array(
 	"dropHere" 				=> 'Arrastre aquí para conectar con: ',
 	"sendRequests"			=> 'Se enviarán las solicitudes a los usuarios que intenta conectar. ¿ Desea continuar ? : ',
 	"continue"				=> 'Si, enviar Solicitudes!',
-	"tree"					=> 'Árbol familiar',
+	"tree"					=> 'Árbol genealógico',
 	"connect"				=> 'Conectar',
 	"close"					=> 'Cerrar',
 	"addParent"				=> 'Agregar Padre',
@@ -42,6 +42,16 @@ return array(
 	"sentRequests"			=> 'Solicitudes enviadas',
 	"acceptConnection"		=> 'Aceptar conexión',
 	"readyToConnect"		=> 'Listos para unirse',
-	"noSentRequests"		=> 'No hay solicitudes enviadas pendientes de confirmación'
+	"noSentRequests"		=> 'No hay solicitudes enviadas pendientes de confirmación',
+	"requestStatus"			=> 'Estatus de solicitudes',
+	"sent"							=> 'Enviadas',
+	"inConfirmation"		=> 'En confirmación',
+	"accepted"					=> 'Aceptadas',
+	"welcome"						=> 'Bienvenido',
+	"logout"						=> 'Salir',
+	"create"						=> 'Crear',
+	"events"						=> 'Eventos',
+	"photoGallery"			=> 'Galería Fotográfica',
+	"invite"						=> 'Invitar'
 
 );

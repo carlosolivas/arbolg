@@ -5,10 +5,26 @@
    height: 100%;
 }
 
-#readyToConnect{
-  height: 20%;
-  min-height: 120px;
-  border: 3px solid #2f4050 !important;
+#menuBar{
+  margin-bottom: 20px;
+  border-bottom-style: solid;
+  border-bottom-color: #1c84c6;
+  border-bottom-width: 1px;
+
+}
+
+#topBar{
+  background-color: #1c84c6;
+}
+
+#menuBarBottomBar{
+  min-height: 50px;
+  text-align: center;
+}
+
+.menuBarBottomBarItem{
+  background-color: #006198;
+  font-size: 14px;
 }
 
 .connectWithSuggested{
