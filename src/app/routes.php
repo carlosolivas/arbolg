@@ -9,6 +9,7 @@
 | It's a breeze. Simply tell Laravel the URIs it should respond to
 | and give it the Closure to execute when that URI is requested.
 |
+
 */
 Route::pattern('id', '[0-9]+');
 
@@ -70,8 +71,13 @@ Route::post('user/forgot_password', 'UserController@do_forgot_password');
 Route::get('user/reset_password/{token}', 'UserController@reset_password');
 Route::post('user/reset_password', 'UserController@do_reset_password');
 Route::get('user/logout', 'UserController@logout');
+
 //Sharing Routes
 Route::get('/share/request', array('before' => 'auth', 'uses' => 'ShareController@testRequestShare'));
 Route::post('/share/request', array('before' => 'auth', 'uses' => 'ShareController@SaveRequestShare'));
 Route::get('/share/request/{shareDetailId}/accept', array('before' => 'auth', 'uses' => 'ShareController@AcceptShareRequest'));
+
 Route::get('/share/request/{shareDetailId}/reject', array('before' => 'auth', 'uses' => 'ShareController@RejectShareRequest'));
+
+Route::get('/share/request/{shareDetailId}/reject', array('before' => 'auth', 'uses' => 'ShareController@RejectShareRequest'));
+
