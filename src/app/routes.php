@@ -12,13 +12,13 @@
 */
 Route::pattern('id', '[0-9]+');
 
-Route::group(array("before" => 'Confide'), function()
-{
-    Route::group(array('prefix' => LaravelLocalization::setLocale()), function()
-    { 
-        Route::get(
-        '/',
-        array('as' => 'home', 'uses' => 'PersonController@get_tree'));
+ Route::group(array('prefix' => LaravelLocalization::setLocale()), function()
+{ 
+    Route::group(array("before" => 'auth'), function()
+    {   
+        Route::get('/', array('before' => 'auth', function () {
+            return View::make('index');
+        }));
 
         Route::get(
         '/tree',
@@ -54,25 +54,24 @@ Route::group(array("before" => 'Confide'), function()
 
         Route::get(
         '/invitation',
-        array('as' => 'invitation', 'uses' => 'JoinController@get_makeInvitation'));
-        
+        array('as' => 'invitation', 'uses' => 'JoinController@get_makeInvitation'));       
+    
     });
 });
 
-Route::get('error','BaseController@error');
-Route::get('test','BaseController@test');
-
 // Confide routes
-Route::get( 'user/create','UserController@create');
-Route::post('user','UserController@store');
-
-Route::get( 'login','UserController@login');
-
-Route::post('login','UserController@do_login');
-Route::get( 'user/confirm/{code}','UserController@confirm');
-Route::get( 'user/forgot_password','UserController@forgot_password');
-Route::post('user/forgot_password','UserController@do_forgot_password');
-Route::get( 'user/reset_password/{token}', 'UserController@reset_password');
-Route::post('user/reset_password','UserController@do_reset_password');
-Route::get( 'user/logout','UserController@logout');
-
+Route::get('user/create', 'UserController@create');
+Route::post('user', 'UserController@store');
+Route::get('login', 'UserController@login');
+Route::post('login', 'UserController@do_login');
+Route::get('user/confirm/{code}', 'UserController@confirm');
+Route::get('user/forgot_password', 'UserController@forgot_password');
+Route::post('user/forgot_password', 'UserController@do_forgot_password');
+Route::get('user/reset_password/{token}', 'UserController@reset_password');
+Route::post('user/reset_password', 'UserController@do_reset_password');
+Route::get('user/logout', 'UserController@logout');
+//Sharing Routes
+Route::get('/share/request', array('before' => 'auth', 'uses' => 'ShareController@testRequestShare'));
+Route::post('/share/request', array('before' => 'auth', 'uses' => 'ShareController@SaveRequestShare'));
+Route::get('/share/request/{shareDetailId}/accept', array('before' => 'auth', 'uses' => 'ShareController@AcceptShareRequest'));
+Route::get('/share/request/{shareDetailId}/reject', array('before' => 'auth', 'uses' => 'ShareController@RejectShareRequest'));

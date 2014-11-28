@@ -13,9 +13,9 @@
 
 Route::filter('Confide', function()
 {
-    /*if (!Confide::user()) {
+    if (!Confide::user()) {
     	return Redirect::to('login');
-    }*/
+    }
 });
 
 App::before(function($request)
