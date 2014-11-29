@@ -1,3 +1,7 @@
+#page-wrapper{
+  background-color: #ffffff;
+}
+
 #cy {
    min-width: 400px;
    min-height: 600px;
@@ -12,7 +16,16 @@
   border-bottom-width: 1px;
 
 }
-
+#suggesteds{
+  width: 100%;
+  height: 100%;
+  border-left-style: groove;
+  border-left-color: #dedede;
+  border-left-width: 5px;
+  border-bottom-style: groove;
+  border-bottom-color: #dedede;
+  border-bottom-width: 5px;
+}
 #topBar{
   background-color: #1c84c6;
 }

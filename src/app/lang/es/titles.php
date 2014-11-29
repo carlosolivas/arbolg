@@ -52,6 +52,7 @@ return array(
 	"create"						=> 'Crear',
 	"events"						=> 'Eventos',
 	"photoGallery"			=> 'Galería Fotográfica',
-	"invite"						=> 'Invitar'
+	"invite"						=> 'Invitar',
+	"suggestedFamilies"	=> 'Familias sugeridas'
 
 );

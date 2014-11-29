@@ -5,68 +5,64 @@
 {{ HTML::style('assets/css/plugins/cytoscape/style.css'); }}
 
 @section('content')
-<div id="menuBar">
-	<div class="row">
-		<div class="col-xs-6">
-			<h1>{{{ Lang::get('titles.tree') }}}</h1>
-			<label>Inicio |</label><label>Datos |</label><label>Ingresar</label>
-		</div>
-		<div class="col-xs-6">
-		<div class="row" style="margin-top: 20px">
-			<div class="col-xs-4">
-		    <h5><span class="glyphicon glyphicon-inbox"></span> {{{ Lang::get('titles.requestStatus') }}}</h5>
-			</div>
-
-			<div class="col-xs-8">
-
-				<div class="row">
-						<div class="col-xs-4">
-						{{ Form::open(array('url' => '/#', 'method' => 'get')) }}
-									<button type="submit" class="btn btn-w-m btn-primary">
-											{{{ Lang::get('titles.sent') }}}
-									</button>
-						{{ Form::close() }}
-					</div>
-
-					<div class="col-xs-4">
-						{{ Form::open(array('url' => '/#', 'method' => 'get')) }}
-									<button type="submit" class="btn btn-w-m btn-warning">
-											{{{ Lang::get('titles.inConfirmation') }}}
-									</button>
-						{{ Form::close() }}
-					</div>
-
-					<div class="col-xs-4">
-						{{ Form::open(array('url' => '/#', 'method' => 'get')) }}
-									<button type="submit" class="btn btn-w-m btn-success">
-											{{{ Lang::get('titles.accepted') }}}
-									</button>
-						{{ Form::close() }}
-					</div>
-				</div>
-			</div>
-		</div>
+<nav id="menuBar" class="navbar navbar-static-top " role="navigation">
+	<div class="navbar-header" style="margin-bottom: 20px">
+		<h1>{{{ Lang::get('titles.tree') }}}</h1>
+		<label>Inicio |</label><label>Datos |</label><label>Ingresar</label>
 	</div>
-	</div>
-</div>
+		<ul class="nav navbar-top-links navbar-right" style="margin-top: 20px;">
+				<li>
+						 <h5><span class="glyphicon glyphicon-inbox"></span> {{{ Lang::get('titles.requestStatus') }}}</h5>
+				</li>
+				<li>
+					{{ Form::open(array('url' => '/#', 'method' => 'get')) }}
+								<button type="submit" class="btn btn-w-m btn-primary">
+										{{{ Lang::get('titles.sent') }}}
+								</button>
+					{{ Form::close() }}
+				</li>
+				<li>
+					{{ Form::open(array('url' => '/#', 'method' => 'get')) }}
+								<button type="submit" class="btn btn-w-m btn-warning">
+										{{{ Lang::get('titles.inConfirmation') }}}
+								</button>
+					{{ Form::close() }}
+				</li>
+				<li>
+					{{ Form::open(array('url' => '/#', 'method' => 'get')) }}
+								<button type="submit" class="btn btn-w-m btn-success">
+										{{{ Lang::get('titles.accepted') }}}
+								</button>
+					{{ Form::close() }}
+				</li>
+		</ul>
+</nav>
  <nav id="menuBarBottomBar" class="navbar navbar-static-top  menuBarBottomBarItem" role="navigation" style="margin-bottom: 0">
-      <ul class="nav navbar-top-links">
-          <li style="width: 25%">
-              <a href="#"><span class="fa fa-plus-square-o"></i> {{ Lang::get('titles.create') }}</a>
+      <ul class="nav navbar-top-links row">
+          <li class="col-xs-3">
+              <a href="#"><span class="fa fa-plus-square-o"></span></i> {{ Lang::get('titles.create') }}</a>
           </li>
-          <li style="width: 25%">
+          <li class="col-xs-3">
               <a href="#"><span class="fa fa-calendar-o"></span> {{ Lang::get('titles.events') }}</a>
           </li>
-					<li style="width: 25%">
-						<a href="#"><span class="fa fa-file-picture-o"></span> {{ Lang::get('titles.photoGallery') }}</a>
-					</li>
-					<li style="width: 23%">
-						<a href="#"><span class="fa fa-slideshare"></span> {{ Lang::get('titles.invite') }}</a>
+					<li class="col-xs-3">
+						<a href="#"><span class="fa fa-picture-o"></span> {{ Lang::get('titles.photoGallery') }}</a>
+				  </li>
+					<li class="col-xs-3" style="margin-right: 0px">
+						<a href="#"><span class="fa fa-users"></span> {{ Lang::get('titles.invite') }}</a>
 					</li>
       </ul>
 </nav>
-
-<div id='cy'>
+<div class="row">
+	<div class="col-xs-9">
+		<div id='cy'>
+		</div>
+	</div>
+	<div class="col-xs-3">
+		<div id="suggesteds">
+			<h2>{{ Lang::get('titles.suggestedFamilies') }}</h2>
+		</div>
+	</div>
 </div>
 <div id="menu-form" title='Menu' style="display: none">
 
