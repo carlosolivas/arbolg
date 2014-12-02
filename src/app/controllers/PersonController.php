@@ -257,7 +257,7 @@ class PersonController extends BaseController
      * @return Json with the request status
      */
 	public function post_saveParent()
-	{
+	{		
 		try {
 
 			// Data of new Person
@@ -273,9 +273,9 @@ class PersonController extends BaseController
 				'birthdate' 	=> $birthdate,
 				'gender' 		=> $input['gender'],
 				'phone' 		=> $input['phone'],
-				'email'		    => 'test@gmail.com',
+				'email'		    => $input['email'],
 				'user_id' 		=> null,
-				'role_id' 		=> 1,
+				'role_id' 		=> $input['gender'] == self::MOTHER ? self::MOTHER : self::FATHER,
 				'file_id'		=> null
 			);
 
@@ -284,7 +284,8 @@ class PersonController extends BaseController
 	            'lastname' => 'required',
 	            'gender' => 'required',
 	            'birthdate' => 'date',
-	            'phone' => 'numeric'
+	            'phone' => 'numeric',
+	            'email' => 'email'
             );
 
 			$validation = Validator::make($data, $rules);
@@ -351,9 +352,9 @@ class PersonController extends BaseController
 					'birthdate' 	=> $birthdate,
 					'gender' 		=> $input['gender'],
 					'phone' 		=> $input['phone'],
-					'email'		    => 'test@gmail.com',
+					'email'		    => $input['email'],
 					'user_id' 		=> null,
-					'role_id' 		=> 1,
+					'role_id' 		=> $input['gender'] == self::MOTHER ? self::MOTHER : self::FATHER,
 					'file_id'		=> null
 				);
 
@@ -362,7 +363,8 @@ class PersonController extends BaseController
 		            'lastname' => 'required',
 		            'gender' => 'required',
 		            'birthdate' => 'date',
-		            'phone' => 'numeric'
+		            'phone' => 'numeric',
+	            	'email' => 'email'
 	            );
 
 				$validation = Validator::make($data, $rules);
@@ -384,6 +386,48 @@ class PersonController extends BaseController
 		} catch (Exception $e) {
 			return Response::json( $e->getMessage() );
 		}
+	}
+
+	/**
+	 * This function laod the view to set photo
+	 * @return View
+	 */
+	function get_setPhoto($id)
+	{
+		// Logged Person
+		$user = Auth::user();
+		$personLoggedId = $user->Person->id;
+
+		if (is_string($id)) {
+			$id = (int)$id;
+		}
+
+		$personToUpdatePhoto = $this->get('NodePerson')->findById($id);
+
+		if ($personToUpdatePhoto == null || $personToUpdatePhoto->ownerId != $personLoggedId) {
+			return Redirect::to('/tree');
+		}
+
+		$person = $this->personRepository->getById($id);
+		Session::put('personIdPhotonEditing', $id);
+		return View::make('person.photo')->with('person', $person);
+	}
+
+	/**
+	* This function add the person photo
+	*/
+	function post_setPhoto()
+	{
+		$personId = Session::get('personIdPhotonEditing');
+		$input = Input::all();
+
+		$data = array(
+			'id'			=> $personId,
+			'photo'			=> $input['photo']
+		);
+
+		$this->personRepository->store($data);
+		return Redirect::to('/tree');
 	}
 
 	/* Utilities */

@@ -316,6 +316,14 @@ function initializeCytoscape()
           suggestedsDialog.dialog("open");          
         }
        },
+       "setPhoto" : {
+         text: "Cambiar Foto",
+         id: "setPhoto",
+         class: "btn btn-primary btn-xs",
+         click: function(){
+          window.location = "/setPhoto/" + personDetail_id;
+         }
+       },
        "closeMenu" : {
          text: "Cerrar",
          id: "closeMenu",
@@ -360,8 +368,9 @@ function initializeCytoscape()
             var newPerson_mothersname = $("#newPerson_mothersname").val(); 
             var newPerson_dateOfBirth = $("#newPerson_dateOfBirth").val();
             var newPerson_gender = $("#newPerson_gender").val();
-            var newPerson_phone = $("#newPerson_phone").val();
-
+            var newPerson_phone = $("#newPerson_phone").val();  
+            var newPerson_email = $("#newPerson_email").val();                         
+            
             // Save
             $.ajax({
               type: "post",
@@ -374,7 +383,8 @@ function initializeCytoscape()
                 mothersname: newPerson_mothersname,
                 dateOfBirth: newPerson_dateOfBirth,
                 gender: newPerson_gender,
-                phone: newPerson_phone
+                phone: newPerson_phone,
+                email: newPerson_email
               }
               }).done(function( json ) {
                    if (json == 'successful') { 
@@ -384,7 +394,8 @@ function initializeCytoscape()
                     $("#newPerson_mothersname").val(""); 
                     $("#newPerson_dateOfBirth").val("");
                     $("#newPerson_gender").val("");
-                    $("#newPerson_phone").val("");          
+                    $("#newPerson_phone").val("");      
+                    $("#newPerson_email").val("");     
 
                     // Reload the graph elements
                     loadNodesAndRelations();
@@ -395,7 +406,14 @@ function initializeCytoscape()
                     cy.load([ elements ]);    
 
                    } else {
-                  alert(json);
+                      $("#newPerson_name").val("");
+                      $("#newPerson_lastname").val("");
+                      $("#newPerson_mothersname").val(""); 
+                      $("#newPerson_dateOfBirth").val("");
+                      $("#newPerson_gender").val("");
+                      $("#newPerson_phone").val("");      
+                      $("#newPerson_email").val("");   
+                      alert(json);
                  }
             });
 

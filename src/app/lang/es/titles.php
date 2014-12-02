@@ -53,6 +53,8 @@ return array(
 	"events"						=> 'Eventos',
 	"photoGallery"			=> 'Galería Fotográfica',
 	"invite"						=> 'Invitar',
-	"suggestedFamilies"	=> 'Familias sugeridas'
+	"suggestedFamilies"	=> 'Familias sugeridas',
+	"changePhoto"		=> 'Cambiar fotografía',
+	"save"				=> 'Guardar'
 
 );

@@ -55,7 +55,15 @@ Route::pattern('id', '[0-9]+');
 
         Route::get(
         '/invitation',
-        array('as' => 'invitation', 'uses' => 'JoinController@get_makeInvitation'));       
+        array('as' => 'invitation', 'uses' => 'JoinController@get_makeInvitation'));    
+
+        Route::get(
+        '/setPhoto/{id}',
+        array('as' => 'photo', 'uses' => 'PersonController@get_setPhoto'));   
+
+        Route::post(
+        '/setPhoto',
+        array('as' => 'photo', 'uses' => 'PersonController@post_setPhoto'));   
     
     });
 });

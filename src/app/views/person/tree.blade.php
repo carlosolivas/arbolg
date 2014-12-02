@@ -120,6 +120,8 @@
 
 		  	<input type="text" name="mothersname" id="newPerson_mothersname" class="form-control" placeholder="Apellido materno">
 
+		  	<input type="email" name="email" id="newPerson_email" class="form-control" placeholder="Email">
+
 		 	<div class="input-group">
 				<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
 				<input type="text" id="newPerson_dateOfBirth" class="form-control datePicker" placeholder="Fecha de Nacimiento">
@@ -133,7 +135,6 @@
 
 		  	<input type="text" name="phone" id="newPerson_phone" class="form-control" placeholder="Teléfono">
 		  	<span class="help-block m-b-none" id="validationBlockMessage">(*) Campos obligatorios</span>
-
 	</div>
 </div>
 

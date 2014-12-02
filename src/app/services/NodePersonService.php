@@ -24,7 +24,7 @@ class NodePersonService extends BaseService
     /**
     * Queries
     */
-    const GET_ALL_FAMILY = 'MATCH (n:NodePerson {personId: ROOT})-[r*]-(p) RETURN DISTINCT p';
+    const GET_ALL_FAMILY = 'MATCH (n:NodePerson {personId: ROOT})<-[r*]-(p) RETURN DISTINCT p';
 
     /**
      * General constants
@@ -159,8 +159,8 @@ class NodePersonService extends BaseService
         $result = DB::connection('neo4j')->select($query);
         
         foreach ($result as $item) {
-            $personId = $item->current()->getProperties('personId');
-            $person = $this->findById($personId);
+            $itemPersonId = $item->current()->getProperties('personId');
+            $person = $this->findById($itemPersonId);
 
             if ($person != null) {
                 $family[] = $person;
@@ -168,9 +168,10 @@ class NodePersonService extends BaseService
         }
 
         /* If doesn't have family, return the single node of Person */
-        if (count($family) == 0) {
+        /*if (count($family) == 0) {
             $family[] = $this->findById($personId);
-        }
+        }*/
+        $family[] = $this->findById($personId);
 
         return $family;             
     }       
