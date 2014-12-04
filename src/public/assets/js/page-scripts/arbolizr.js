@@ -14,6 +14,7 @@ var CANVAS_SELECTOR = '[data-id="layer1"]';
 var LAYER_SELECTOR = '[data-id="relations"]';
 var COINTAINER_SELECTOR = '#cy div:first';
 var NODE_SELECTOR = 'node';
+var NODE_BORDER_WIDTH = 2;
 var DEBUG = false;
 var FIRST = 0;
 
@@ -48,7 +49,7 @@ function drawRelations() {
             n = graph.$('node')[i];
             childrens = getChildrens(n.data().id);
 
-            canvasContext.lineWidth = 2 * graph.zoom();
+            canvasContext.lineWidth = NODE_BORDER_WIDTH * graph.zoom();
             canvasContext.strokeStyle = '#0081CB';
             canvasContext.lineCap = 'round';
             
@@ -252,10 +253,10 @@ function drawChildrensSupLine (childrens)
 
             node = graph.getElementById(childrens[child]);
 
-            xStart = posH(node.position().x);//(node.position().x * graph.zoom()) +  graph.viewport().getCenterPan().x
+            xStart = posH(node.position().x);
             xEnd = xStart;
             yStart = posV(node.position().y - (separation + lineHeight));   
-            yEnd = posV(node.position().y - lineHeight);//(yStart + (graph.options().layout.rankSep / 2) * graph.zoom());
+            yEnd = posV(node.position().y - lineHeight - NODE_BORDER_WIDTH);
 
             canvasContext.moveTo(xStart, yStart);
             canvasContext.lineTo(xEnd, yEnd);
@@ -272,7 +273,7 @@ function drawParentsLine (parentId) {
         bounds = {
             p1:{
                 x:posH(graph.$('#' + parentId).position().x),
-                y:posV(graph.$('#' + parentId).position().y + lineHeight)
+                y:posV(graph.$('#' + parentId).position().y + lineHeight + NODE_BORDER_WIDTH)
             },
             p2: {
                 x:posH(graph.$('#' + parentId).position().x),
