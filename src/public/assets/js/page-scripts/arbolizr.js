@@ -1,7 +1,7 @@
 /**
  * Arbolizr.js
  *
- * Agnostic edge drawer for cytoscape.js
+ * Agnostic tree edge drawer for cytoscape.js
  *
  * @author Kiwing IT <info@kiwing.it>
  * @author Leandro Banchio <lbanchio@gmail.com>
@@ -40,34 +40,44 @@ function drawRelations() {
         canvasContext.clearRect(0, 0, $(LAYER_SELECTOR)[FIRST].width, $(LAYER_SELECTOR)[FIRST].height);     
     }
     
-    
 
     if(canvasContext) {
+
         for (i = 0; i < graph.$('node').length; i++) { 
             
             n = graph.$('node')[i];
             childrens = getChildrens(n.data().id);
+
+            canvasContext.lineWidth = 2 * graph.zoom();
+            canvasContext.strokeStyle = '#0081CB';
+            canvasContext.lineCap = 'round';
             
             cp = parentCoParents(n.data().id);
             cp.push(parseInt(n.data().id));
             dd(isLeftParent(n.data().id, cp));
 
-            if(childrens.length > 0) {
+            if(childrens.length == 1) {
+                dd('==');
+                //dd(n);
+                dd(cp);
+
+                    h = hLineBounds(cp); 
+                    v = vLineBounds(cp, true);
+
+                    makeLineBounds(h, v);
+
+                    drawChildrensSupLine(childrens);
+                    drawLine(lineBounds);
+                drawParentsLine(graph.$('node')[i].data().id);
+                
+                //return
+            } else if(childrens.length > 1) {
                 if(isLeftParent(n.data().id, cp)) {
-                    dd('childrens: ' + childrens);
+                    //dd(childrens);
                     h = hLineBounds(childrens); 
                     v = vLineBounds(childrens);
 
-                    lineBounds = {
-                        p1:{
-                            x: h.p1.x,
-                            y: v.p1.y
-                        },
-                        p2:{
-                            x: h.p2.x,
-                            y: v.p2.y,
-                        }
-                    } 
+                    makeLineBounds(h, v);
 
                     drawChildrensSupLine(childrens);
                     drawLine(lineBounds);
@@ -78,6 +88,21 @@ function drawRelations() {
     }
 }
 
+
+function makeLineBounds(h, v) {
+    lineBounds = {
+        p1:{
+            x: h.p1.x,
+            y: v.p1.y
+        },
+        p2:{
+            x: h.p2.x,
+            y: v.p2.y,
+        }
+    }
+
+    return lineBounds;  
+}
 /** 
  * Returns the coparents of a node
  *
@@ -234,6 +259,7 @@ function drawChildrensSupLine (childrens)
 
             canvasContext.moveTo(xStart, yStart);
             canvasContext.lineTo(xEnd, yEnd);
+
             canvasContext.stroke();
         }
     }
@@ -276,7 +302,7 @@ function drawParentsLine (parentId) {
         return (yPos * graph.zoom()) + (graph.viewport().pan().y);
     }
 
-function vLineBounds (childrens) {
+function vLineBounds (childrens, isBottomLine) {
     yChildrens = [];
 
     separation = graph.options().layout.rankSep / 2;
@@ -285,7 +311,11 @@ function vLineBounds (childrens) {
     for (var child in childrens) {
         if(isFinite(child)) {
             node = graph.getElementById(childrens[child]);
-            nodeVerticalPosition = posV(node.position().y - (separation + lineHeight));
+            if(isBottomLine) {
+                nodeVerticalPosition = posV(node.position().y + (separation + lineHeight));
+            } else {
+                nodeVerticalPosition = posV(node.position().y - (separation + lineHeight));
+            }
             yChildrens.push(nodeVerticalPosition);
         }
     } 
