@@ -53,60 +53,71 @@
 					</li>
       </ul>
 </nav>
-<div class="row">
-	<div class="col-xs-9">
-		<div id='cy'>
-		</div>
-	</div>
-	<div class="col-xs-3">
-		<div id="suggesteds">
-			<h2>{{ Lang::get('titles.suggestedFamilies') }}</h2>
-		</div>
-	</div>
+
+<div id='cy'>
 </div>
-<div id="menu-form" title='Menu' style="display: none">
 
-	 <div class="input-group m-b">
-	    <span class="input-group-addon"><b> {{{ Lang::get('titles.name') }}}</b></span>
-		<input type="text" id="personDetailName" class="form-control" disabled="true">
+<div id="menu-form" class="form-horizontal" title='Menu' style="display: none">
+
+	<div class="form-group">
+		<label class="col-xs-3 control-label">
+			{{ Lang::get('titles.name') }}
+		</label>
+    	<div class="col-xs-8">
+    		<input type="text" id="personDetailName" class="form-control" disabled="true">
+    	</div>
 	</div>
 
-	<div class="input-group m-b">
-	    <span class="input-group-addon"><b>{{{ Lang::get('titles.lastName') }}}</b></span>
-    	<input type="text" id="personDetailLastName" class="form-control" disabled="true">
-    </div>
+	<div class="form-group">
+		<label class="col-xs-3 control-label">{{ Lang::get('titles.lastName') }}
+		</label>
+    	<div class="col-xs-8">
+    		<input type="text" id="personDetailLastName" class="form-control" disabled="true">
+    	</div>
+	</div>	
 
-	<div class="input-group m-b">
-	     <span class="input-group-addon"><b>{{{ Lang::get('titles.mothersMaidenName') }}}</b></span>
-    	<input type="text" id="personDetailMothersName" class="form-control" disabled="true">
-    </div>
+	<div class="form-group">
+		<label  class="col-xs-3 control-label">{{ Lang::get('titles.mothersMaidenName') }}
+		</label>
+    	<div class="col-xs-8">
+    		<input type="text" id="personDetailMothersName" class="form-control" disabled="true">
+    	</div>
+	</div>	
 
-	<div class="input-group m-b">
-	   <span class="input-group-addon"><b>{{{ Lang::get('titles.email') }}}</b></span>
-    	<input type="text" id="personDetailEmail" class="form-control" disabled="true">
-    </div>
+	<div class="form-group">
+		<label class="col-xs-3 control-label">{{ Lang::get('titles.email') }}
+		</label>
+    	<div class="col-xs-8">
+    		<input type="text" id="personDetailEmail" class="form-control" disabled="true">
+    	</div>
+	</div>
 
-	<div class="input-group m-b">
-	    <span class="input-group-addon"><b>{{{ Lang::get('titles.birth') }}}</b></span>
-	    	<div class="input-group">
-	    		<input type="text" id="personDetailBirthDate" class="form-control datePicker" disabled="true">
-	    	</div>
-    </div>
+	<div class="form-group">
+		<label class="col-xs-3 control-label">{{ Lang::get('titles.birth') }}
+		</label>
+    	<div class="col-xs-8">
+    		<input type="text" id="personDetailBirthDate" class="form-control" disabled="true">
+    	</div>
+	</div>
 
-	<div class="input-group m-b">
-	    <span class="input-group-addon"><b>Sexo</b></span>
-	    	<select id="personDetailGender" disabled="true" class="form-control m-b">
+	<div class="form-group">
+		<label class="col-xs-3 control-label">{{ Lang::get('titles.sex') }}
+		</label>
+    	<div class="col-xs-8">
+    		<select id="personDetailGender" disabled="true" class="form-control m-b">
 	    		<option value="1">{{{ Lang::get('titles.male') }}}</option>
 	    		<option value="2">{{{ Lang::get('titles.female') }}}</option>
 	    	</select>
-    </div>
-
-	<div class="input-group m-b">
-	    <span class="input-group-addon"><b>{{{ Lang::get('titles.phone') }}}</b></span>
-	    <div class="col-lg-10">
-	    	<input type="text" id="personDetailPhone" class="form-control" disabled="true">
     	</div>
- 	</div>
+	</div>
+	
+	<div class="form-group">
+		<label class="col-xs-3 control-label">{{ Lang::get('titles.phone') }}
+		</label>
+    	<div class="col-xs-8">
+    		<input type="text" id="personDetailPhone" class="form-control" disabled="true">
+    	</div>
+	</div>
 
 </div>
 

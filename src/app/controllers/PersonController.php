@@ -32,27 +32,9 @@ class PersonController extends BaseController
 			$suggestedPersons = array();
 			$readyToConnectPersons = array();
 			$sentRequests = array();
-			/* Suggesteds */
-			/*$rootPerson = $this->personRepository->getById(8); // Milhouse			
-			$suggestedPersons = array();
-			$readyToConnectPersons = array();
-			$sentRequests = array();
 
-			if ($rootPerson != null) {
-
-				$suggestedPersons = array();
-				$readyToConnectPersons = array();
-				$sentRequests = array();
-
-				foreach ($rootPerson->getFamily()->Persons as $p) {
-					$fullname = $p->name . " " . $p->lastname . " " . $p->mothersname;
-					$personItem = array('id' => $p->id,
-						'fullname' => $fullname);
-
-					$suggestedPersons[] = $personItem;
-					$readyToConnectPersons[] = $personItem;
-				}
-			}*/		
+			/* Suggesteds (the people who accepted join)*/
+				
 
 			/**/
 

@@ -173,6 +173,9 @@ function initializeCytoscape()
 
   // On click of node 
   cy.on('tap', 'node', function(){    
+
+    /* Set the tree view like disabled */
+    $("#cy").fadeTo( "slow", 0.33 );
     
     // Control of opening dialogue
     if ( $( "#menu-form" ).dialog() != null && $( "#menu-form" ).dialog() != undefined) {
@@ -214,6 +217,7 @@ function initializeCytoscape()
     // Menu with node selected data
     var menuDialog = $( "#menu-form" ).dialog({
       autoOpen: false,
+      zIndex: 50000,
       open: function(event, ui) { 
         $(".ui-widget-header").css('border','none');
         $(".ui-dialog-titlebar-close").hide();   
@@ -235,12 +239,12 @@ function initializeCytoscape()
         duration: 200
       },
       modal: false,
-      title: 'Menu de ' + personDetail_fullname,
+      title: 'Menú de ' + personDetail_fullname,
       buttons:{
          "updateData" : {
          text: "Editar",
          id: "updateData",
-         class: (canBeUpdatedByLoggedUser ? "btn btn-primary btn-xs" : "btn btn-default btn-xs"),
+         class: (canBeUpdatedByLoggedUser ? "btn btn-success btn-xs" : "btn btn-default btn-xs"),
          click: function(){
 
           if (!canBeUpdatedByLoggedUser) {
@@ -266,9 +270,9 @@ function initializeCytoscape()
          }
        },
         "addParent" : {
-         text: "Agregar padre",
+         text: "Agregar padre/madre",
          id: "addParent",
-         class: "btn btn-primary btn-xs",
+         class: "btn btn-success btn-xs",
          click: function(){
           if (!personDetail_canAddParents) {
             return false;
@@ -283,34 +287,14 @@ function initializeCytoscape()
          }
        },      
         "extendTree" : {
-         text: "Extender árbol desde aquí",
-         id: "extendTree",
-         class: "btn btn-primary btn-xs",
+         text: "Agregar hermano/a",
+         id: "extendTree",         
+         class: "btn btn-success btn-xs",
          click: function() {
 
-          $.ajax({
-            type: "get",
-            url: "/loadSuggesteds/" + parseInt(personDetail_id)
-            }).done(function( json ) {
-               json.forEach(function(person) {
-                var div = "<div class='connectWithSuggested onHoverShow'><h4>fullnameToReplace</h4>"
-                        + "<button " 
-                        +  "class='btn btn-primary btn-xs connectWithSuggestedBtn' " 
-                        +    "type='button' style='display: none' " 
-                        +    "id=idToReplace > "
-                        +    "<strong>Conectar</strong> "
-                        +  "</button> "
-                  + "</div>";
-                div = div.replace("idToReplace",person.id);
-                div = div.replace("fullnameToReplace", person.fullname);
-                $("#extendTree-form").append(div);               
-              });
-
-               /* Register on click */
-               $(".connectWithSuggestedBtn").click(function(){
-                  window.location = /sendRequest/ + parseInt(personDetail_id) + "/" + parseInt(this.id);      
-              });
-          });
+          if (!canBeUpdatedByLoggedUser) {
+            return false;
+          }          
 
           $( this ).dialog().parent().hide("scale",200);
           suggestedsDialog.dialog("open");          
@@ -319,7 +303,7 @@ function initializeCytoscape()
        "setPhoto" : {
          text: "Cambiar Foto",
          id: "setPhoto",
-         class: "btn btn-primary btn-xs",
+         class: "btn btn-success btn-xs",
          click: function(){
           window.location = "/setPhoto/" + personDetail_id;
          }
@@ -331,12 +315,15 @@ function initializeCytoscape()
          click: function(){
           $("#extendTree-form").html("");
            $( this ).dialog( "close" );
+
+           /* Remove the tree view like disabled  */
+           $("#cy").css({opacity: 1})
          }
        }
       }
     }); 
-    menuDialog.dialog({ position: { my: "left+30 bottom+30 center", at: "right bottom", of: currentMousePos } }); 
-    
+    menuDialog.dialog({ position: { my: "left+30 bottom+30 center", at: "right bottom", of: currentMousePos }, width: 550}); 
+    menuDialog.parent().css('z-index', 50000);
     // Dialog for create a familiar and manage the data edition of them and the person logged
     var familiarDialog = $( "#familiarDialog-form" ).dialog({
       autoOpen: false,
@@ -357,7 +344,7 @@ function initializeCytoscape()
         "Save" : {
          text: "Guardar",
          id: "saveFamiliar",
-         class: "btn btn-primary btn-xs",
+         class: "btn btn-success btn-xs",
          click: function(){
           if (addFamiliar_completeFields()) 
           {
@@ -452,7 +439,7 @@ function initializeCytoscape()
       }    
     });   
     familiarDialog.dialog({ position: { my: "left+30 bottom", at: "right bottom", of: currentMousePos } });     
-
+    familiarDialog.parent().css('z-index', 50000);
     /* Dialog for suggesteds persons to connect */
     var suggestedsDialog = $("#extendTree-form").dialog({
       autoOpen: false,
@@ -482,6 +469,7 @@ function initializeCytoscape()
       }
     });
     suggestedsDialog.dialog({ position: { my: "left+30 bottom", at: "right bottom", of: currentMousePos } }); 
+    suggestedsDialog.parent().css('z-index', 50000);
 
     // Open the menu dialog when the user 'on tap' a node
     menuDialog.dialog( "open" );

@@ -55,6 +55,7 @@ return array(
 	"invite"						=> 'Invitar',
 	"suggestedFamilies"	=> 'Familias sugeridas',
 	"changePhoto"		=> 'Cambiar fotografía',
-	"save"				=> 'Guardar'
+	"save"				=> 'Guardar',
+	"sex"				=> 'Sexo'
 
 );

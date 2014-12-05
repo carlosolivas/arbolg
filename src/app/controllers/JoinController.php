@@ -142,7 +142,7 @@ class JoinController extends BaseController
 	{
 		/* Suggesteds */
 			
-			$rootPerson = $this->personRepository->getById(8); // Milhouse
+			$rootPerson = $this->personRepository->getById(77); // Milhouse
 			$suggestedPersons = array();
 
 			foreach ($rootPerson->getFamily()->Persons as $p) {

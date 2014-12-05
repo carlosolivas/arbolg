@@ -15,7 +15,7 @@ class DbPersonRepository implements PersonRepositoryInterface
     {
 		//store user's avatar
 		if (isset($data['photo'])) {
-			$file_id = $file->store($data['photo']);
+			$file_id = $this->file->store($data['photo']);
 		} else {
 			$file_id = 25;
 		}
