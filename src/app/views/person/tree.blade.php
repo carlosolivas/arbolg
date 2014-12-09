@@ -136,7 +136,7 @@
 		 	<div class="input-group">
 				<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
 				<input type="text" id="newPerson_dateOfBirth" class="form-control datePicker" placeholder="Fecha de Nacimiento">
-			</div>
+			</div>			
 
 			<select id="newPerson_gender" class="form-control">
 				<option default disable value="">Sexo*</option>
@@ -149,35 +149,8 @@
 	</div>
 </div>
 
-<div id="extendTree-form" title= {{{ Lang::get('titles.suggesteds') }}} style="display: none">
-
-</div>
-
-
-<!-- Modal for sent request -->
-<div class="modal fade" id="sentRequestsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title">{{{ Lang::get('titles.sentRequests') }}}</h4>
-      </div>
-      <div class="modal-body">
-      	@if ($sentRequests == null || $sentRequests->count() == 0)
-      		<div style="text-align: center">
-      			<h2>{{{ Lang::get('titles.noSentRequests') }}}</h2>
-      		</div>
-      	@endif
-      	@if ($sentRequests != null && $sentRequests->count() > 0)
-	        @foreach ($sentRequests as $request)
-				<div class="ui-widget-content toAssign">
-			  		<h4>{{{ $request['person'] }}}</h4>
-				</div>
-			@endforeach
-		@endif
-      </div>
-    </div>
-  </div>
+<div id="extendTree-form" style="display: none">	
+	
 </div>
 
 {{ HTML::script('assets/js/page-scripts/dagre.js'); }}

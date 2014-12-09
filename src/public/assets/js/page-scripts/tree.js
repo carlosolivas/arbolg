@@ -192,8 +192,7 @@ function initializeCytoscape()
     }
 
     if ( $( "#extendTree-form" ).dialog() != null && $( "#extendTree-form" ).dialog() != undefined) {
-      if ($( "#extendTree-form" ).dialog("isOpen")) {
-          $("#extendTree-form").html("");
+      if ($( "#extendTree-form" ).dialog("isOpen")) {         
           $( "#extendTree-form" ).dialog("close");
        }     
     }
@@ -459,7 +458,7 @@ function initializeCytoscape()
       buttons: {
         "Cancel" : {
          text: "Cancelar",
-         id: "cancelSuggesteds",
+         id: "cancelExtend",
          class: "btn btn-success btn-xs",
          click: function(){
            $( this ).dialog( "close" );   

@@ -29,16 +29,6 @@ class PersonController extends BaseController
 		try
 		{
 
-			$suggestedPersons = array();
-			$readyToConnectPersons = array();
-			$sentRequests = array();
-
-			/* Suggesteds (the people who accepted join)*/
-				
-
-			/**/
-
-
 			$person = Auth::user()->Person;
 			
 
@@ -51,8 +41,7 @@ class PersonController extends BaseController
 
 				if ($person->getFamily() == null) {
 					
-					return View::make('person.tree')->with('suggestedPersons', $suggestedPersons)
-						->with('readyToConnectPersons', $readyToConnectPersons)->with('sentRequests', $sentRequests);
+					return View::make('person.tree');
 
 				}
 
@@ -147,11 +136,10 @@ class PersonController extends BaseController
 				}
 			}
 
-			return View::make('person.tree')->with('suggestedPersons', $suggestedPersons)
-			->with('readyToConnectPersons', $readyToConnectPersons)->with('sentRequests', $sentRequests);
+			return View::make('person.tree');
 
 		} catch (Exception $e) {
-			return Redirect::to('error')->with('error', $e);
+			return Redirect::to('500')->with('error', $e);
 		}
 	}
 
@@ -400,15 +388,23 @@ class PersonController extends BaseController
 	*/
 	function post_setPhoto()
 	{
+		// Logged Person
+		$user = Auth::user();
+		$personLoggedId = $user->Person->id;
+
 		$personId = Session::get('personIdPhotonEditing');
-		$input = Input::all();
+		$input = Input::all();		
 
-		$data = array(
-			'id'			=> $personId,
-			'photo'			=> $input['photo']
-		);
+		$nodePersonToUpdatePhoto = $this->get('NodePerson')->findById($personId);
 
-		$this->personRepository->store($data);
+		if ($nodePersonToUpdatePhoto == null || $nodePersonToUpdatePhoto->ownerId != $personLoggedId) {
+			return Redirect::to('/tree');
+		}
+
+		$person = $this->personRepository->getById($personId);
+		$person->photo = $input["photo"];
+
+		$this->personRepository->store($person);
 		return Redirect::to('/tree');
 	}
 

@@ -10,7 +10,8 @@
 		 "vinelab/neoeloquent": "*",
 		 "mcamara/laravel-localization": "0.14.*",
 		 "laravelbook/ardent": "dev-master",
-		 "zizaco/confide": "3.2.x"
+		 "zizaco/confide": "3.2.x",
+		 "aws/aws-sdk-php-laravel": "1.*"
 	},
 	"autoload": {
 		"classmap": [

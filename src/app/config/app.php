@@ -128,6 +128,7 @@ return array(
 		's4h\social\BackendServiceProvider',
 		's4h\core\CoreServiceProvider',
 		's4h\share\ShareServiceProvider',
+		'Aws\Laravel\AwsServiceProvider'
 	),
 
 	/*
@@ -195,6 +196,7 @@ return array(
 		'View' => 'Illuminate\Support\Facades\View',
 		'LaravelLocalization' => 'Mcamara\LaravelLocalization\Facades\LaravelLocalization',
 		'Confide' => 'Zizaco\Confide\ConfideFacade',
+		'AWS' => 'Aws\Laravel\AwsFacade',
 	),
 
 );

@@ -104,7 +104,7 @@
                     <li class="nav-header">
 
                         <div class="dropdown profile-element"> <span>
-                            <img alt="image" class="img-circle" src={{ Confide::User()->person->Photo->fileURL }}>
+                            <img alt="image" style="width: 40px" class="img-circle" src={{ Confide::User()->person->Photo->fileURL }}>
                              </span>
                             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                             <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">{{ Confide::User()->username }}</strong>
