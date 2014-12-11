@@ -54,7 +54,7 @@ return array(
 	"photoGallery"			=> 'Galería Fotográfica',
 	"invite"						=> 'Invitar',
 	"suggestedFamilies"	=> 'Familias sugeridas',
-	"changePhoto"		=> 'Cambiar fotografía',
+	"changePhoto"		=> 'Cambiar fotografía a',
 	"save"				=> 'Guardar',
 	"sex"				=> 'Sexo'
 

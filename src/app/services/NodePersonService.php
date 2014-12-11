@@ -26,8 +26,8 @@ class NodePersonService extends BaseService
 
     public function setPersonRepository($personRepository)
     {
-          $this->personRepository = $personRepository;
-    }
+       $this->personRepository = $personRepository;     
+    }   
 
     /**
     * Queries

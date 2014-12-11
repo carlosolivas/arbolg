@@ -33,21 +33,18 @@ function loadNodesAndRelations()
     type: "get",
     url: "/loadTreePersons",
     }).done(function( json ) {
-      initNodes = json;
 
-      /*initNodes.forEach(function(nodeItem) {
-        if (nodeItem.data.isRootNode) {
-          rootNodes.push(parseInt(nodeItem.data.id));  
-        }                
-      });*/
+      initNodes = json;      
 
       // Load the initial edges (Relations)
       $.ajax({
         type: "get",
         url: "/loadTreeRelations",
         }).done(function( json ) {
-          initEdges = json;    
-          initializeCytoscape();    
+
+          initEdges = json;       
+          initializeCytoscape();             
+                   
       });
   });
 }
@@ -66,9 +63,12 @@ function initializeCytoscape()
               selector: 'node',
               css: {
                 'content': 'data(fullname)',
-                'text-valign': 'center',
+                'text-valign': 'bottom',                
                 'text-halign': 'center',
-                'font-size': '5px'
+                'font-weight': 'bold',
+                'font-size': '6px',
+                'font-family': 'Helvetica',
+                'color': 'black'
               }
             },
             {
@@ -116,7 +116,9 @@ function initializeCytoscape()
       rankSep: 60, // separación entre niveles
       edgeSep: 0,
       rankDir: 'TB',
-      stop: function () {drawRelations()},
+      stop: function () {
+        drawRelations();
+      },
     },
 
 
@@ -272,7 +274,7 @@ function initializeCytoscape()
          text: "Agregar padre/madre",
          id: "addParent",
          class: "btn btn-success btn-xs",
-         click: function(){
+         click: function(){   
           if (!personDetail_canAddParents) {
             return false;
           }
@@ -345,6 +347,7 @@ function initializeCytoscape()
          id: "saveFamiliar",
          class: "btn btn-success btn-xs",
          click: function(){
+
           if (addFamiliar_completeFields()) 
           {
               // Fields of new Person
@@ -388,8 +391,10 @@ function initializeCytoscape()
 
                     // Set the updated elements
                     var elements = initNodes;
-                    elements.push(initEdges); 
-                    cy.load([ elements ]);    
+                    elements.concat(initEdges); 
+                    cy.load({nodes: initNodes, edges: initEdges});    
+                    //cy.layout();
+                    window.location = "/tree";
 
                    } else {
                       $("#newPerson_name").val("");
@@ -409,6 +414,9 @@ function initializeCytoscape()
             // Close the dialog
             $(this).dialog("close");  
             menuDialog.dialog("close");  
+
+            /* Remove the tree view like disabled  */
+            $("#cy").css({opacity: 1});
           } else {
               setValidationBlockMessage(false);
           }
