@@ -293,12 +293,20 @@ function initializeCytoscape()
          class: "btn btn-success btn-xs",
          click: function() {
 
-          if (!canBeUpdatedByLoggedUser) {
-            return false;
-          }          
+          var personIdToShare = parseInt(personDetail_id);
+          $.ajax({
+            type: "get",
+            url: "/sharing/" + personIdToShare
+            }).done(function( json ) {
+                 if (json == 'successful') { 
+                    aler(json);
+                 } else {
+                    alert(json);
+               }
+          });  
 
           $( this ).dialog().parent().hide("scale",200);
-          suggestedsDialog.dialog("open");          
+          //suggestedsDialog.dialog("open");          
         }
        },
        "setPhoto" : {
@@ -324,6 +332,7 @@ function initializeCytoscape()
       }
     }); 
     menuDialog.dialog({ position: { my: "left+30 bottom+30 center", at: "right bottom", of: currentMousePos }, width: 550}); 
+    
     menuDialog.parent().css('z-index', 50000);
     // Dialog for create a familiar and manage the data edition of them and the person logged
     var familiarDialog = $( "#familiarDialog-form" ).dialog({

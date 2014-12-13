@@ -12,6 +12,8 @@ return array(
 	'user_must_login'				=> 'Debe identificarse para ingresar al sitio.',
 
 	'error_on_create_person'		=> 'Hubo un error mientras se intentaba guardar los datos de la persona',
-	"cannotUpdateData"				=> 'No tiene permiso para editar los datos de esta persona'
+	"cannotUpdateData"				=> 'No tiene permiso para editar los datos de esta persona',
+	"shareElementMessage"			=> 'Invitación para compartir los árboles',
+	"error_loading_share_view"		=> 'Hubo un error mientras se intentaba mostrar el menú para compartir árboles'
 
 );
