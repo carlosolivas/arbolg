@@ -2,11 +2,13 @@
 
 use s4h\core\PersonRepositoryInterface;
 use s4h\core\UserRepositoryInterface;
+use s4h\social\GroupRepositoryInterface;
 
 class PersonController extends BaseController
 {
 	protected $personRepository;
 	protected $userRepository;
+	protected $groupRepository;
 
 	/**
      * General constants
@@ -16,12 +18,17 @@ class PersonController extends BaseController
     const SON       			= 3;   
     const NODE_IS_NOT_A_COPY	= 0; 
     const NO_GROUP				= 0;
+    const NOT_ADMIN				= 0;
 
 
-	public function __construct(PersonRepositoryInterface $personRepository, UserRepositoryInterface $userRepository)
+	public function __construct(
+		PersonRepositoryInterface $personRepository, 
+		UserRepositoryInterface $userRepository,
+		GroupRepositoryInterface $groupRepository)
 	{
         $this->personRepository = $personRepository;
         $this->userRepository = $userRepository;
+        $this->groupRepository = $groupRepository;
 	}
 
 
@@ -35,8 +42,7 @@ class PersonController extends BaseController
 		try
 		{
 
-			$person = Auth::user()->Person;
-			
+			$person = Auth::user()->Person;		
 
 			/* Check if the NodePerson for this user wasn´t created yet */
 			if (!($this->get('NodePerson')->nodePersonExists($person->id))) {
@@ -44,8 +50,7 @@ class PersonController extends BaseController
 				$groupId = self::NO_GROUP;
 				if ($person->getFamily() != null) {
 					$groupId = $person->getFamily()->id;
-				}
-				
+				}				
 
 				/* Create the NodePerson for this user */
 				$this->get('NodePerson')->create($person->id,$person->id, self::NODE_IS_NOT_A_COPY, $groupId);
@@ -255,7 +260,7 @@ class PersonController extends BaseController
      * @return Json with the request status
      */
 	public function post_saveParent()
-	{		
+	{				 
 		try {
 
 			// Data of new Person
@@ -294,12 +299,20 @@ class PersonController extends BaseController
 
 			if ($this->get('NodePerson')->canAddParents($son) && !($validation->fails())) {
 
+				$user = Auth::user();
+				$personLogged = $user->Person->id;
+
 				// Create a Person
 				$newPersonId =  $this->personRepository->store($data);
 
-				// Create a NodePerson
-				$user = Auth::user();
-				$personLogged = $user->Person->id;
+				// Push into the family group
+				if ($user->Person->getFamily() != null) {
+
+					$groupFamilyId = $user->Person->getFamily()->id;
+					$this->groupRepository->addGroupMember($groupFamilyId, $newPersonId, self::NOT_ADMIN);
+				}				
+
+				// Create a NodePerson				
 				$this->get('NodePerson')->create($newPersonId, $personLogged, self::NODE_IS_NOT_A_COPY, $son->groupId);
 
 				// Add new Person as parent

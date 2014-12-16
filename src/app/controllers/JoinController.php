@@ -24,7 +24,7 @@ class JoinController extends BaseController
 	 */
 	public function get_sharing($id)
 	{		
-		try {
+		/*try {*/
 			$input = Input::all();
 		
 			$user = Auth::user();
@@ -51,8 +51,8 @@ class JoinController extends BaseController
 		    $sharing = new s4h\share\Sharing($groupRepository, $shareRepository);
 
 			return $sharing->displayShareForm($shareElement);			
-		} catch (Exception $e) {
+		/*} catch (Exception $e) {
 			return Lang::get('messages.error_loading_share_view');
-		}		
+		}	*/	
 	}
 }
