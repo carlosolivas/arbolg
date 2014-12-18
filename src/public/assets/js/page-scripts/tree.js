@@ -298,15 +298,17 @@ function initializeCytoscape()
             type: "get",
             url: "/sharing/" + personIdToShare
             }).done(function( json ) {
-                 if (json == 'successful') { 
-                    aler(json);
+                 if (json.status == 'successful') { 
+                    $("#extendTreeBody").html($.parseHTML(json.data));
                  } else {
-                    alert(json);
+                    alert(json.data);
+                    /* Remove the tree view like disabled  */
+                    $("#cy").css({opacity: 1})
                }
           });  
 
           $( this ).dialog().parent().hide("scale",200);
-          //suggestedsDialog.dialog("open");          
+          suggestedsDialog.dialog("open");          
         }
        },
        "setPhoto" : {

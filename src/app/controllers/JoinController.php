@@ -15,6 +15,9 @@ class JoinController extends BaseController
  	const CUSTOM_ELEMENT_NAME_KEEP_THE_TREE		= "keepTheTree";
  	const CUSTOM_ELEMENT_KEEP_THE_TREE_HTML		= "<input type='checkbox' name='keepTheTree' value='1'/>";
 
+ 	const REQUEST_STATUS_SUCCESSFUL 			= 'successful';
+ 	const REQUEST_STATUS_FAILURE				= 'failure';
+
 	public function __construct(PersonRepositoryInterface $personRepository) 
 	{
         $this->personRepository = $personRepository;
@@ -26,7 +29,7 @@ class JoinController extends BaseController
 	 */
 	public function get_sharing($id)
 	{		
-		/*try {*/
+		try {
 			$input = Input::all();
 		
 			$user = Auth::user();
@@ -58,9 +61,15 @@ class JoinController extends BaseController
 		    $shareRepository = new s4h\share\DbShareRepository;
 		    $sharing = new s4h\share\Sharing($groupRepository, $shareRepository);
 
-			return $sharing->displayShareForm($shareElement);			
-		/*} catch (Exception $e) {
-			return Lang::get('messages.error_loading_share_view');
-		}	*/	
+		    $data = $sharing->displayShareForm($shareElement);
+
+		    $response = array('status' => self::REQUEST_STATUS_SUCCESSFUL, 'data' => (string)$data);
+			return Response::json($response);		
+
+		} catch (Exception $e) {
+
+			$response = array('status' => self::REQUEST_STATUS_FAILURE, 'data' => Lang::get('messages.error_loading_share_view'));
+			return Response::json($response);		
+		}	
 	}
 }

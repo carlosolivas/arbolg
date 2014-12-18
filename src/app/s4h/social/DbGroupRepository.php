@@ -97,7 +97,7 @@ class DbGroupRepository implements GroupRepositoryInterface {
 			->whereIn('id', $groupIds)
 			->lists('id');
 
-		$myFamilyFriends = null;
+		$myFamilyFriends = array();
 		if (!empty($ff)) {
 			$myFamilyFriends = \DB::table('group_person')
 			->join('groups', 'group_person.group_id', '=', 'groups.id')

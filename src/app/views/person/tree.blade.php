@@ -150,7 +150,7 @@
 </div>
 
 <div id="extendTree-form" style="display: none">	
-	
+	<div id="extendTreeBody"></div>	
 </div>
 
 {{ HTML::script('assets/js/page-scripts/dagre.js'); }}
