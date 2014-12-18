@@ -32,7 +32,8 @@ CREATE TABLE `roles` (
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `position` tinyint(4) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+ PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
@@ -52,7 +53,7 @@ INSERT INTO `roles` (`id`, `grouptype_id`, `name`, `position`, `created_at`, `up
 -- Indexes for table `roles`
 --
 ALTER TABLE `roles`
- ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `roles_name_unique` (`name`), ADD KEY `FK_roles.grouptype_id_grouptypes.id_idx` (`grouptype_id`);
+ADD UNIQUE KEY `roles_name_unique` (`name`), ADD KEY `FK_roles.grouptype_id_grouptypes.id_idx` (`grouptype_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables

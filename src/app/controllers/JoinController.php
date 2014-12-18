@@ -12,6 +12,8 @@ class JoinController extends BaseController
      */
  	const SHARE_ELEMENT_CLASS_NAME_FAMILY_TREE	= "familyTree";
  	const SHARE_ELEMENT_TYPE					= 1;
+ 	const CUSTOM_ELEMENT_NAME_KEEP_THE_TREE		= "keepTheTree";
+ 	const CUSTOM_ELEMENT_KEEP_THE_TREE_HTML		= "<input type='checkbox' name='keepTheTree' value='1'/>";
 
 	public function __construct(PersonRepositoryInterface $personRepository) 
 	{
@@ -44,6 +46,12 @@ class JoinController extends BaseController
 		    $shareElement->$personId = $personId;
 		    $shareElement->$message = $message;
 		    $shareElement->$type = $type;
+
+		    $keepTheTreeCheckBox = new s4h\share\SharedElementCustomItem(
+		    	self::CUSTOM_ELEMENT_NAME_KEEP_THE_TREE,
+		    	self::CUSTOM_ELEMENT_KEEP_THE_TREE_HTML);
+
+		    $shareElement->addCustomItem($keepTheTreeCheckBox);
 
 		    $fileRepository = new \s4h\core\DbS3FileRepository;
 		    $groupRepository = new s4h\social\DbGroupRepository($fileRepository);
