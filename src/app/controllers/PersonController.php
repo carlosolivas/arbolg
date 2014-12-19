@@ -185,7 +185,7 @@ class PersonController extends BaseController
 
 			$personId = $person->id;
 			$dataOfPerson = array(
-				"id" => $personId,
+				"id" => (string)$personId,
 				"name" => $person->name,
 				"lastname" => $person->lastname,
 				"mothersname" => $person->mothersname,
@@ -242,9 +242,9 @@ class PersonController extends BaseController
 			foreach ($person->parents as $nodeParent) {
 				$parent = $this->personRepository->getById($nodeParent->personId);
 				// Source is the parent of person
-				$source = $parent->getId();
+				$source = (string)$parent->getId();
 				// Target is the person
-				$target = $person->personId;
+				$target = (string)$person->personId;
 				$dataParOfRelations = array("source" => $source, "target" => $target);
 				$data = array("data" => $dataParOfRelations);
 				array_push($relations, $data);
