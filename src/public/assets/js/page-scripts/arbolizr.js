@@ -32,6 +32,10 @@ function pos(node) {
     }
 }
 
+function clearTree() {
+	canvasContext.clearRect(0, 0, $(LAYER_SELECTOR)[FIRST].width, $(LAYER_SELECTOR)[FIRST].height);
+}
+
 function drawRelations() {
 
     if($(LAYER_SELECTOR).length < 1) {
@@ -41,7 +45,8 @@ function drawRelations() {
         canvasContext.clearRect(0, 0, $(LAYER_SELECTOR)[FIRST].width, $(LAYER_SELECTOR)[FIRST].height);     
     }
     
-
+    canvasContext.clearRect ( 0 , 0 , $(LAYER_SELECTOR).width, $(LAYER_SELECTOR).height );
+    
     if(canvasContext) {
 
         for (i = 0; i < graph.$('node').length; i++) { 
@@ -58,10 +63,6 @@ function drawRelations() {
             dd(isLeftParent(n.data().id, cp));
 
             if(childrens.length == 1) {
-                dd('==');
-                //dd(n);
-                dd(cp);
-
                     h = hLineBounds(cp); 
                     v = vLineBounds(cp, true);
 
