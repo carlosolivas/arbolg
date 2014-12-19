@@ -1,4 +1,17 @@
+@extends('layouts.template')
 
+@section('title')
+    {{ Lang::get('social.timeline') }}
+@stop
+
+@section('head')
+
+@stop
+
+@section('breadcrumb')
+@stop
+
+@section('content')
 <div class="wrapper wrapper-content">
     <div class="row">
         <div class="col-lg-12">
@@ -24,6 +37,7 @@
                             @endforeach
                             <br/>
                             <p>Share with Friends: <br/>
+
                             @if (!empty($myFriends))
                                 @foreach($myFriends as $friend)
                                     @if ($friend != null && $friend->FriendType == 'Person')
@@ -41,8 +55,7 @@
                                         {{ Form::radio('shareWithFamilies',$friend->Id, '1', false)}} {{ $friend->Name }}
                                     @endif
                                 @endforeach
-                            @endif
-                            </p>
+                            @endif                            
                             {{ Form::submit(Lang::get('share.share')) }}
                         {{ Form::close() }}
                         </div>
@@ -52,3 +65,4 @@
         </div>
     </div>
 </div>
+@stop

@@ -15,7 +15,7 @@ var LAYER_SELECTOR = '[data-id="relations"]';
 var COINTAINER_SELECTOR = '#cy div:first';
 var NODE_SELECTOR = 'node';
 var NODE_BORDER_WIDTH = 1;
-var DEBUG = false;
+var DEBUG = true;
 var FIRST = 0;
 var canvasHeight = 500;
 var canvasWidth = 500;
@@ -35,6 +35,10 @@ function pos(node) {
     }
 }
 
+function clearTree() {
+	canvasContext.clearRect(0, 0, $(LAYER_SELECTOR)[FIRST].width, $(LAYER_SELECTOR)[FIRST].height);
+}
+
 function drawRelations() {
 
     if($(LAYER_SELECTOR).length < 1) {
@@ -49,7 +53,8 @@ function drawRelations() {
         canvasContext.clearRect(0, 0, $(LAYER_SELECTOR)[FIRST].width, $(LAYER_SELECTOR)[FIRST].height);     
     }
     
-
+    canvasContext.clearRect ( 0 , 0 , $(LAYER_SELECTOR).width, $(LAYER_SELECTOR).height );
+    
     if(canvasContext) {
 
         for (i = 0; i < graph.$('node').length; i++) { 
@@ -63,14 +68,10 @@ function drawRelations() {
             
             cp = parentCoParents(n.data().id);
             cp.push(parseInt(n.data().id));
-            dd(isLeftParent(n.data().id, cp));
+            //dd(isLeftParent(n.data().id, cp));
 
             if(childrens.length == 1) {
-                dd('==');
-                //dd(n);
-                dd(cp);
-
-                    h = hLineBounds(cp); 
+                    h = hLineBounds(cp, true); 
                     v = vLineBounds(cp, true);
 
                     makeLineBounds(h, v);
@@ -160,7 +161,7 @@ function coParents (children)
     var _relations  = graph.$('edge[target="'+children+'"]');
 
     for (var r = 0; r < _relations.length; r++) {
-        dd('Parent found: ' + _relations[r].data().source);
+        //dd('Parent found: ' + _relations[r].data().source);
         _coparents.push(parseInt(_relations[r].data().source));
     }
 
@@ -179,6 +180,10 @@ function parentsOf(nodeId)
     }
 
     return ret;
+}
+
+function parentsOfChild() {
+
 }
 
 function isLeftParent (parentId, parents) {
@@ -243,7 +248,7 @@ function getChildrens(nodeId)
     var _childrens = [];
 
     for(var r = 0; r < _relations.length; r++) {
-        dd('Children found: ' + _relations[r].data().target);
+        //dd('Children found: ' + _relations[r].data().target);
         _childrens.push(parseInt(_relations[r].data().target));
     }
 
@@ -335,14 +340,26 @@ function vLineBounds (childrens, isBottomLine) {
     return {p1: {y:yPos.min}, p2: {y:yPos.max}};
 }
 
-function hLineBounds (childrens) {
+function hLineBounds (childrens, noParentsCheck) {
     var xChildrens = [];
 
     for (var child in childrens){
+        
+        if(!noParentsCheck) {
+            _parents = graph.elements('edge[target = "' + childrens[child] + '"]');
+            if(_parents.length >= 2) {
+                for(ii = 0; ii < _parents.length; ii++) {
+                    xChildrens.push(posH(_parents[ii].source().position().x));
+                }
+            }
+        }
+
         if(isFinite(child)) {
             xChildrens.push(posH(graph.getElementById(childrens[child]).position().x));
         }
     }
+
+    
     
     xPos = minMax(xChildrens);
 
@@ -353,6 +370,10 @@ function hLineBounds (childrens) {
 function minMax (elements) {
     min = null;
     max = null;
+
+    if(elements.length == 1) {
+        return {'min': elements[0], 'max': elements[0]};
+    }
 
     for (var elem in elements){
         if(elements[elem] < min) {
