@@ -92,7 +92,7 @@ class NodePersonService extends BaseService
                 'personId'          => $personId,
                 'ownerId'           => $ownerId,
                 'isACopy'           => $isACopy,
-                'groupId'           => $groupId
+                'groupId'           => $groupId,
             ]);
 
     	} catch (Exception $e) {

@@ -13,6 +13,15 @@ class User extends ConfideUser {
 	return $this->hasOne('Familie');
 	}*/
 
+	public function getId() 
+	{
+	    if(!is_null($this->id)) {
+		return intval($this->id);
+	    }
+
+	    return null;
+	}
+
 	public function calendars() {
 		return $this->hasMany('Calendar');
 	}

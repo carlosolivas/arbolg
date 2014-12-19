@@ -41,11 +41,10 @@ class PersonController extends BaseController
 	{
 		try
 		{
-
 			$person = Auth::user()->Person;		
 
 			/* Check if the NodePerson for this user wasn´t created yet */
-			if (!($this->get('NodePerson')->nodePersonExists($person->id))) {
+			if (!($this->get('NodePerson')->nodePersonExists($person->getId()))) {
 
 				$groupId = self::NO_GROUP;
 				if ($person->getFamily() != null) {
@@ -53,7 +52,7 @@ class PersonController extends BaseController
 				}				
 
 				/* Create the NodePerson for this user */
-				$this->get('NodePerson')->create($person->id,$person->id, self::NODE_IS_NOT_A_COPY, $groupId);
+				$this->get('NodePerson')->create($person->getId(),$person->getId(), self::NODE_IS_NOT_A_COPY, $groupId);
 
 				if ($person->getFamily() == null) {
 					
@@ -167,7 +166,7 @@ class PersonController extends BaseController
 	{
 		$user = Auth::user();
 
-		$personLogged = $user->Person->id;
+		$personLogged = $user->Person->getId();
 
 		$family = $this->get('NodePerson')->getFamily($personLogged);
 		
@@ -184,7 +183,7 @@ class PersonController extends BaseController
 			// Check if the logged person can update his data
 			$canBeUpdatedByLoggedUser = $nodePerson->ownerId == $personLogged;
 
-			$personId = (string)$person->id;
+			$personId = $person->id;
 			$dataOfPerson = array(
 				"id" => $personId,
 				"name" => $person->name,
@@ -235,7 +234,7 @@ class PersonController extends BaseController
 	public function get_loadTreeRelations()
 	{
 		$user = Auth::user();
-		$personLogged = $user->Person->id;
+		$personLogged = $user->Person->getId();
 		$family = $this->get('NodePerson')->getFamily($personLogged);
 
 		$relations = array();
@@ -243,9 +242,9 @@ class PersonController extends BaseController
 			foreach ($person->parents as $nodeParent) {
 				$parent = $this->personRepository->getById($nodeParent->personId);
 				// Source is the parent of person
-				$source = (string)$parent->id;
+				$source = $parent->getId();
 				// Target is the person
-				$target = (string)$person->personId;
+				$target = $person->personId;
 				$dataParOfRelations = array("source" => $source, "target" => $target);
 				$data = array("data" => $dataParOfRelations);
 				array_push($relations, $data);
@@ -300,7 +299,7 @@ class PersonController extends BaseController
 			if ($this->get('NodePerson')->canAddParents($son) && !($validation->fails())) {
 
 				$user = Auth::user();
-				$personLogged = $user->Person->id;
+				$personLogged = $user->Person->getId();
 
 				// Create a Person
 				$newPersonId =  $this->personRepository->store($data);
@@ -407,7 +406,7 @@ class PersonController extends BaseController
 	{
 		// Logged Person
 		$user = Auth::user();
-		$personLoggedId = $user->Person->id;
+		$personLoggedId = $user->Person->getId();
 
 		if (is_string($id)) {
 			$id = (int)$id;
