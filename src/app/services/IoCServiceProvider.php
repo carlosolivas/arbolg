@@ -11,18 +11,12 @@ class IoCServiceProvider extends ServiceProvider
     {
         $this->app->bind('NodePersonService', function() 
         {
-        	try {
-
-        		$service = new NodePersonService;    
-        		//$repo = new DbPersonRepository;
-        		//dd($repo);
-            	//$service->setPersonRepository(new \s4h\core\DbPersonRepository);           	
-            	
-            	return $service;
-        	} catch (Exception $e) {
-        		 dd($e);
-        	}
+    		$service = new NodePersonService;    
+            $repo = new \s4h\core\DbPersonRepository(new \s4h\core\DbS3FileRepository);
+           
+        	$service->setPersonRepository($repo);           	
         	
+        	return $service;        	
         });
     }
 }

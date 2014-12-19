@@ -55,4 +55,21 @@ class DbUserRepository implements UserRepositoryInterface {
      */public function getById($id) {
         return User::find($id);
 	}
+
+    /**
+     * Returns if exists or not a User for an person id
+     * @param personId
+     * @return Boolean
+     */
+    public function existsUser($personId)
+    {
+        $user = User::where('person_id', '=', $personId)->first();
+        if ($user != null) {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }

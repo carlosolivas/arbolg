@@ -14,9 +14,12 @@ var CANVAS_SELECTOR = '[data-id="layer1"]';
 var LAYER_SELECTOR = '[data-id="relations"]';
 var COINTAINER_SELECTOR = '#cy div:first';
 var NODE_SELECTOR = 'node';
-var NODE_BORDER_WIDTH = 2;
+var NODE_BORDER_WIDTH = 1;
 var DEBUG = false;
 var FIRST = 0;
+var canvasHeight = 500;
+var canvasWidth = 500;
+
 
 //var nodes = 
 
@@ -39,7 +42,12 @@ function clearTree() {
 function drawRelations() {
 
     if($(LAYER_SELECTOR).length < 1) {
-        $(COINTAINER_SELECTOR).append("<canvas data-id=\"relations\" width=\"" + $(COINTAINER_SELECTOR).width() + "\" height=\"" + $(COINTAINER_SELECTOR).height() + "\" style=\"position: absolute; z-index: 10; width: " + $(COINTAINER_SELECTOR).width() + "px; height: " + $(COINTAINER_SELECTOR).height() + "px;\"></canvas>");
+        if ($(COINTAINER_SELECTOR).height() != 0 && $(COINTAINER_SELECTOR).width() != 0) {
+            canvasHeight = $(COINTAINER_SELECTOR).height();
+            canvasWidth = $(COINTAINER_SELECTOR).width();
+        };
+        
+        $(COINTAINER_SELECTOR).append("<canvas data-id=\"relations\" width=\"" + canvasWidth + "\" height=\"" + canvasHeight + "\" style=\"position: absolute; z-index: 10; width: " + $(COINTAINER_SELECTOR).width() + "px; height: " + $(COINTAINER_SELECTOR).height() + "px;\"></canvas>");
         canvasContext = $(LAYER_SELECTOR)[FIRST].getContext("2d");
     } else {
         canvasContext.clearRect(0, 0, $(LAYER_SELECTOR)[FIRST].width, $(LAYER_SELECTOR)[FIRST].height);     
@@ -270,11 +278,12 @@ function drawChildrensSupLine (childrens)
 function drawParentsLine (parentId) {
     separation = graph.options().layout.rankSep / 2;
     lineHeight = parseInt(graph.$(NODE_SELECTOR).css().height) / 2;
+    LABEL_BOTTOM_SPACE = 8;
 
         bounds = {
             p1:{
                 x:posH(graph.$('#' + parentId).position().x),
-                y:posV(graph.$('#' + parentId).position().y + lineHeight + NODE_BORDER_WIDTH)
+                y:posV(graph.$('#' + parentId).position().y + lineHeight + NODE_BORDER_WIDTH + LABEL_BOTTOM_SPACE)
             },
             p2: {
                 x:posH(graph.$('#' + parentId).position().x),

@@ -1,21 +1,27 @@
 <?php
 
 use s4h\core\PersonRepositoryInterface;
+use s4h\core\UserRepositoryInterface;
 
 class PersonController extends BaseController
 {
 	protected $personRepository;
+	protected $userRepository;
 
 	/**
      * General constants
      */
- 	const FATHER 	= 1;
-    const MOTHER    = 2;
-    const SON       = 3;
+ 	const FATHER 				= 1;
+    const MOTHER    			= 2;
+    const SON       			= 3;   
+    const NODE_IS_NOT_A_COPY	= 0; 
+    const NO_GROUP				= 0;
 
-	public function __construct(PersonRepositoryInterface $personRepository)
+
+	public function __construct(PersonRepositoryInterface $personRepository, UserRepositoryInterface $userRepository)
 	{
         $this->personRepository = $personRepository;
+        $this->userRepository = $userRepository;
 	}
 
 
@@ -34,10 +40,15 @@ class PersonController extends BaseController
 
 			/* Check if the NodePerson for this user wasn´t created yet */
 			if (!($this->get('NodePerson')->nodePersonExists($person->id))) {
+
+				$groupId = self::NO_GROUP;
+				if ($person->getFamily() != null) {
+					$groupId = $person->getFamily()->id;
+				}
 				
 
 				/* Create the NodePerson for this user */
-				$this->get('NodePerson')->create($person->id,$person->id);
+				$this->get('NodePerson')->create($person->id,$person->id, self::NODE_IS_NOT_A_COPY, $groupId);
 
 				if ($person->getFamily() == null) {
 					
@@ -73,7 +84,7 @@ class PersonController extends BaseController
 						if ( $directFamiliar->id != $person->id) {
 
 							/* Create the NodePerson for this direct familiar */
-							$this->get('NodePerson')->create($directFamiliar->id,$directFamiliar->id);
+							$this->get('NodePerson')->create($directFamiliar->id,$directFamiliar->id, self::NODE_IS_NOT_A_COPY,$groupId);
 
 							/* Now we check the role of the logged Person and we infer how relate it to
 							the direct familiar */
@@ -183,9 +194,26 @@ class PersonController extends BaseController
 				"isRootNode"	=> $isRootNode,
 				"canBeUpdatedByLoggedUser"	=> $canBeUpdatedByLoggedUser
 			);
+			
+			/* If the person are user, set a distinctive border */
+			if ($this->userRepository->existsUser($personId)) {
 
-			$photo = array('background-image' => $person->Photo->fileURL,
+				/* Distinctive border for the logged person*/
+				if ($personId == $personLogged) {
+					$photo = array('background-image' => $person->Photo->fileURL,
+					"background-fit" => 'cover', 'border-width' => '3px', 'border-color' => '#18a78a');
+				}
+				else
+				{
+					$photo = array('background-image' => $person->Photo->fileURL,
+					"background-fit" => 'cover', 'border-width' => '3px', 'border-color' => '#f8ac59');
+				}				
+			}
+			else
+			{
+				$photo = array('background-image' => $person->Photo->fileURL,
 					"background-fit" => 'cover');
+			}
 
 
 			$data = array('data' => $dataOfPerson, 'css' => $photo);
@@ -272,7 +300,7 @@ class PersonController extends BaseController
 				// Create a NodePerson
 				$user = Auth::user();
 				$personLogged = $user->Person->id;
-				$this->get('NodePerson')->create($newPersonId, $personLogged);
+				$this->get('NodePerson')->create($newPersonId, $personLogged, self::NODE_IS_NOT_A_COPY, $son->groupId);
 
 				// Add new Person as parent
 				$parentId = $newPersonId;

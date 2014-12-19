@@ -35,27 +35,15 @@ Route::pattern('id', '[0-9]+');
 
         Route::post(
         '/saveParent',
-        array('as' => 'saveParent', 'uses' => 'PersonController@post_saveParent'));
-
-        Route::get(
-        '/extendTree/{id}',
-        array('as' => 'extendTree', 'uses' => 'PersonController@get_extendTree'));        
+        array('as' => 'saveParent', 'uses' => 'PersonController@post_saveParent'));              
 
          Route::post(
         '/updatePersonData',
-        array('as' => 'updatePersonData', 'uses' => 'PersonController@post_updatePersonData'));
-
-         Route::get(
-        '/loadSuggesteds/{id}',
-        array('as' => 'loadSuggesteds', 'uses' => 'JoinController@get_loadSuggesteds'));
-
-         Route::get(
-        '/sendRequest/{fromId}/{toId}',
-        array('as' => 'sendRequest', 'uses' => 'JoinController@get_sendRequest'));
+        array('as' => 'updatePersonData', 'uses' => 'PersonController@post_updatePersonData'));         
 
         Route::get(
-        '/invitation',
-        array('as' => 'invitation', 'uses' => 'JoinController@get_makeInvitation'));    
+        '/sharing/{id}',
+        array('as' => 'sharing', 'uses' => 'JoinController@get_sharing'));    
 
         Route::get(
         '/setPhoto/{id}',

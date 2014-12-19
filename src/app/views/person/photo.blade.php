@@ -7,7 +7,8 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <h3 class="panel-title">
-        {{ Lang::get('titles.changePhoto') }}
+        {{ Lang::get('titles.changePhoto') }} {{ $person->name . " " . $person->lastname . " " . 
+        $person->mothersname}}
       </h3>
     </div>
 

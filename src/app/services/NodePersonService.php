@@ -26,8 +26,8 @@ class NodePersonService extends BaseService
 
     public function setPersonRepository($personRepository)
     {
-          $this->personRepository = $personRepository;
-    }
+       $this->personRepository = $personRepository;     
+    }   
 
     /**
     * Queries
@@ -42,6 +42,7 @@ class NodePersonService extends BaseService
     const FAILURE_MERGE                     = false;
     const GENDER_MALE                       = 1;
     const GENDER_FEMALE                     = 2;
+    const NODE_IS_A_COPY                    = 1;
 
 
     /**
@@ -75,21 +76,23 @@ class NodePersonService extends BaseService
      */
     public function findById($personId)
     {        
-        return NodePerson::where('personId', '=', $personId)->first();
+        return NodePerson::where('personId', '=', $personId)->where('isACopy', '<', 1)->first();
     }
 
     /**
      * Create a new NodePerson
      * @param $personId The id of the person to create the NodePerson
      */
-    public function create($personId, $ownerId)
+    public function create($personId, $ownerId, $isACopy, $groupId)
     {
         
     	try {           
 
     		NodePerson::create([
                 'personId'          => $personId,
-                'ownerId'           => $ownerId
+                'ownerId'           => $ownerId,
+                'isACopy'           => $isACopy,
+                'groupId'           => $groupId
             ]);
 
     	} catch (Exception $e) {
@@ -279,28 +282,10 @@ class NodePersonService extends BaseService
 
             /* If connectionPerson keeps his tree, then we makes a copy of $nodePersonToConnect
             and set nodePersonToConnect like connectionPerson brother */
-            if ($fromKeepsTheTree) {
-
-                /* Get the Person data */
-                $person =  $this->personRepository->getById($nodePersonToConnect->personId);
-                $data = array(
-                    'name'          => $person->name,
-                    'lastname'      => $person->lastname,
-                    'mothersname'   => $person->mothersname,
-                    'birthdate'     => $person->birthdate,
-                    'gender'        => $person->gender,
-                    'phone'         => $person->phone,
-                    'email'         => $person->email,
-                    'user_id'       => null,
-                    'role_id'       => $person->gender,
-                    'file_id'       => $person->Photo->id
-                );
-
-                // Create a Person (Copy of nodePersonToConnect)
-                $newPersonId =  $this->personRepository->store($data);
+            if ($fromKeepsTheTree) {                
 
                 /* Creating a copy of nodePersonToConnect into connectionPerson tree */
-                $this->create($newPersonId, $userWhoMakeTheInvitation);
+                $this->create($nodePersonToConnect->personId, $userWhoMakeTheInvitation, self::NODE_IS_A_COPY, $nodePersonToConnect->groupId);
 
                 /* New parents */
                 foreach ($connectionPerson->parents as $parent) {   
