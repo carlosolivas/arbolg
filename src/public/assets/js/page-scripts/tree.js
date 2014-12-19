@@ -300,6 +300,7 @@ function initializeCytoscape()
             }).done(function( json ) {
                  if (json.status == 'successful') { 
                     $("#extendTreeBody").html($.parseHTML(json.data));
+                    suggestedsDialog.dialog("open");       
                  } else {
                     alert(json.data);
                     /* Remove the tree view like disabled  */
@@ -307,8 +308,7 @@ function initializeCytoscape()
                }
           });  
 
-          $( this ).dialog().parent().hide("scale",200);
-          suggestedsDialog.dialog("open");          
+          $( this ).dialog().parent().hide("scale",200);             
         }
        },
        "setPhoto" : {

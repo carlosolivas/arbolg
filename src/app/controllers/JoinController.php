@@ -62,7 +62,7 @@ class JoinController extends BaseController
 		    $sharing = new s4h\share\Sharing($groupRepository, $shareRepository);
 
 		    $data = $sharing->displayShareForm($shareElement);
-
+		    
 		    $response = array('status' => self::REQUEST_STATUS_SUCCESSFUL, 'data' => (string)$data);
 			return Response::json($response);		
 

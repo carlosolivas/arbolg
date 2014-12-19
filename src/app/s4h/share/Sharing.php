@@ -36,10 +36,6 @@ class Sharing {
     {
         $myFriends = $this->groupRepo->myFriends();
 
-        if (empty($myFriends)) {
-            $myFriends = array('myFriends' => array(), 'myFamilyFriends' => array());
-        }
-        
         return View::make('share.share')
             ->with('shareTypeId', $sharedElement->getType())
             ->with('elementId', $sharedElement->getElementId())

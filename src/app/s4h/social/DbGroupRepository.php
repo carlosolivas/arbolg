@@ -102,7 +102,7 @@ class DbGroupRepository implements GroupRepositoryInterface {
 			$myFamilyFriends = \DB::table('group_person')
 			->join('groups', 'group_person.group_id', '=', 'groups.id')
 			->whereIn('group_person.group_id', $ff)	->get();
-		}		
+		}	
 
 		return array('myFriends' => $myFriends, 'myFamilyFriends' => $myFamilyFriends);
 	}
