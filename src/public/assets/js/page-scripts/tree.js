@@ -20,42 +20,7 @@ var initEdges;
 var currentMousePos;
 /*var rootNodes = [];*/
 
-// Capture the mouse position
-$(document).mousemove(function(event) {
-    currentMousePos = event;
-});
-
-
-// Load the initial nodes (Persons)
-function loadNodesAndRelations()
-{
-  $.ajax({
-    type: "get",
-    url: "/loadTreePersons",
-    }).done(function( json ) {
-
-      initNodes = json;      
-
-      // Load the initial edges (Relations)
-      $.ajax({
-        type: "get",
-        url: "/loadTreeRelations",
-        }).done(function( json ) {
-
-          initEdges = json;       
-          initializeCytoscape();             
-                   
-      });
-  });
-}
-
-loadNodesAndRelations();
-
-// cy is an instance of Cytoscape, so cy is a graph
-
-function initializeCytoscape()
-{
-  cy = graph =  cytoscape({
+cy = graph =  cytoscape({
     container: document.getElementById('cy'),
 
     style: [
@@ -102,22 +67,18 @@ function initializeCytoscape()
                 'border-color': '#333'
               }
             }
-    ],
-
-    elements:{
-      nodes: initNodes,
-      edges: initEdges
-    },
+    ],   
 
     layout: {
       name: 'dagre',
-      animate: false,
+      animate: true,
+      animationDuration: 500,
       padding: 10,
       rankSep: 60, // separación entre niveles
       edgeSep: 0,
       rankDir: 'TB',
       stop: function () {
-        drawRelations();
+        //drawRelations();
       },
     },
 
@@ -159,15 +120,24 @@ function initializeCytoscape()
 
   cy.on('zoom', null, null, function(evt){
     if(canvasContext) {
-      drawRelations();
+    if (typeof timeout !== 'undefined') {
+        clearTimeout(timeout);
+      clearTree();
+    }
+    timeout = setTimeout(function(){drawRelations();},100)    
     }
   });
 
   cy.on('pan', null, null, function(evt){
     if(canvasContext) {
-      drawRelations();
+    if (typeof timeout !== 'undefined') {
+        clearTimeout(timeout);
+      clearTree();
     }
-  });  
+    timeout = setTimeout(function(){drawRelations();},100)    
+    
+    }
+  }); 
 
   cy.panzoom({
    panDistance: 100,
@@ -400,13 +370,6 @@ function initializeCytoscape()
                     // Reload the graph elements
                     loadNodesAndRelations();
 
-                    // Set the updated elements
-                    var elements = initNodes;
-                    elements.concat(initEdges); 
-                    cy.load({nodes: initNodes, edges: initEdges});    
-                    //cy.layout();
-                    window.location = "/tree";
-
                    } else {
                       $("#newPerson_name").val("");
                       $("#newPerson_lastname").val("");
@@ -492,7 +455,39 @@ function initializeCytoscape()
     // Open the menu dialog when the user 'on tap' a node
     menuDialog.dialog( "open" );
   });
+
+// Capture the mouse position
+$(document).mousemove(function(event) {
+    currentMousePos = event;
+});
+
+
+// Load the initial nodes (Persons)
+function loadNodesAndRelations()
+{
+  $.ajax({
+    type: "get",
+    url: "/loadTreePersons",
+    }).done(function( json ) {
+
+      initNodes = json;      
+
+      // Load the initial edges (Relations)
+      $.ajax({
+        type: "get",
+        url: "/loadTreeRelations",
+        }).done(function( json ) {
+
+          initEdges = json;                       
+
+          cy.load({nodes: initNodes, edges: initEdges},function () {drawRelations();});         
+      });
+  });
 }
+
+// cy is an instance of Cytoscape, so cy is a graph
+
+loadNodesAndRelations();  
 }); // on dom ready
 
 // Auxiliar functions
@@ -596,5 +591,5 @@ $(document).on('mouseenter', '.onHoverShow', function () {
 $("#closeSuggesteds").click(function(){
   $("#suggesteds").hide('slide');
   $("html, body").animate({ scrollTop: 1 }, "slow");
-})
+});
                     
