@@ -175,6 +175,8 @@ class PersonController extends BaseController
 			$person = $this->personRepository->getById($nodePerson->personId);
 			// Check if can add more Parents
 			$canAddParents = $this->get('NodePerson')->canAddParents($nodePerson);
+			// Check if can add a Couple
+			$canAddCouple = $this->get('NodePerson')->canAddCouple($nodePerson);
 			// Set the root Node
 			$isRootNode = false;
 			if ($nodePerson->personId == $personLogged) {
@@ -195,6 +197,7 @@ class PersonController extends BaseController
 				"phone"	=> $person->phone,
 				"fullname"	=> $person->name . " " . $person->lastname . " " . $person->mothersname,
 				"canAddParents"	=> $canAddParents,
+				"canAddCouple"	=> $canAddCouple,
 				"isRootNode"	=> $isRootNode,
 				"canBeUpdatedByLoggedUser"	=> $canBeUpdatedByLoggedUser
 			);
@@ -255,7 +258,7 @@ class PersonController extends BaseController
 
 
 	/**
-     * This function creates a Person, a NodePerson and relate this NodePerson with
+     * This function creates a Person, a NodePerson and relate this NodePerson like a someone's father
      * @return Json with the request status
      */
 	public function post_saveParent()
@@ -277,7 +280,7 @@ class PersonController extends BaseController
 				'phone' 		=> $input['phone'],
 				'email'		    => $input['email'],
 				'user_id' 		=> null,
-				'role_id' 		=> $input['gender'] == self::MOTHER ? self::MOTHER : self::FATHER,
+				'role_id' 		=> $input['gender'],
 				'file_id'		=> null
 			);
 
@@ -325,7 +328,82 @@ class PersonController extends BaseController
 			}
 
 		} catch (Exception $e) {
-			return Response::json( $e->getMessage() );
+			return Response::json( Lang::get('messages.error_on_create_person') );
+		}
+	}
+
+	/**
+     * This function creates a Person, a NodePerson and relate this NodePerson with a someone's couple
+     * @return Json with the request status
+     */
+	public function post_saveCouple()
+	{				 
+		try {
+
+			// Data of new Person
+			$input = Input::all();
+
+			// Converting the date of birth
+			$birthdate =  $this->formatDate($input['dateOfBirth']);
+
+			$data = array(
+				'name' 			=> $input['name'],
+				'lastname' 		=> $input['lastname'],
+				'mothersname' 	=> $input['mothersname'],
+				'birthdate' 	=> $birthdate,
+				'gender' 		=> $input['gender'],
+				'phone' 		=> $input['phone'],
+				'email'		    => $input['email'],
+				'user_id' 		=> null,
+				'role_id' 		=> $input['gender'],
+				'file_id'		=> null
+			);
+
+		 	$rules = array(
+			 	'name' => 'required',
+	            'lastname' => 'required',
+	            'gender' => 'required',
+	            'birthdate' => 'date',
+	            'phone' => 'numeric',
+	            'email' => 'email'
+            );
+
+			$validation = Validator::make($data, $rules);
+
+			// Check if son can add a Couple
+			$clickedPersonId = (int)$input['id'];
+			$clickedPerson = $this->get('NodePerson')->findById($clickedPersonId);
+
+			if ($this->get('NodePerson')->canAddCouple($clickedPerson) && !($validation->fails())) {
+
+				$user = Auth::user();
+				$personLogged = $user->Person->getId();
+
+				// Create a Person
+				$newPersonId =  $this->personRepository->store($data);
+
+				// Push into the family group
+				if ($user->Person->getFamily() != null) {
+
+					$groupFamilyId = $user->Person->getFamily()->id;
+					$this->groupRepository->addGroupMember($groupFamilyId, $newPersonId, self::NOT_ADMIN);
+				}				
+
+				// Create a NodePerson				
+				$this->get('NodePerson')->create($newPersonId, $personLogged, self::NODE_IS_NOT_A_COPY, $clickedPerson->groupId);
+
+				// Add new Person as couple
+				$coupleId = $newPersonId;
+				$this->get('NodePerson')->addCouple($clickedPersonId, $coupleId);
+
+				return Response::json( 'successful' );
+			}
+			else {
+				return Response::json( $validation->messages()->all('- :message -') );
+			}
+
+		} catch (Exception $e) {
+			return Response::json( Lang::get('messages.error_on_create_person') );
 		}
 	}
 

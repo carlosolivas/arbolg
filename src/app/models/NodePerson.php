@@ -12,9 +12,9 @@ class NodePerson extends \NeoEloquent
         return $this->belongsToMany('App\Models\NodePerson', 'PARENT');
     }
 
-	public function coup()
+	public function couple()
     {
-        return $this->hasOne('App\Models\NodePerson', 'COUP');
+        return $this->hasOne('App\Models\NodePerson', 'COUPLE');
     } 
 
     /*

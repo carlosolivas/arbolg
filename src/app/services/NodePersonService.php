@@ -38,6 +38,7 @@ class NodePersonService extends BaseService
      * General constants
      */
     const MAX_PARENTS_ALLOWED               = 2;
+    const MAX_COUPLES_ALLOWED               = 1;
     const SUCCESSFUL_MERGE                  = true;
     const FAILURE_MERGE                     = false;
     const GENDER_MALE                       = 1;
@@ -108,13 +109,26 @@ class NodePersonService extends BaseService
      */
     public function addParent($son, $parent)
     {
-        $person = $this->findById($son);
-        if ($this->canAddParents($person)) 
-        {             
-            $personToAsignLikeParent = $this->findById($parent);
+        $person = $this->findById($son);        
 
-            $person->parents()->save($personToAsignLikeParent); 
-        }
+        $personToAsignLikeParent = $this->findById($parent);
+
+        $person->parents()->save($personToAsignLikeParent); 
+      
+    }
+
+    /**
+     * Add couple to a NodePerson
+     * @param int $root The id of the person
+     * @param int $couple The id of the couple
+     */
+    public function addCouple($root, $couple)
+    {    
+        $personToAddCouple = $this->findById($root);               
+                        
+        $personToAsignLikeCouple = $this->findById($couple);
+
+        $personToAddCouple->couple()->save($personToAsignLikeCouple);
     }
 
     /**
@@ -129,21 +143,7 @@ class NodePersonService extends BaseService
         $personToUnAsignLikeParent = Person::where('personId', '=', $parent)->first();
 
         $person->parents()->detach($personToUnAsignLikeParent);                
-    }
-
-    /**
-     * Add couple to a NodePerson
-     * @param int $root The id of the person
-     * @param int $couple The id of the couple
-     */
-    public function addCoup($root, $couple)
-    {
-        $personToAddCoup = $this->findById($root);               
-                        
-        $personToAsignLikeCoup = $this->findById($couple);
-
-        $personToAddCoup->coup()->save($personToAsignLikeCoup);
-    }
+    }    
 
     /**
      * Get the family of Person
@@ -262,6 +262,26 @@ class NodePersonService extends BaseService
             return true;
         }
         
+    }
+    /**
+     * Check if the Person can add a Couple
+     * @param $person The NodePerson to evaluate if can add a Couple
+     * @return Bool
+     */
+    public function canAddCouple($person)
+    {
+        if ($person->couple != null) {
+           if ($person->couple()->count() < self::MAX_COUPLES_ALLOWED) 
+            {
+                return true;  
+            }
+            else
+            {
+                return false;
+            }
+        } else{
+            return true;
+        }
     }
 
     /**

@@ -35,7 +35,11 @@ Route::pattern('id', '[0-9]+');
 
         Route::post(
         '/saveParent',
-        array('as' => 'saveParent', 'uses' => 'PersonController@post_saveParent'));              
+        array('as' => 'saveParent', 'uses' => 'PersonController@post_saveParent'));          
+
+        Route::post(
+        '/saveCouple',
+        array('as' => 'saveCouple', 'uses' => 'PersonController@post_saveCouple'));       
 
          Route::post(
         '/updatePersonData',

@@ -180,6 +180,7 @@ cy = graph =  cytoscape({
     var personDetail_phone = this.data('phone');
     var personDetail_fullname = this.data('fullname');    
     var personDetail_canAddParents = this.data('canAddParents');
+    var personDetail_canAddCouple = this.data('canAddCouple');
     var canBeUpdatedByLoggedUser =  this.data('canBeUpdatedByLoggedUser');   
 
     // Familiar option selected
@@ -215,7 +216,7 @@ cy = graph =  cytoscape({
          "updateData" : {
          text: "Editar",
          id: "updateData",
-         class: (canBeUpdatedByLoggedUser ? "btn btn-success btn-xs" : "btn btn-default btn-xs"),
+         class: "btn btn-success btn-xs menu-bottom-buttons",
          click: function(){
 
           if (!canBeUpdatedByLoggedUser) {
@@ -243,7 +244,7 @@ cy = graph =  cytoscape({
         "addParent" : {
          text: "Agregar padre/madre",
          id: "addParent",
-         class: "btn btn-success btn-xs",
+         class: "btn btn-success btn-xs menu-bottom-buttons",
          click: function(){   
           if (!personDetail_canAddParents) {
             return false;
@@ -256,11 +257,28 @@ cy = graph =  cytoscape({
           familiarDialog.dialog('option','title', getTitleForDialog(optionSelected) + personDetail_fullname);
           familiarDialog.dialog( "open" );
          }
+       },
+       "addCouple":{
+        text: "Agregar pareja",
+        id: "addCouple",
+        class: "btn btn-success btn-xs menu-bottom-buttons",
+        click: function(){
+          if (!personDetail_canAddCouple) {
+            return false;
+          }
+          else {
+          optionSelected = getFamiliarOptionsToAdd().COUPLE;
+          $( this ).dialog().parent().hide("scale",200);  
+          }        
+
+          familiarDialog.dialog('option','title', getTitleForDialog(optionSelected) + personDetail_fullname);
+          familiarDialog.dialog( "open" );
+        }
        },      
         "extendTree" : {
          text: "Agregar hermano/a",
          id: "extendTree",         
-         class: "btn btn-success btn-xs",
+         class: "btn btn-success btn-xs menu-bottom-buttons",
          click: function() {
 
           var personIdToShare = parseInt(personDetail_id);
@@ -284,7 +302,7 @@ cy = graph =  cytoscape({
        "setPhoto" : {
          text: "Cambiar Foto",
          id: "setPhoto",
-         class: "btn btn-success btn-xs",
+         class: "btn btn-success btn-xs menu-bottom-buttons",
          click: function(){
           window.location = "/setPhoto/" + personDetail_id;
          }
@@ -292,7 +310,7 @@ cy = graph =  cytoscape({
        "closeMenu" : {
          text: "Cerrar",
          id: "closeMenu",
-         class: "btn btn-success btn-xs",
+         class: "btn btn-success btn-xs menu-bottom-buttons",
          click: function(){
           $("#extendTree-form").html("");
            $( this ).dialog( "close" );
@@ -502,7 +520,7 @@ function getTitleForDialog(optionSelected)
     case options.SON:
         title = 'Agregar hijo/a a: ';
         break;
-     case options.COUP:
+     case options.COUPLE:
         title = 'Agregar pareja a: ';
         break;
     case options.UPDATEDATA:
@@ -528,8 +546,8 @@ function getUrlForSaveFamiliar(optionSelected)
     case options.SON:
         url = '#';
         break;
-     case options.COUP:
-        url = '#';
+     case options.COUPLE:
+        url = '/saveCouple';
         break;
     case options.UPDATEDATA:
       url = '/updatePersonData';
@@ -546,7 +564,7 @@ function getFamiliarOptionsToAdd()
   var options = {
       PARENT: 1,
       SON: 2,
-      COUP: 3,
+      COUPLE: 3,
       UPDATEDATA: 4
     };
 
