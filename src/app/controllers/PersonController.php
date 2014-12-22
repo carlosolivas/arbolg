@@ -411,7 +411,7 @@ class PersonController extends BaseController
 	* This function update the data of person
 	* @return Json with the request status
 	*/
-	function post_updatePersonData()
+	public function post_updatePersonData()
 	{
 		try {
 
@@ -480,7 +480,7 @@ class PersonController extends BaseController
 	 * This function laod the view to set photo
 	 * @return View
 	 */
-	function get_setPhoto($id)
+	public function get_setPhoto($id)
 	{
 		// Logged Person
 		$user = Auth::user();
@@ -504,7 +504,39 @@ class PersonController extends BaseController
 	/**
 	* This function add the person photo
 	*/
-	function post_setPhoto()
+	public function post_setPhoto()
+	{
+		// Logged Person
+		$user = Auth::user();
+		$personLoggedId = $user->Person->id;
+
+		$personId = Session::get('personIdPhotonEditing');
+		$input = Input::all();	
+
+		$rules = array(
+		 	'photo' => 'required|mimes:jpeg,bmp,png'
+        );		
+
+        $validation = Validator::make($input, $rules);
+
+		$nodePersonToUpdatePhoto = $this->get('NodePerson')->findById($personId);
+
+		if ($validation->fails() || $nodePersonToUpdatePhoto == null || $nodePersonToUpdatePhoto->ownerId != $personLoggedId) 
+		{
+			return Redirect::to('/tree');
+		}
+
+		$person = $this->personRepository->getById($personId);
+		$person->photo = $input["photo"];
+
+		$this->personRepository->store($person);
+		return Redirect::to('/tree');
+	}
+
+	/**
+	 * This function remove the person photo
+	 */
+	public function get_removePhoto()
 	{
 		// Logged Person
 		$user = Auth::user();
@@ -520,7 +552,7 @@ class PersonController extends BaseController
 		}
 
 		$person = $this->personRepository->getById($personId);
-		$person->photo = $input["photo"];
+		$person->photo = null;
 
 		$this->personRepository->store($person);
 		return Redirect::to('/tree');

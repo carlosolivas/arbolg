@@ -56,6 +56,7 @@ return array(
 	"suggestedFamilies"	=> 'Familias sugeridas',
 	"changePhoto"		=> 'Cambiar fotografía a',
 	"save"				=> 'Guardar',
-	"sex"				=> 'Sexo'
+	"sex"				=> 'Sexo',
+	"removePhoto"		=> 'Quitar fotografía'
 
 );

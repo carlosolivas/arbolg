@@ -56,6 +56,10 @@ Route::pattern('id', '[0-9]+');
         Route::post(
         '/setPhoto',
         array('as' => 'photo', 'uses' => 'PersonController@post_setPhoto'));   
+
+        Route::get(
+        '/removePhoto',
+        array('as' => 'removePhoto', 'uses' => 'PersonController@get_removePhoto')); 
     
     });
 });
