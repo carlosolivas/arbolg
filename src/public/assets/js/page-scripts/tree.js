@@ -181,7 +181,9 @@ cy = graph =  cytoscape({
     var personDetail_fullname = this.data('fullname');    
     var personDetail_canAddParents = this.data('canAddParents');
     var personDetail_canAddCouple = this.data('canAddCouple');
-    var canBeUpdatedByLoggedUser =  this.data('canBeUpdatedByLoggedUser');   
+    var personDetail_canBeModifiedByLoggedUser =  this.data('canBeModifiedByLoggedUser');   
+    var personDetail_canBeRemoved  = this.data('canBeRemoved');
+    var personDetail_ownerId = this.data('ownerId');
 
     // Familiar option selected
     var optionSelected = 0;
@@ -219,7 +221,7 @@ cy = graph =  cytoscape({
          class: "btn btn-success btn-xs menu-bottom-buttons",
          click: function(){
 
-          if (!canBeUpdatedByLoggedUser) {
+          if (!personDetail_canBeModifiedByLoggedUser) {
             return false;
           }
 
@@ -240,6 +242,21 @@ cy = graph =  cytoscape({
           familiarDialog.dialog('option','title', getTitleForDialog(optionSelected) + personDetail_fullname);
           familiarDialog.dialog( "open" );
          }
+       },
+       "remove":{
+        text: "Eliminar",
+        id: "remove",
+        class: "btn btn-success btn-xs menu-bottom-buttons",
+        click: function(){
+          if (!personDetail_canBeRemoved) {
+            return false;
+          }
+
+          $("#removing-person").text(personDetail_fullname + personDetail_lastname + personDetail_mothersname );
+          $("#confirm-removing").attr("href", "/removePerson/" + personDetail_id + "/" + personDetail_ownerId);
+          $( this ).dialog().parent().hide("scale",200);
+          $("#remove-form").modal('show');
+        }
        },
         "addParent" : {
          text: "Agregar padre/madre",
@@ -321,7 +338,7 @@ cy = graph =  cytoscape({
        }
       }
     }); 
-    menuDialog.dialog({ position: { my: "left+30 bottom+30 center", at: "right bottom", of: currentMousePos }, width: 550}); 
+    menuDialog.dialog({ position: { my: "left+30 bottom+30 center", at: "right bottom", of: currentMousePos }, width: 600}); 
     
     menuDialog.parent().css('z-index', 50000);
     // Dialog for create a familiar and manage the data edition of them and the person logged
@@ -503,7 +520,28 @@ function loadNodesAndRelations()
   });
 }
 
-// cy is an instance of Cytoscape, so cy is a graph
+$( "#confirm-removing" ).click(function() {
+  var url = $("#confirm-removing").attr("href");
+  $.ajax({
+        type: "get",
+        url: url,
+        }).done(function( json ) {
+
+          if (json == "successful") {
+            loadNodesAndRelations();
+            $("#confirm-removing").attr("href", "#");
+            $('#remove-form').modal("hide");
+            return false;
+          }                      
+          else{
+            $("#confirm-removing").attr("href", "#");
+            $('#remove-form').modal("hide");
+            alert(json);
+            return false;
+          }       
+      }); 
+    return false;
+});
 
 loadNodesAndRelations();  
 }); // on dom ready
@@ -610,4 +648,10 @@ $("#closeSuggesteds").click(function(){
   $("#suggesteds").hide('slide');
   $("html, body").animate({ scrollTop: 1 }, "slow");
 });
-                    
+
+$('#remove-form').on('hidden.bs.modal', function () {
+    /* Remove the tree view like disabled  */
+    $("#cy").css({opacity: 1});
+    $("#removing-person").text("");
+    $("#confirm-removing").attr("href", "#");
+});                    

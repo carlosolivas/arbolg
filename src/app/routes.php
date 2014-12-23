@@ -12,6 +12,7 @@
 
 */
 Route::pattern('id', '[0-9]+');
+Route::pattern('ownerId', '[0-9]+');
 
  Route::group(array('prefix' => LaravelLocalization::setLocale()), function()
 { 
@@ -39,7 +40,11 @@ Route::pattern('id', '[0-9]+');
 
         Route::post(
         '/saveCouple',
-        array('as' => 'saveCouple', 'uses' => 'PersonController@post_saveCouple'));       
+        array('as' => 'saveCouple', 'uses' => 'PersonController@post_saveCouple'));   
+
+        Route::get(
+        '/removePerson/{id}/{ownerId}',
+        array('as' => 'removePerson', 'uses' => 'PersonController@get_removePerson'));    
 
          Route::post(
         '/updatePersonData',

@@ -32,7 +32,8 @@ class NodePersonService extends BaseService
     /**
     * Queries
     */
-    const GET_ALL_FAMILY = 'MATCH (n:NodePerson {personId: ROOT})<-[r*]-(p) RETURN DISTINCT p';
+    const GET_ALL_FAMILY = 'MATCH (n:NodePerson {personId: R_PERSON})<-[r*]-(p) RETURN DISTINCT p';
+    const DELETE_NODE    = 'MATCH (n:NodePerson {personId: R_PERSON, ownerId: R_OWNER }) OPTIONAL MATCH (n)-[r]-() DELETE n,r';
 
     /**
      * General constants
@@ -71,8 +72,8 @@ class NodePersonService extends BaseService
     }
 
     /**
-     * Find person by identifier
-     * @param int $personId The id of the NodePerson to find
+     * Find NodePerson by the Person id
+     * @param $personId The id of the Person related with the NodePerson to find
      * @return Person       
      */
     public function findById($personId)
@@ -83,10 +84,12 @@ class NodePersonService extends BaseService
     /**
      * Create a new NodePerson
      * @param $personId The id of the person to create the NodePerson
+     * @param $ownerID The id of the NodePerson owner
+     * @param $isACopy If the NodePerson is a copy of other NodePerson
+     * @param $groupId The id of the Person's group 
      */
     public function create($personId, $ownerId, $isACopy, $groupId)
-    {
-        
+    {        
     	try {           
 
     		NodePerson::create([
@@ -101,6 +104,26 @@ class NodePersonService extends BaseService
     		throw new Exception($e->getMessage());
     	}
     }
+
+    /**
+     * Delete a NodePerson
+     * @param $personId The id of the Person to delete
+     * @param $ownerId The id of the owner
+     */
+    public function delete($personId, $ownerId)
+    {
+        try {
+
+            $query = str_replace("R_PERSON", $personId, self::DELETE_NODE);  
+            $query = str_replace("R_OWNER", $ownerId, $query);  
+
+            $result = DB::connection('neo4j')->select($query);            
+
+        } catch (Exception $e) {
+            Log::error($e);
+            throw new Exception($e->getMessage());
+        }
+    }    
 
     /**
      * Add parent to a NodePerson
@@ -129,20 +152,6 @@ class NodePersonService extends BaseService
         $personToAsignLikeCouple = $this->findById($couple);
 
         $personToAddCouple->couple()->save($personToAsignLikeCouple);
-    }
-
-    /**
-     * REmove parent to a NodePerson
-     * @param int $sonId The id of the son
-     * @param int $parentId The id of the parent
-     */
-    public function removeParent($sonId, $parentId)
-    {
-        $person = Person::where('personId', '=', $sonId)->first();    
-    
-        $personToUnAsignLikeParent = Person::where('personId', '=', $parent)->first();
-
-        $person->parents()->detach($personToUnAsignLikeParent);                
     }    
 
     /**
@@ -154,7 +163,7 @@ class NodePersonService extends BaseService
     {
         $family = array();
         
-        $query = str_replace("ROOT", $personId, self::GET_ALL_FAMILY);        
+        $query = str_replace("R_PERSON", $personId, self::GET_ALL_FAMILY);        
          
         $result = DB::connection('neo4j')->select($query);
         

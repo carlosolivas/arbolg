@@ -13,12 +13,13 @@ class PersonController extends BaseController
 	/**
      * General constants
      */
- 	const FATHER 				= 1;
-    const MOTHER    			= 2;
-    const SON       			= 3;   
-    const NODE_IS_NOT_A_COPY	= 0; 
-    const NO_GROUP				= 0;
-    const NOT_ADMIN				= 0;
+ 	const FATHER                                = 1;
+    const MOTHER                                = 2;
+    const SON                                   = 3;   
+    const NODE_IS_NOT_A_COPY                    = 0; 
+    const NO_GROUP                              = 0;
+    const NOT_ADMIN                             = 0;
+    const REQUEST_STATUS_SUCCESSFUL 			= 'successful';
 
 
 	public function __construct(
@@ -183,7 +184,9 @@ class PersonController extends BaseController
 				$isRootNode = true;
 			}
 			// Check if the logged person can update his data
-			$canBeUpdatedByLoggedUser = $nodePerson->ownerId == $personLogged;
+			$canBeModifiedByLoggedUser = $nodePerson->ownerId == $personLogged;
+			// If the node is the logged person, he can't remove itself
+			$canBeRemoved = ($nodePerson->personId != $personLogged) && $canBeModifiedByLoggedUser;
 
 			$personId = $person->id;
 			$dataOfPerson = array(
@@ -199,7 +202,9 @@ class PersonController extends BaseController
 				"canAddParents"	=> $canAddParents,
 				"canAddCouple"	=> $canAddCouple,
 				"isRootNode"	=> $isRootNode,
-				"canBeUpdatedByLoggedUser"	=> $canBeUpdatedByLoggedUser
+				"canBeModifiedByLoggedUser"	=> $canBeModifiedByLoggedUser,
+				"canBeRemoved"	=> $canBeRemoved,
+				"ownerId"		=> $nodePerson->ownerId
 			);
 			
 			/* If the person are user, set a distinctive border */
@@ -321,7 +326,7 @@ class PersonController extends BaseController
 				$parentId = $newPersonId;
 				$this->get('NodePerson')->addParent($sonId, $parentId);
 
-				return Response::json( 'successful' );
+				return Response::json( self::REQUEST_STATUS_SUCCESSFUL );
 			}
 			else {
 				return Response::json( $validation->messages()->all('- :message -') );
@@ -396,7 +401,7 @@ class PersonController extends BaseController
 				$coupleId = $newPersonId;
 				$this->get('NodePerson')->addCouple($clickedPersonId, $coupleId);
 
-				return Response::json( 'successful' );
+				return Response::json( self::REQUEST_STATUS_SUCCESSFUL );
 			}
 			else {
 				return Response::json( $validation->messages()->all('- :message -') );
@@ -462,7 +467,7 @@ class PersonController extends BaseController
 					// Edition a Person
 					$this->personRepository->store($data);
 
-					return Response::json( 'successful' );
+					return Response::json( self::REQUEST_STATUS_SUCCESSFUL );
 				}
 				else {
 					return Response::json( $validation->messages()->all('- :message -') );
@@ -556,6 +561,45 @@ class PersonController extends BaseController
 
 		$this->personRepository->store($person);
 		return Redirect::to('/tree');
+	}
+
+	public function get_removePerson($id, $ownerId)
+	{
+		try {
+
+			if (is_string($id)) {
+				$id = (int)$id;
+			}
+
+			if (is_string($ownerId)) {
+				$ownerId = (int)$ownerId;
+			}
+
+			// Logged Person
+			$user = Auth::user();
+			$personLoggedId = $user->Person->id;
+
+			$nodePerson = $this->get('NodePerson')->findById($id);
+			if ($nodePerson == null) {
+				return Response::json( Lang::get('messages.not_existing_node_person') );
+			}
+
+			if ($this->userRepository->existsUser($id)) {
+			   // Do something
+			}		
+			else {
+				if ($nodePerson->ownerId != $personLoggedId) {
+					return Response::json( Lang::get('messages.cannotRemove') );
+			}
+
+			$this->get('NodePerson')->delete($nodePerson->personId, $nodePerson->ownerId);
+
+			return Response::json( self::REQUEST_STATUS_SUCCESSFUL );
+		}
+		} catch (Exception $e) {
+			return Response::json( Lang::get('messages.error_removing_node') );
+		}
+		
 	}
 
 	/* Utilities */

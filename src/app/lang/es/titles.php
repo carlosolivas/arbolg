@@ -57,6 +57,7 @@ return array(
 	"changePhoto"		=> 'Cambiar fotografía a',
 	"save"				=> 'Guardar',
 	"sex"				=> 'Sexo',
-	"removePhoto"		=> 'Quitar fotografía'
+	"removePhoto"		=> 'Quitar fotografía',
+	"remove_node"		=> 'Si, quitar de mi árbol'
 
 );

@@ -153,6 +153,24 @@
 	<div id="extendTreeBody"></div>	
 </div>
 
+
+<div id="remove-form" class="modal fade" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                      <div>{{ Lang::get('messages.removing_node') }}</div>   
+                      <div id="removing-person" style="font-weight: bold"></div>     
+                </div>
+            </div>
+            <div class="modal-footer">
+            	<a id="confirm-removing" class="btn btn-sm btn-success" type="button" href="#"><strong>{{ Lang::get("titles.remove_node")}} </strong> </a>
+            	<button class="btn btn-sm btn-default" type="button" data-dismiss="modal"><strong>{{ Lang::get("titles.cancel")}} </strong></button>
+            </div>
+            </div>
+        </div>
+</div>
+
 {{ HTML::script('assets/js/page-scripts/dagre.js'); }}
 {{ HTML::script('assets/js/page-scripts/cytoscape.js-panzoom.js'); }}
 {{ HTML::script('assets/js/page-scripts/tree.js'); }}
