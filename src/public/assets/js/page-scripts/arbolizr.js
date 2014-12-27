@@ -19,6 +19,7 @@ var DEBUG = true;
 var FIRST = 0;
 var canvasHeight = 500;
 var canvasWidth = 500;
+var COUPLE_LINE_STYLE = '#FF0000';
 
 
 //var nodes = 
@@ -68,9 +69,12 @@ function drawRelations() {
             
             cp = parentCoParents(n.data().id);
             cp.push(parseInt(n.data().id));
-            //dd(isLeftParent(n.data().id, cp));
 
             if(childrens.length == 1) {
+                if(graph.$('node#' + childrens[0]).data('aux')) {
+                    drawCoupleLine(cp);
+                    continue;
+                }
                     h = hLineBounds(cp, true); 
                     v = vLineBounds(cp, true);
 
@@ -279,6 +283,31 @@ function drawChildrensSupLine (childrens)
     }
  }
 
+function drawCoupleLine(couple) {
+    nodeWidth = parseInt(graph.$(NODE_SELECTOR).css().width) / 2;
+    
+    if(isLeftParent(couple[0], couple)) {
+        signA = 1;
+        signB = -1;
+    } else {
+        signA = -1;
+        signB = 1;
+    }
+
+    bounds = {
+        p1:{
+            x:posH(graph.$('node#' + couple[0]).position().x + (nodeWidth + 1) * signA),
+            y:posV(graph.$('node#' + couple[0]).position().y)
+        },
+        p2: {
+            x:posH(graph.$('node#' + couple[1]).position().x + (nodeWidth + 1) * signB),
+            y:posV(graph.$('node#' + couple[1]).position().y)
+        }
+    };
+    drawLine(bounds, COUPLE_LINE_STYLE);
+}
+
+
 function drawParentsLine (parentId) {
     separation = graph.options().layout.rankSep / 2;
     lineHeight = parseInt(graph.$(NODE_SELECTOR).css().height) / 2;
@@ -298,11 +327,16 @@ function drawParentsLine (parentId) {
 
 }
 
-    function drawLine (bounds) {
+    function drawLine (bounds, strokeStyle) {
         canvasContext.beginPath();
+
+        if(strokeStyle) {
+            canvasContext.strokeStyle = strokeStyle;
+        }
         canvasContext.moveTo(bounds.p1.x, bounds.p1.y);
         canvasContext.lineTo(bounds.p2.x, bounds.p2.y);
         canvasContext.stroke();
+
 
     }
 
