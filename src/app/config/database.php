@@ -61,7 +61,7 @@ return array(
 		'mysql' => array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
-			'database'  => 'objetivos',
+			'database'  => 's4h',
 			'username'  => 'root',
 			'password'  => 'root',
 			'charset'   => 'utf8',

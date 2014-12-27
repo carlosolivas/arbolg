@@ -4,6 +4,8 @@ use Zizaco\Confide\ConfideUser;
 
 class User extends ConfideUser {
 
+    protected $table = 'users';
+
     public function userdetail()
     {
         return $this->hasOne('Userdetail');

@@ -2,10 +2,20 @@
 namespace s4h\core;
 
 class Person extends \Eloquent {
+	protected $table = 'people';
+
 	protected $fillable = [];
 
 	public function getThumbnail() {
 		return asset('assets/img/groups/' . $this->id . '-48x48.jpg');
+	}
+
+	public function getId() 
+	{
+	    if(!is_null($this->id)) {
+		return intval($this->id);
+	    }
+	    return null;
 	}
 
 	public function Photo() {

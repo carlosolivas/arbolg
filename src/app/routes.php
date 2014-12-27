@@ -12,6 +12,7 @@
 
 */
 Route::pattern('id', '[0-9]+');
+Route::pattern('ownerId', '[0-9]+');
 
  Route::group(array('prefix' => LaravelLocalization::setLocale()), function()
 { 
@@ -35,7 +36,15 @@ Route::pattern('id', '[0-9]+');
 
         Route::post(
         '/saveParent',
-        array('as' => 'saveParent', 'uses' => 'PersonController@post_saveParent'));              
+        array('as' => 'saveParent', 'uses' => 'PersonController@post_saveParent'));          
+
+        Route::post(
+        '/saveCouple',
+        array('as' => 'saveCouple', 'uses' => 'PersonController@post_saveCouple'));   
+
+        Route::get(
+        '/removePerson/{id}/{ownerId}',
+        array('as' => 'removePerson', 'uses' => 'PersonController@get_removePerson'));    
 
          Route::post(
         '/updatePersonData',
@@ -52,6 +61,10 @@ Route::pattern('id', '[0-9]+');
         Route::post(
         '/setPhoto',
         array('as' => 'photo', 'uses' => 'PersonController@post_setPhoto'));   
+
+        Route::get(
+        '/removePhoto',
+        array('as' => 'removePhoto', 'uses' => 'PersonController@get_removePhoto')); 
     
     });
 });

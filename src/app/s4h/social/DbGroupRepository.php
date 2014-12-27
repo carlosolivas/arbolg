@@ -97,9 +97,12 @@ class DbGroupRepository implements GroupRepositoryInterface {
 			->whereIn('id', $groupIds)
 			->lists('id');
 
-		$myFamilyFriends = \DB::table('group_group')
-			->join('groups', 'group_group.member_group_id', '=', 'groups.id')
-			->whereIn('group_group.group_id', $ff)	->get();
+		$myFamilyFriends = array();
+		if (!empty($ff)) {
+			$myFamilyFriends = \DB::table('group_person')
+			->join('groups', 'group_person.group_id', '=', 'groups.id')
+			->whereIn('group_person.group_id', $ff)	->get();
+		}	
 
 		return array('myFriends' => $myFriends, 'myFamilyFriends' => $myFamilyFriends);
 	}

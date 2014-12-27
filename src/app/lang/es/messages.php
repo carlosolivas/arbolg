@@ -13,7 +13,11 @@ return array(
 
 	'error_on_create_person'		=> 'Hubo un error mientras se intentaba guardar los datos de la persona',
 	"cannotUpdateData"				=> 'No tiene permiso para editar los datos de esta persona',
+	"cannotRemove"				    => 'No tiene permiso para borrar a esta persona',
 	"shareElementMessage"			=> 'Invitación para compartir los árboles',
-	"error_loading_share_view"		=> 'Hubo un error mientras se intentaba mostrar el menú para compartir árboles'
+	"error_loading_share_view"		=> 'Hubo un error mientras se intentaba mostrar el menú para compartir árboles',
+	"removing_node"					=> 'Está por quitar a la siguiente persona de forma permanente de su árbol. ¿Desea continuar?',
+	"not_existing_node_person"		=> 'No se pudo encontrar el nodo',
+	"error_removing_node"			=> 'Hubo un error al intentar borrar la persona de su árbol'
 
 );

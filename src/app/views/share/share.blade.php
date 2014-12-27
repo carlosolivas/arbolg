@@ -37,20 +37,25 @@
                             @endforeach
                             <br/>
                             <p>Share with Friends: <br/>
-                            @foreach($myFriends as $friend)
-                                @if ($friend->FriendType == 'Person')
-                                    {{ Form::radio('shareWithFriends', $friend->Id, '1', false)}} {{ $friend->Name }}
-                                @endif
+
+                            @if (!empty($myFriends))
+                                @foreach($myFriends as $friend)
+                                    @if ($friend != null && $friend->FriendType == 'Person')
+                                        {{ Form::radio('shareWithFriends', $friend->Id, '1', false)}} {{ $friend->Name }}
+                                    @endif
                             @endforeach
+                            @endif
+                            
                             </p>
 
                             <p>Share with Families:<br/>
-                            @foreach($myFriends as $friend)
-                                @if ($friend->FriendType == 'Family')
-                                    {{ Form::radio('shareWithFamilies',$friend->Id, '1', false)}} {{ $friend->Name }}
-                                @endif
-                            @endforeach
-                            </p>
+                            @if (!empty($myFriends))
+                                @foreach($myFriends as $friend)
+                                    @if ($friend != null && $friend->FriendType == 'Family')
+                                        {{ Form::radio('shareWithFamilies',$friend->Id, '1', false)}} {{ $friend->Name }}
+                                    @endif
+                                @endforeach
+                            @endif                            
                             {{ Form::submit(Lang::get('share.share')) }}
                         {{ Form::close() }}
                         </div>

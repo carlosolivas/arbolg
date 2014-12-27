@@ -2,26 +2,34 @@
 
 use s4h\core\PersonRepositoryInterface;
 use s4h\core\UserRepositoryInterface;
+use s4h\social\GroupRepositoryInterface;
 
 class PersonController extends BaseController
 {
 	protected $personRepository;
 	protected $userRepository;
+	protected $groupRepository;
 
 	/**
      * General constants
      */
- 	const FATHER 				= 1;
-    const MOTHER    			= 2;
-    const SON       			= 3;   
-    const NODE_IS_NOT_A_COPY	= 0; 
-    const NO_GROUP				= 0;
+ 	const FATHER                                = 1;
+    const MOTHER                                = 2;
+    const SON                                   = 3;   
+    const NODE_IS_NOT_A_COPY                    = 0; 
+    const NO_GROUP                              = 0;
+    const NOT_ADMIN                             = 0;
+    const REQUEST_STATUS_SUCCESSFUL 			= 'successful';
 
 
-	public function __construct(PersonRepositoryInterface $personRepository, UserRepositoryInterface $userRepository)
+	public function __construct(
+		PersonRepositoryInterface $personRepository, 
+		UserRepositoryInterface $userRepository,
+		GroupRepositoryInterface $groupRepository)
 	{
         $this->personRepository = $personRepository;
         $this->userRepository = $userRepository;
+        $this->groupRepository = $groupRepository;
 	}
 
 
@@ -34,21 +42,18 @@ class PersonController extends BaseController
 	{
 		try
 		{
-
-			$person = Auth::user()->Person;
-			
+			$person = Auth::user()->Person;		
 
 			/* Check if the NodePerson for this user wasn´t created yet */
-			if (!($this->get('NodePerson')->nodePersonExists($person->id))) {
+			if (!($this->get('NodePerson')->nodePersonExists($person->getId()))) {
 
 				$groupId = self::NO_GROUP;
 				if ($person->getFamily() != null) {
 					$groupId = $person->getFamily()->id;
-				}
-				
+				}				
 
 				/* Create the NodePerson for this user */
-				$this->get('NodePerson')->create($person->id,$person->id, self::NODE_IS_NOT_A_COPY, $groupId);
+				$this->get('NodePerson')->create($person->getId(),$person->getId(), self::NODE_IS_NOT_A_COPY, $groupId);
 
 				if ($person->getFamily() == null) {
 					
@@ -162,7 +167,7 @@ class PersonController extends BaseController
 	{
 		$user = Auth::user();
 
-		$personLogged = $user->Person->id;
+		$personLogged = $user->Person->getId();
 
 		$family = $this->get('NodePerson')->getFamily($personLogged);
 		
@@ -171,17 +176,21 @@ class PersonController extends BaseController
 			$person = $this->personRepository->getById($nodePerson->personId);
 			// Check if can add more Parents
 			$canAddParents = $this->get('NodePerson')->canAddParents($nodePerson);
+			// Check if can add a Couple
+			$canAddCouple = $this->get('NodePerson')->canAddCouple($nodePerson);
 			// Set the root Node
 			$isRootNode = false;
 			if ($nodePerson->personId == $personLogged) {
 				$isRootNode = true;
 			}
 			// Check if the logged person can update his data
-			$canBeUpdatedByLoggedUser = $nodePerson->ownerId == $personLogged;
+			$canBeModifiedByLoggedUser = $nodePerson->ownerId == $personLogged;
+			// If the node is the logged person, he can't remove itself
+			$canBeRemoved = ($nodePerson->personId != $personLogged) && $canBeModifiedByLoggedUser;
 
-			$personId = (string)$person->id;
+			$personId = $person->id;
 			$dataOfPerson = array(
-				"id" => $personId,
+				"id" => (string)$personId,
 				"name" => $person->name,
 				"lastname" => $person->lastname,
 				"mothersname" => $person->mothersname,
@@ -191,8 +200,11 @@ class PersonController extends BaseController
 				"phone"	=> $person->phone,
 				"fullname"	=> $person->name . " " . $person->lastname . " " . $person->mothersname,
 				"canAddParents"	=> $canAddParents,
+				"canAddCouple"	=> $canAddCouple,
 				"isRootNode"	=> $isRootNode,
-				"canBeUpdatedByLoggedUser"	=> $canBeUpdatedByLoggedUser
+				"canBeModifiedByLoggedUser"	=> $canBeModifiedByLoggedUser,
+				"canBeRemoved"	=> $canBeRemoved,
+				"ownerId"		=> $nodePerson->ownerId
 			);
 			
 			/* If the person are user, set a distinctive border */
@@ -230,7 +242,7 @@ class PersonController extends BaseController
 	public function get_loadTreeRelations()
 	{
 		$user = Auth::user();
-		$personLogged = $user->Person->id;
+		$personLogged = $user->Person->getId();
 		$family = $this->get('NodePerson')->getFamily($personLogged);
 
 		$relations = array();
@@ -238,7 +250,7 @@ class PersonController extends BaseController
 			foreach ($person->parents as $nodeParent) {
 				$parent = $this->personRepository->getById($nodeParent->personId);
 				// Source is the parent of person
-				$source = (string)$parent->id;
+				$source = (string)$parent->getId();
 				// Target is the person
 				$target = (string)$person->personId;
 				$dataParOfRelations = array("source" => $source, "target" => $target);
@@ -251,11 +263,11 @@ class PersonController extends BaseController
 
 
 	/**
-     * This function creates a Person, a NodePerson and relate this NodePerson with
+     * This function creates a Person, a NodePerson and relate this NodePerson like a someone's father
      * @return Json with the request status
      */
 	public function post_saveParent()
-	{		
+	{				 
 		try {
 
 			// Data of new Person
@@ -273,7 +285,7 @@ class PersonController extends BaseController
 				'phone' 		=> $input['phone'],
 				'email'		    => $input['email'],
 				'user_id' 		=> null,
-				'role_id' 		=> $input['gender'] == self::MOTHER ? self::MOTHER : self::FATHER,
+				'role_id' 		=> $input['gender'],
 				'file_id'		=> null
 			);
 
@@ -294,26 +306,109 @@ class PersonController extends BaseController
 
 			if ($this->get('NodePerson')->canAddParents($son) && !($validation->fails())) {
 
+				$user = Auth::user();
+				$personLogged = $user->Person->getId();
+
 				// Create a Person
 				$newPersonId =  $this->personRepository->store($data);
 
-				// Create a NodePerson
-				$user = Auth::user();
-				$personLogged = $user->Person->id;
+				// Push into the family group
+				if ($user->Person->getFamily() != null) {
+
+					$groupFamilyId = $user->Person->getFamily()->id;
+					$this->groupRepository->addGroupMember($groupFamilyId, $newPersonId, self::NOT_ADMIN);
+				}				
+
+				// Create a NodePerson				
 				$this->get('NodePerson')->create($newPersonId, $personLogged, self::NODE_IS_NOT_A_COPY, $son->groupId);
 
 				// Add new Person as parent
 				$parentId = $newPersonId;
 				$this->get('NodePerson')->addParent($sonId, $parentId);
 
-				return Response::json( 'successful' );
+				return Response::json( self::REQUEST_STATUS_SUCCESSFUL );
 			}
 			else {
 				return Response::json( $validation->messages()->all('- :message -') );
 			}
 
 		} catch (Exception $e) {
-			return Response::json( $e->getMessage() );
+			return Response::json( Lang::get('messages.error_on_create_person') );
+		}
+	}
+
+	/**
+     * This function creates a Person, a NodePerson and relate this NodePerson with a someone's couple
+     * @return Json with the request status
+     */
+	public function post_saveCouple()
+	{				 
+		try {
+
+			// Data of new Person
+			$input = Input::all();
+
+			// Converting the date of birth
+			$birthdate =  $this->formatDate($input['dateOfBirth']);
+
+			$data = array(
+				'name' 			=> $input['name'],
+				'lastname' 		=> $input['lastname'],
+				'mothersname' 	=> $input['mothersname'],
+				'birthdate' 	=> $birthdate,
+				'gender' 		=> $input['gender'],
+				'phone' 		=> $input['phone'],
+				'email'		    => $input['email'],
+				'user_id' 		=> null,
+				'role_id' 		=> $input['gender'],
+				'file_id'		=> null
+			);
+
+		 	$rules = array(
+			 	'name' => 'required',
+	            'lastname' => 'required',
+	            'gender' => 'required',
+	            'birthdate' => 'date',
+	            'phone' => 'numeric',
+	            'email' => 'email'
+            );
+
+			$validation = Validator::make($data, $rules);
+
+			// Check if son can add a Couple
+			$clickedPersonId = (int)$input['id'];
+			$clickedPerson = $this->get('NodePerson')->findById($clickedPersonId);
+
+			if ($this->get('NodePerson')->canAddCouple($clickedPerson) && !($validation->fails())) {
+
+				$user = Auth::user();
+				$personLogged = $user->Person->getId();
+
+				// Create a Person
+				$newPersonId =  $this->personRepository->store($data);
+
+				// Push into the family group
+				if ($user->Person->getFamily() != null) {
+
+					$groupFamilyId = $user->Person->getFamily()->id;
+					$this->groupRepository->addGroupMember($groupFamilyId, $newPersonId, self::NOT_ADMIN);
+				}				
+
+				// Create a NodePerson				
+				$this->get('NodePerson')->create($newPersonId, $personLogged, self::NODE_IS_NOT_A_COPY, $clickedPerson->groupId);
+
+				// Add new Person as couple
+				$coupleId = $newPersonId;
+				$this->get('NodePerson')->addCouple($clickedPersonId, $coupleId);
+
+				return Response::json( self::REQUEST_STATUS_SUCCESSFUL );
+			}
+			else {
+				return Response::json( $validation->messages()->all('- :message -') );
+			}
+
+		} catch (Exception $e) {
+			return Response::json( Lang::get('messages.error_on_create_person') );
 		}
 	}
 
@@ -321,7 +416,7 @@ class PersonController extends BaseController
 	* This function update the data of person
 	* @return Json with the request status
 	*/
-	function post_updatePersonData()
+	public function post_updatePersonData()
 	{
 		try {
 
@@ -372,7 +467,7 @@ class PersonController extends BaseController
 					// Edition a Person
 					$this->personRepository->store($data);
 
-					return Response::json( 'successful' );
+					return Response::json( self::REQUEST_STATUS_SUCCESSFUL );
 				}
 				else {
 					return Response::json( $validation->messages()->all('- :message -') );
@@ -390,11 +485,11 @@ class PersonController extends BaseController
 	 * This function laod the view to set photo
 	 * @return View
 	 */
-	function get_setPhoto($id)
+	public function get_setPhoto($id)
 	{
 		// Logged Person
 		$user = Auth::user();
-		$personLoggedId = $user->Person->id;
+		$personLoggedId = $user->Person->getId();
 
 		if (is_string($id)) {
 			$id = (int)$id;
@@ -414,7 +509,39 @@ class PersonController extends BaseController
 	/**
 	* This function add the person photo
 	*/
-	function post_setPhoto()
+	public function post_setPhoto()
+	{
+		// Logged Person
+		$user = Auth::user();
+		$personLoggedId = $user->Person->id;
+
+		$personId = Session::get('personIdPhotonEditing');
+		$input = Input::all();	
+
+		$rules = array(
+		 	'photo' => 'required|mimes:jpeg,bmp,png'
+        );		
+
+        $validation = Validator::make($input, $rules);
+
+		$nodePersonToUpdatePhoto = $this->get('NodePerson')->findById($personId);
+
+		if ($validation->fails() || $nodePersonToUpdatePhoto == null || $nodePersonToUpdatePhoto->ownerId != $personLoggedId) 
+		{
+			return Redirect::to('/tree');
+		}
+
+		$person = $this->personRepository->getById($personId);
+		$person->photo = $input["photo"];
+
+		$this->personRepository->store($person);
+		return Redirect::to('/tree');
+	}
+
+	/**
+	 * This function remove the person photo
+	 */
+	public function get_removePhoto()
 	{
 		// Logged Person
 		$user = Auth::user();
@@ -430,10 +557,49 @@ class PersonController extends BaseController
 		}
 
 		$person = $this->personRepository->getById($personId);
-		$person->photo = $input["photo"];
+		$person->photo = null;
 
 		$this->personRepository->store($person);
 		return Redirect::to('/tree');
+	}
+
+	public function get_removePerson($id, $ownerId)
+	{
+		try {
+
+			if (is_string($id)) {
+				$id = (int)$id;
+			}
+
+			if (is_string($ownerId)) {
+				$ownerId = (int)$ownerId;
+			}
+
+			// Logged Person
+			$user = Auth::user();
+			$personLoggedId = $user->Person->id;
+
+			$nodePerson = $this->get('NodePerson')->findById($id);
+			if ($nodePerson == null) {
+				return Response::json( Lang::get('messages.not_existing_node_person') );
+			}
+
+			if ($this->userRepository->existsUser($id)) {
+			   // Do something
+			}		
+			else {
+				if ($nodePerson->ownerId != $personLoggedId) {
+					return Response::json( Lang::get('messages.cannotRemove') );
+			}
+
+			$this->get('NodePerson')->delete($nodePerson->personId, $nodePerson->ownerId);
+
+			return Response::json( self::REQUEST_STATUS_SUCCESSFUL );
+		}
+		} catch (Exception $e) {
+			return Response::json( Lang::get('messages.error_removing_node') );
+		}
+		
 	}
 
 	/* Utilities */

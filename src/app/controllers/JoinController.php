@@ -12,6 +12,11 @@ class JoinController extends BaseController
      */
  	const SHARE_ELEMENT_CLASS_NAME_FAMILY_TREE	= "familyTree";
  	const SHARE_ELEMENT_TYPE					= 1;
+ 	const CUSTOM_ELEMENT_NAME_KEEP_THE_TREE		= "keepTheTree";
+ 	const CUSTOM_ELEMENT_KEEP_THE_TREE_HTML		= "<input type='checkbox' name='keepTheTree' value='1'/>";
+
+ 	const REQUEST_STATUS_SUCCESSFUL 			= 'successful';
+ 	const REQUEST_STATUS_FAILURE				= 'failure';
 
 	public function __construct(PersonRepositoryInterface $personRepository) 
 	{
@@ -45,14 +50,26 @@ class JoinController extends BaseController
 		    $shareElement->$message = $message;
 		    $shareElement->$type = $type;
 
+		    $keepTheTreeCheckBox = new s4h\share\SharedElementCustomItem(
+		    	self::CUSTOM_ELEMENT_NAME_KEEP_THE_TREE,
+		    	self::CUSTOM_ELEMENT_KEEP_THE_TREE_HTML);
+
+		    $shareElement->addCustomItem($keepTheTreeCheckBox);
+
 		    $fileRepository = new \s4h\core\DbS3FileRepository;
 		    $groupRepository = new s4h\social\DbGroupRepository($fileRepository);
 		    $shareRepository = new s4h\share\DbShareRepository;
 		    $sharing = new s4h\share\Sharing($groupRepository, $shareRepository);
 
-			return $sharing->displayShareForm($shareElement);			
+		    $data = $sharing->displayShareForm($shareElement);
+		    
+		    $response = array('status' => self::REQUEST_STATUS_SUCCESSFUL, 'data' => (string)$data);
+			return Response::json($response);		
+
 		} catch (Exception $e) {
-			return Lang::get('messages.error_loading_share_view');
-		}		
+
+			$response = array('status' => self::REQUEST_STATUS_FAILURE, 'data' => Lang::get('messages.error_loading_share_view'));
+			return Response::json($response);		
+		}	
 	}
 }

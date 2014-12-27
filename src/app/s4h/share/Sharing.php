@@ -35,6 +35,7 @@ class Sharing {
     public function displayShareForm(SharedElement $sharedElement)
     {
         $myFriends = $this->groupRepo->myFriends();
+
         return View::make('share.share')
             ->with('shareTypeId', $sharedElement->getType())
             ->with('elementId', $sharedElement->getElementId())
