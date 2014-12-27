@@ -21,7 +21,7 @@ return array(
 	"biography"				=> 'Biografía',
 	"son"					=> 'Hijo/a',
 	"parent"				=> 'Padre/Madre',
-	"birth"					=> 'Nació?',
+	"birth"					=> 'Nacimiento',
 	"phone"					=> 'Teléfono',
 
 	"dropHere" 				=> 'Arrastre aquí para conectar con: ',

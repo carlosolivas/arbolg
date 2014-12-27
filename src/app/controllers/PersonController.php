@@ -1,4 +1,14 @@
 <?php
+/**
+* PersonController.php
+*
+* Handles the tree's people's interaction
+*
+*  @category Controllers
+*  @author   Kiwing IT Solutions <info@kiwing.net>
+*  @author   Federico Rossi <rossi.federico.e@gmail.com>
+*
+*/
 
 use s4h\core\PersonRepositoryInterface;
 use s4h\core\UserRepositoryInterface;
@@ -10,20 +20,20 @@ class PersonController extends BaseController
 	protected $userRepository;
 	protected $groupRepository;
 
-	/**
-     * General constants
-     */
- 	const FATHER                                = 1;
+	  /**
+    * General constants
+    */
+ 	  const FATHER                                = 1;
     const MOTHER                                = 2;
-    const SON                                   = 3;   
-    const NODE_IS_NOT_A_COPY                    = 0; 
+    const SON                                   = 3;
+    const NODE_IS_NOT_A_COPY                    = 0;
     const NO_GROUP                              = 0;
     const NOT_ADMIN                             = 0;
     const REQUEST_STATUS_SUCCESSFUL 			= 'successful';
 
 
 	public function __construct(
-		PersonRepositoryInterface $personRepository, 
+		PersonRepositoryInterface $personRepository,
 		UserRepositoryInterface $userRepository,
 		GroupRepositoryInterface $groupRepository)
 	{
@@ -34,15 +44,16 @@ class PersonController extends BaseController
 
 
 	/**
-     * This function check if the Person exists already in the graph model
-     * and create the view for the tree
-     * @return View
-     */
+    * This function check if the Person exists already in the tree (graph model)
+    * and create the view for the tree. If the Persons doesn't exists in the
+		* graph model, then we create it and map all his family into the tree.
+    * @return View
+    */
 	public function get_tree()
 	{
 		try
 		{
-			$person = Auth::user()->Person;		
+			$person = Auth::user()->Person;
 
 			/* Check if the NodePerson for this user wasn´t created yet */
 			if (!($this->get('NodePerson')->nodePersonExists($person->getId()))) {
@@ -50,13 +61,13 @@ class PersonController extends BaseController
 				$groupId = self::NO_GROUP;
 				if ($person->getFamily() != null) {
 					$groupId = $person->getFamily()->id;
-				}				
+				}
 
 				/* Create the NodePerson for this user */
 				$this->get('NodePerson')->create($person->getId(),$person->getId(), self::NODE_IS_NOT_A_COPY, $groupId);
 
 				if ($person->getFamily() == null) {
-					
+
 					return View::make('person.tree');
 
 				}
@@ -69,7 +80,7 @@ class PersonController extends BaseController
 					if ($directFamiliar->role_id == self::FATHER || $directFamiliar->role_id == self::MOTHER) {
 						array_push($directFamiliars, $directFamiliar);
 					}
-				}				
+				}
 
 				/* Then the sons */
 				foreach ($person->getFamily()->Persons as $directFamiliar) {
@@ -110,8 +121,8 @@ class PersonController extends BaseController
 								if ($directFamiliar->role_id == self::FATHER || $directFamiliar->role_id == self::MOTHER) {
 									$coupId = $directFamiliar->id;
 									/* Add as the coup the logged Person and vice versa */
-									$this->get('NodePerson')->addCoup($person->id, $coupId);
-									$this->get('NodePerson')->addCoup($directFamiliar->id, $person->id);
+									$this->get('NodePerson')->addCouple($person->id, $coupId);
+									$this->get('NodePerson')->addCouple($directFamiliar->id, $person->id);
 								}
 							}
 
@@ -128,7 +139,7 @@ class PersonController extends BaseController
 										foreach ($nodePersonLogged->parents as $parent) {
 											foreach ($nodePersonLogged->parents as $otherParent) {
 												if ($parent->personId != $otherParent->personId) {
-													$this->get('NodePerson')->addCoup($parent->personId, $otherParent->personId);
+													$this->get('NodePerson')->addCouple($parent->personId, $otherParent->personId);
 												}
 											}
 										}
@@ -160,97 +171,93 @@ class PersonController extends BaseController
 	}
 
 	/**
-     * Get the family of Person
+     * Get the elements (nodes and edges) necessary for the tree
      * @return Node Persons
      */
-	public function get_loadTreePersons()
+	public function get_loadTreeElements()
 	{
 		$user = Auth::user();
 
 		$personLogged = $user->Person->getId();
 
 		$family = $this->get('NodePerson')->getFamily($personLogged);
-		
+
+		// Loading Nodes
 		$nodes = array();
 		foreach ($family as $nodePerson) {
-			$person = $this->personRepository->getById($nodePerson->personId);
-			// Check if can add more Parents
-			$canAddParents = $this->get('NodePerson')->canAddParents($nodePerson);
-			// Check if can add a Couple
-			$canAddCouple = $this->get('NodePerson')->canAddCouple($nodePerson);
-			// Set the root Node
-			$isRootNode = false;
-			if ($nodePerson->personId == $personLogged) {
-				$isRootNode = true;
-			}
-			// Check if the logged person can update his data
-			$canBeModifiedByLoggedUser = $nodePerson->ownerId == $personLogged;
-			// If the node is the logged person, he can't remove itself
-			$canBeRemoved = ($nodePerson->personId != $personLogged) && $canBeModifiedByLoggedUser;
+			// If isn't a auxiliar node
+			if ($nodePerson->aux == null) {
+				$person = $this->personRepository->getById($nodePerson->personId);
+				// Check if can add more Parents
+				$canAddParents = $this->get('NodePerson')->canAddParents($nodePerson);
+				// Check if can add a Couple
+				$canAddCouple = $this->get('NodePerson')->canAddCouple($nodePerson);
 
-			$personId = $person->id;
-			$dataOfPerson = array(
-				"id" => (string)$personId,
-				"name" => $person->name,
-				"lastname" => $person->lastname,
-				"mothersname" => $person->mothersname,
-				"email" => $person->email,
-				"birthdate"	=> $this->formatDate($person->birthdate, $toSpanishFormat = true),
-				"gender"	=> $person->gender,
-				"phone"	=> $person->phone,
-				"fullname"	=> $person->name . " " . $person->lastname . " " . $person->mothersname,
-				"canAddParents"	=> $canAddParents,
-				"canAddCouple"	=> $canAddCouple,
-				"isRootNode"	=> $isRootNode,
-				"canBeModifiedByLoggedUser"	=> $canBeModifiedByLoggedUser,
-				"canBeRemoved"	=> $canBeRemoved,
-				"ownerId"		=> $nodePerson->ownerId
-			);
-			
-			/* If the person are user, set a distinctive border */
-			if ($this->userRepository->existsUser($personId)) {
+				// Check if the logged person can update his data
+				$canBeModifiedByLoggedUser = $nodePerson->ownerId == $personLogged;
+				// If the node is the logged person, he can't remove itself
+				$canBeRemoved = ($nodePerson->personId != $personLogged) && $canBeModifiedByLoggedUser;
 
-				/* Distinctive border for the logged person*/
-				if ($personId == $personLogged) {
-					$photo = array('background-image' => $person->Photo->fileURL,
-					"background-fit" => 'cover', 'border-width' => '3px', 'border-color' => '#18a78a');
+				$personId = $person->id;
+				$dataOfPerson = array(
+					"id" => (string)$personId,
+					"name" => $person->name,
+					"lastname" => $person->lastname,
+					"mothersname" => $person->mothersname,
+					"email" => $person->email,
+					"birthdate"	=> $this->formatDate($person->birthdate, $toSpanishFormat = true),
+					"gender"	=> $person->gender,
+					"phone"	=> $person->phone,
+					"fullname"	=> $person->name . " " . $person->lastname . " " . $person->mothersname,
+					"canAddParents"	=> $canAddParents,
+					"canAddCouple"	=> $canAddCouple,
+					"canBeModifiedByLoggedUser"	=> $canBeModifiedByLoggedUser,
+					"canBeRemoved"	=> $canBeRemoved,
+					"ownerId"		=> $nodePerson->ownerId
+				);
+
+				/* If the person are user, set a distinctive border */
+				if ($this->userRepository->existsUser($personId)) {
+
+					/* Distinctive border for the logged person*/
+					if ($personId == $personLogged) {
+						$photo = array('background-image' => $person->Photo->fileURL,
+						"background-fit" => 'cover', 'border-width' => '3px', 'border-color' => '#18a78a');
+					}
+					else
+					{
+						$photo = array('background-image' => $person->Photo->fileURL,
+						"background-fit" => 'cover', 'border-width' => '3px', 'border-color' => '#f8ac59');
+					}
 				}
 				else
 				{
 					$photo = array('background-image' => $person->Photo->fileURL,
-					"background-fit" => 'cover', 'border-width' => '3px', 'border-color' => '#f8ac59');
-				}				
-			}
-			else
-			{
-				$photo = array('background-image' => $person->Photo->fileURL,
 					"background-fit" => 'cover');
+				}
+
+
+				$data = array('data' => $dataOfPerson, 'css' => $photo);
+
+				array_push($nodes, $data);
 			}
+			else {
+				$dataOfPerson = array(
+					"id" => $nodePerson->personId,
+					"aux" => $nodePerson->aux
+				);
 
-
-			$data = array('data' => $dataOfPerson, 'css' => $photo);
-
-			array_push($nodes, $data);
+				$data = array('data' => $dataOfPerson);
+				array_push($nodes, $data);
+			}
 		}
-		return Response::json( $nodes );
-	}
 
-	/**
-	* Get the relations between the Person's familiars
-	* @return Node Persons
-	*/
-	public function get_loadTreeRelations()
-	{
-		$user = Auth::user();
-		$personLogged = $user->Person->getId();
-		$family = $this->get('NodePerson')->getFamily($personLogged);
-
+		// Loading edges
 		$relations = array();
 		foreach ($family as $person) {
 			foreach ($person->parents as $nodeParent) {
-				$parent = $this->personRepository->getById($nodeParent->personId);
 				// Source is the parent of person
-				$source = (string)$parent->getId();
+				$source = (string)$nodeParent->personId;
 				// Target is the person
 				$target = (string)$person->personId;
 				$dataParOfRelations = array("source" => $source, "target" => $target);
@@ -258,16 +265,18 @@ class PersonController extends BaseController
 				array_push($relations, $data);
 			}
 		}
-		return Response::json( $relations );
+
+		$elements = array('nodes' => $nodes, 'edges' => $relations);
+		return Response::json( $elements );
 	}
 
-
 	/**
-     * This function creates a Person, a NodePerson and relate this NodePerson like a someone's father
-     * @return Json with the request status
-     */
+    * This function creates a Person, a NodePerson and relate this NodePerson
+		* like a someone's father
+    * @return Json with the request status
+    */
 	public function post_saveParent()
-	{				 
+	{
 		try {
 
 			// Data of new Person
@@ -317,9 +326,9 @@ class PersonController extends BaseController
 
 					$groupFamilyId = $user->Person->getFamily()->id;
 					$this->groupRepository->addGroupMember($groupFamilyId, $newPersonId, self::NOT_ADMIN);
-				}				
+				}
 
-				// Create a NodePerson				
+				// Create a NodePerson
 				$this->get('NodePerson')->create($newPersonId, $personLogged, self::NODE_IS_NOT_A_COPY, $son->groupId);
 
 				// Add new Person as parent
@@ -338,11 +347,12 @@ class PersonController extends BaseController
 	}
 
 	/**
-     * This function creates a Person, a NodePerson and relate this NodePerson with a someone's couple
-     * @return Json with the request status
-     */
+    * This function creates a Person, a NodePerson and relate this NodePerson
+		* with a someone's couple
+    * @return Json with the request status
+    */
 	public function post_saveCouple()
-	{				 
+	{
 		try {
 
 			// Data of new Person
@@ -392,14 +402,18 @@ class PersonController extends BaseController
 
 					$groupFamilyId = $user->Person->getFamily()->id;
 					$this->groupRepository->addGroupMember($groupFamilyId, $newPersonId, self::NOT_ADMIN);
-				}				
+				}
 
-				// Create a NodePerson				
+				// Create a NodePerson
 				$this->get('NodePerson')->create($newPersonId, $personLogged, self::NODE_IS_NOT_A_COPY, $clickedPerson->groupId);
 
 				// Add new Person as couple
 				$coupleId = $newPersonId;
 				$this->get('NodePerson')->addCouple($clickedPersonId, $coupleId);
+
+				// Create the auxiliar son node. For the right drawing
+				$coupleAdded = $this->get('NodePerson')->findById($newPersonId);
+				$this->get('NodePerson')->addAuxiliarSon($clickedPerson, $coupleAdded);
 
 				return Response::json( self::REQUEST_STATUS_SUCCESSFUL );
 			}
@@ -482,7 +496,7 @@ class PersonController extends BaseController
 	}
 
 	/**
-	 * This function laod the view to set photo
+	 * This function load the view of the photo loading
 	 * @return View
 	 */
 	public function get_setPhoto($id)
@@ -516,17 +530,17 @@ class PersonController extends BaseController
 		$personLoggedId = $user->Person->id;
 
 		$personId = Session::get('personIdPhotonEditing');
-		$input = Input::all();	
+		$input = Input::all();
 
 		$rules = array(
 		 	'photo' => 'required|mimes:jpeg,bmp,png'
-        );		
+        );
 
         $validation = Validator::make($input, $rules);
 
 		$nodePersonToUpdatePhoto = $this->get('NodePerson')->findById($personId);
 
-		if ($validation->fails() || $nodePersonToUpdatePhoto == null || $nodePersonToUpdatePhoto->ownerId != $personLoggedId) 
+		if ($validation->fails() || $nodePersonToUpdatePhoto == null || $nodePersonToUpdatePhoto->ownerId != $personLoggedId)
 		{
 			return Redirect::to('/tree');
 		}
@@ -548,7 +562,7 @@ class PersonController extends BaseController
 		$personLoggedId = $user->Person->id;
 
 		$personId = Session::get('personIdPhotonEditing');
-		$input = Input::all();		
+		$input = Input::all();
 
 		$nodePersonToUpdatePhoto = $this->get('NodePerson')->findById($personId);
 
@@ -563,6 +577,12 @@ class PersonController extends BaseController
 		return Redirect::to('/tree');
 	}
 
+/**
+ * This function removes a person from the tree
+ * @param $id The personId of the node in the tree
+ * @param $ownerId The personId of the node's owner
+ * @return Json with the request status
+ */
 	public function get_removePerson($id, $ownerId)
 	{
 		try {
@@ -586,7 +606,7 @@ class PersonController extends BaseController
 
 			if ($this->userRepository->existsUser($id)) {
 			   // Do something
-			}		
+			}
 			else {
 				if ($nodePerson->ownerId != $personLoggedId) {
 					return Response::json( Lang::get('messages.cannotRemove') );
@@ -599,15 +619,15 @@ class PersonController extends BaseController
 		} catch (Exception $e) {
 			return Response::json( Lang::get('messages.error_removing_node') );
 		}
-		
+
 	}
 
 	/* Utilities */
 
 	/**
      * The function wich manages the date format
-     * @param date The date to format
-     * @param toSpanishFormat Indicates if the return value must be in spanish format
+     * @param $date The date to format
+     * @param $toSpanishFormat Indicates if the return value must be in spanish format
      * @return Date
      */
 	public function formatDate($date, $toSpanishFormat = false)

@@ -15,9 +15,9 @@ Route::pattern('id', '[0-9]+');
 Route::pattern('ownerId', '[0-9]+');
 
  Route::group(array('prefix' => LaravelLocalization::setLocale()), function()
-{ 
+{
     Route::group(array("before" => 'auth'), function()
-    {   
+    {
         Route::get('/', array('before' => 'auth', function () {
             return View::make('index');
         }));
@@ -27,45 +27,41 @@ Route::pattern('ownerId', '[0-9]+');
         array('as' => 'tree', 'uses' => 'PersonController@get_tree'));
 
         Route::get(
-        '/loadTreePersons',
-        array('as' => 'loadTreePersons', 'uses' => 'PersonController@get_loadTreePersons'));
-
-        Route::get(
-        '/loadTreeRelations',
-        array('as' => 'loadTreeRelations', 'uses' => 'PersonController@get_loadTreeRelations'));
+        '/loadTreeElements',
+        array('as' => 'loadTreeElements', 'uses' => 'PersonController@get_loadTreeElements'));        
 
         Route::post(
         '/saveParent',
-        array('as' => 'saveParent', 'uses' => 'PersonController@post_saveParent'));          
+        array('as' => 'saveParent', 'uses' => 'PersonController@post_saveParent'));
 
         Route::post(
         '/saveCouple',
-        array('as' => 'saveCouple', 'uses' => 'PersonController@post_saveCouple'));   
+        array('as' => 'saveCouple', 'uses' => 'PersonController@post_saveCouple'));
 
         Route::get(
         '/removePerson/{id}/{ownerId}',
-        array('as' => 'removePerson', 'uses' => 'PersonController@get_removePerson'));    
+        array('as' => 'removePerson', 'uses' => 'PersonController@get_removePerson'));
 
          Route::post(
         '/updatePersonData',
-        array('as' => 'updatePersonData', 'uses' => 'PersonController@post_updatePersonData'));         
+        array('as' => 'updatePersonData', 'uses' => 'PersonController@post_updatePersonData'));
 
         Route::get(
         '/sharing/{id}',
-        array('as' => 'sharing', 'uses' => 'JoinController@get_sharing'));    
+        array('as' => 'sharing', 'uses' => 'JoinController@get_sharing'));
 
         Route::get(
         '/setPhoto/{id}',
-        array('as' => 'photo', 'uses' => 'PersonController@get_setPhoto'));   
+        array('as' => 'photo', 'uses' => 'PersonController@get_setPhoto'));
 
         Route::post(
         '/setPhoto',
-        array('as' => 'photo', 'uses' => 'PersonController@post_setPhoto'));   
+        array('as' => 'photo', 'uses' => 'PersonController@post_setPhoto'));
 
         Route::get(
         '/removePhoto',
-        array('as' => 'removePhoto', 'uses' => 'PersonController@get_removePhoto')); 
-    
+        array('as' => 'removePhoto', 'uses' => 'PersonController@get_removePhoto'));
+
     });
 });
 
@@ -89,4 +85,3 @@ Route::get('/share/request/{shareDetailId}/accept', array('before' => 'auth', 'u
 Route::get('/share/request/{shareDetailId}/reject', array('before' => 'auth', 'uses' => 'ShareController@RejectShareRequest'));
 
 Route::get('/share/request/{shareDetailId}/reject', array('before' => 'auth', 'uses' => 'ShareController@RejectShareRequest'));
-

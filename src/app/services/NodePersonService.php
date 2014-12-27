@@ -7,9 +7,9 @@
  *  @package  ArbolG
  *  @author   Kiwing IT Solutions <info@kiwing.net>
  *  @author   Federico Rossi <rossi.federico.e@gmail.com>
- *  @license  undefined 
+ *  @license  undefined
  *  @version  0.1
- *  @link     https://github.com/kiwing-it/arbolg  
+ *  @link     https://github.com/kiwing-it/arbolg
  *
  */
 
@@ -20,19 +20,19 @@ use Illuminate\Support\Facades\DB;
 use App\Models\NodePerson;
 use s4h\core\PersonRepositoryInterface;
 
-class NodePersonService extends BaseService 
-{  
+class NodePersonService extends BaseService
+{
     public $personRepository;
 
     public function setPersonRepository($personRepository)
     {
-       $this->personRepository = $personRepository;     
-    }   
+       $this->personRepository = $personRepository;
+    }
 
     /**
     * Queries
     */
-    const GET_ALL_FAMILY = 'MATCH (n:NodePerson {personId: R_PERSON})<-[r*]-(p) RETURN DISTINCT p';
+    const GET_ALL_FAMILY = 'MATCH (n:NodePerson {personId: R_PERSON})-[r*]-(p) RETURN DISTINCT p';
     const DELETE_NODE    = 'MATCH (n:NodePerson {personId: R_PERSON, ownerId: R_OWNER }) OPTIONAL MATCH (n)-[r]-() DELETE n,r';
 
     /**
@@ -63,21 +63,12 @@ class NodePersonService extends BaseService
     }
 
     /**
-     * Get all the persons
-     * @return NodePersons collection
-     */
-    public function findAll() 
-    {
-        return NodePerson::all();
-    }
-
-    /**
      * Find NodePerson by the Person id
      * @param $personId The id of the Person related with the NodePerson to find
-     * @return Person       
+     * @return Person
      */
     public function findById($personId)
-    {        
+    {
         return NodePerson::where('personId', '=', $personId)->where('isACopy', '<', 1)->first();
     }
 
@@ -86,11 +77,11 @@ class NodePersonService extends BaseService
      * @param $personId The id of the person to create the NodePerson
      * @param $ownerID The id of the NodePerson owner
      * @param $isACopy If the NodePerson is a copy of other NodePerson
-     * @param $groupId The id of the Person's group 
+     * @param $groupId The id of the Person's group
      */
     public function create($personId, $ownerId, $isACopy, $groupId)
-    {        
-    	try {           
+    {
+    	try {
 
     		NodePerson::create([
                 'personId'          => $personId,
@@ -100,7 +91,7 @@ class NodePersonService extends BaseService
             ]);
 
     	} catch (Exception $e) {
-    		Log::error($e); 	
+    		Log::error($e);
     		throw new Exception($e->getMessage());
     	}
     }
@@ -114,16 +105,16 @@ class NodePersonService extends BaseService
     {
         try {
 
-            $query = str_replace("R_PERSON", $personId, self::DELETE_NODE);  
-            $query = str_replace("R_OWNER", $ownerId, $query);  
+            $query = str_replace("R_PERSON", $personId, self::DELETE_NODE);
+            $query = str_replace("R_OWNER", $ownerId, $query);
 
-            $result = DB::connection('neo4j')->select($query);            
+            $result = DB::connection('neo4j')->select($query);
 
         } catch (Exception $e) {
             Log::error($e);
             throw new Exception($e->getMessage());
         }
-    }    
+    }
 
     /**
      * Add parent to a NodePerson
@@ -132,12 +123,12 @@ class NodePersonService extends BaseService
      */
     public function addParent($son, $parent)
     {
-        $person = $this->findById($son);        
+        $person = $this->findById($son);
 
         $personToAsignLikeParent = $this->findById($parent);
 
-        $person->parents()->save($personToAsignLikeParent); 
-      
+        $person->parents()->save($personToAsignLikeParent);
+
     }
 
     /**
@@ -146,27 +137,46 @@ class NodePersonService extends BaseService
      * @param int $couple The id of the couple
      */
     public function addCouple($root, $couple)
-    {    
-        $personToAddCouple = $this->findById($root);               
-                        
+    {
+        $personToAddCouple = $this->findById($root);
+
         $personToAsignLikeCouple = $this->findById($couple);
 
         $personToAddCouple->couple()->save($personToAsignLikeCouple);
-    }    
+    }
+
+    /**
+    * Add auxiliar son Node for the couple
+    * @param $firstCouple The first couple
+    * @param $secondCouple The second couple
+    */
+    public function addAuxiliarSon($firstCouple, $secondCouple)
+    {
+      $id = 'aux_' . $firstCouple->personId . "_" . $secondCouple->personId;
+      $auxNodePerson = NodePerson::create([
+        'personId'          => $id,
+        'ownerId'           => $id,
+        'isACopy'           => 0,
+        'groupId'           => 0,
+        'aux'               => true]);
+
+        $auxNodePerson->parents()->save($firstCouple);
+        $auxNodePerson->parents()->save($secondCouple);
+    }
 
     /**
      * Get the family of Person
      * @param  $personId The id of the Person
-     * @return Persons   
-     */  
+     * @return Persons
+     */
     public function getFamily($personId)
     {
         $family = array();
-        
-        $query = str_replace("R_PERSON", $personId, self::GET_ALL_FAMILY);        
-         
+
+        $query = str_replace("R_PERSON", $personId, self::GET_ALL_FAMILY);
+
         $result = DB::connection('neo4j')->select($query);
-        
+
         foreach ($result as $item) {
             $itemPersonId = $item->current()->getProperties('personId');
             $person = $this->findById($itemPersonId);
@@ -176,64 +186,16 @@ class NodePersonService extends BaseService
             }
         }
 
-        /* If doesn't have family, return the single node of Person */
-        /*if (count($family) == 0) {
-            $family[] = $this->findById($personId);
-        }*/
+        // Add the logged user
         $family[] = $this->findById($personId);
 
-        return $family;             
-    }       
-
-     /**
-     * Get all brothers of a Person deducing through the Person's parent
-     * @param  $parent: the Person's parent
-     * @param  $person: the Person to search his brothers
-     * @return Persons   
-     */
-    public function getBrothers($parent, $person)
-    {
-        $brothers = array();
-
-        foreach (NodePerson::with('parents')->get() as $son)
-        {
-            if ($son->name != $person) {
-                foreach ($son->parents as $parentItem) {
-                    if ($parentItem->name == $parent) {
-                        $brothers[] = $son;
-                    }
-                }
-            }            
-        }
-
-        return $brothers;
-    }    
-
-     /**
-     * Get all sons of a Person deducing through the Person's parent
-     * @param  $parent The son's parent to search
-     * @return Persons   
-     */
-    public function getSons($parentId)
-    {
-        $sons = array();
-
-        foreach (NodePerson::with('parents')->get() as $son)
-        {
-            foreach ($son->parents as $parentItem) {
-                if ($parentItem->personId == $parentId) {
-                    array_push($sons,$son);
-                }
-            }
-        }
-
-        return $sons;
+        return $family;
     }
 
     /**
      * Return if the person has sons
      * @param  personId
-     * @return Bool   
+     * @return Bool
      */
     public function hasSons($personId)
     {
@@ -254,14 +216,14 @@ class NodePersonService extends BaseService
     /**
      * Check if the Person can have more Parents
      * @param  $person The NodePerson to evaluate if can add Parents
-     * @return Bool   
+     * @return Bool
      */
     public function canAddParents($person)
     {
         if ($person->parents != null) {
-           if ($person->parents()->count() < self::MAX_PARENTS_ALLOWED) 
+           if ($person->parents()->count() < self::MAX_PARENTS_ALLOWED)
             {
-                return true;  
+                return true;
             }
             else
             {
@@ -270,7 +232,7 @@ class NodePersonService extends BaseService
         } else{
             return true;
         }
-        
+
     }
     /**
      * Check if the Person can add a Couple
@@ -279,28 +241,32 @@ class NodePersonService extends BaseService
      */
     public function canAddCouple($person)
     {
-        if ($person->couple != null) {
-           if ($person->couple()->count() < self::MAX_COUPLES_ALLOWED) 
-            {
-                return true;  
-            }
-            else
-            {
-                return false;
-            }
-        } else{
-            return true;
-        }
+      if ($this->hasSons($person->personId)) {
+        return false;
+      }
+
+      if ($person->couple != null) {
+         if ($person->couple()->count() < self::MAX_COUPLES_ALLOWED)
+          {
+              return true;
+          }
+          else
+          {
+              return false;
+          }
+      } else{
+          return true;
+      }
     }
 
     /**
      * The function wich manages the merge
-     * @param fromId The id of the Person in the tree of the sender 
+     * @param fromId The id of the Person in the tree of the sender
      * @param toId The id of the Person to connect like Person(fromId) brother
      * @param fromKeepsTheTree Indicates if Person(fromId) keeps his tree or join in the Person(toId) tree
      * @param userWhoMakesTheInvitation is id of the user who makes the invitation to share the tree
      * @return boolean indicating the success or failure of the merge
-     */ 
+     */
     public function merge($fromId, $toId, $fromKeepsTheTree, $userWhoMakesTheInvitation)
     {
         try {
@@ -311,13 +277,13 @@ class NodePersonService extends BaseService
 
             /* If connectionPerson keeps his tree, then we makes a copy of $nodePersonToConnect
             and set nodePersonToConnect like connectionPerson brother */
-            if ($fromKeepsTheTree) {                
+            if ($fromKeepsTheTree) {
 
                 /* Creating a copy of nodePersonToConnect into connectionPerson tree */
                 $this->create($nodePersonToConnect->personId, $userWhoMakeTheInvitation, self::NODE_IS_A_COPY, $nodePersonToConnect->groupId);
 
                 /* New parents */
-                foreach ($connectionPerson->parents as $parent) {   
+                foreach ($connectionPerson->parents as $parent) {
 
                     $this->get('NodePerson')->addParent($nodePersonToConnect->personId, $parent->personId);
                 }
@@ -332,7 +298,7 @@ class NodePersonService extends BaseService
                     foreach ($nodePersonToConnect->parents as $parent) {
                         $this->get('NodePerson')->removeParent($nodePersonToConnect->personId, $parent->personId);
                     }
-                }       
+                }
 
                  /* Check if nodePersonToConnect has father and mothers  */
 
@@ -344,13 +310,13 @@ class NodePersonService extends BaseService
 
                         if ($person != null && $person->gender == self::GENDER_MALE) {
                             $nodePersonToConnectHasFather = true;
-                        }   
-                        
+                        }
+
                         if ($person != null && $person->gender == self::GENDER_FEMALE) {
                             $nodePersonToConnectHasMother = true;
-                        }           
+                        }
                     }
-                }             
+                }
 
                 /* Create nodePersonToConnect parent's */
                 if (!$nodePersonToConnectHasFather) {
@@ -358,7 +324,7 @@ class NodePersonService extends BaseService
                     /* Father creation */
 
                     $father = array(
-                        'name'          => Lang::get('titles.addParent'), 
+                        'name'          => Lang::get('titles.addParent'),
                         'lastname'      => ' ',
                         'mothersname'   => ' ',
                         'birthdate'     => '',
@@ -370,12 +336,12 @@ class NodePersonService extends BaseService
                         'file_id'       => null
                     );
 
-                    // Create a Person 
+                    // Create a Person
                     $newPersonId =  $this->personRepository->store($father);
 
                     // Create a NodePerson (the owner is the user who makes the invitation)
                     $this->get('NodePerson')->create($newPersonId, $userWhoMakesTheInvitation);
-                    
+
                     // Add new Person as parent
                     $parentId = $newPersonId;
                     $this->get('NodePerson')->addParent($connectionPerson->personId, $parentId);
@@ -386,7 +352,7 @@ class NodePersonService extends BaseService
                     /* Mother creation */
 
                      $mother = array(
-                        'name'          => Lang::get('titles.addMother'), 
+                        'name'          => Lang::get('titles.addMother'),
                         'lastname'      => ' ',
                         'mothersname'   => ' ',
                         'birthdate'     => '',
@@ -398,30 +364,30 @@ class NodePersonService extends BaseService
                         'file_id'       => null
                     );
 
-                    // Create a Person 
+                    // Create a Person
                     $newPersonId =  $this->personRepository->store($mother);
 
                     // Create a NodePerson (the owner is the user who makes the invitation)
                     $this->get('NodePerson')->create($newPersonId, $userWhoMakesTheInvitation);
-                    
+
                     // Add new Person as parent
                     $parentId = $newPersonId;
                     $this->get('NodePerson')->addParent($connectionPerson->personId, $parentId);
-                }        
+                }
 
                 // Get again nodePersonToConnect to update the relations
                 $connectionPerson = $this->get('NodePerson')->findById($connectionPerson->personId);
 
                 /* New parents */
-                foreach ($connectionPerson->parents as $parent) {   
+                foreach ($connectionPerson->parents as $parent) {
 
                     $this->get('NodePerson')->addParent($nodePersonToConnect->personId, $parent->personId);
                 }
-        }        
-            
+        }
+
         } catch (Exception $e) {
             return self::FAILURE_MERGE;
-        }       
+        }
 
         return self::SUCCESSFUL_MERGE;
     }
