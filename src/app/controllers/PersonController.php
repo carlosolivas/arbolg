@@ -243,11 +243,13 @@ class PersonController extends BaseController
 			}
 			else {
 				$dataOfPerson = array(
-					"id" => $nodePerson->personId,
+					"id" => (string)$nodePerson->personId,
 					"aux" => $nodePerson->aux
 				);
 
-				$data = array('data' => $dataOfPerson);
+				$css = array('display' => 'none');
+
+				$data = array('data' => $dataOfPerson, 'css' => $css);
 				array_push($nodes, $data);
 			}
 		}
@@ -410,10 +412,11 @@ class PersonController extends BaseController
 				// Add new Person as couple
 				$coupleId = $newPersonId;
 				$this->get('NodePerson')->addCouple($clickedPersonId, $coupleId);
+				$this->get('NodePerson')->addCouple($coupleId, $clickedPersonId);
 
 				// Create the auxiliar son node. For the right drawing
 				$coupleAdded = $this->get('NodePerson')->findById($newPersonId);
-				$this->get('NodePerson')->addAuxiliarSon($clickedPerson, $coupleAdded);
+				$this->get('NodePerson')->addAuxiliarSon($clickedPerson, $coupleAdded, $personLogged);
 
 				return Response::json( self::REQUEST_STATUS_SUCCESSFUL );
 			}
@@ -612,11 +615,23 @@ class PersonController extends BaseController
 					return Response::json( Lang::get('messages.cannotRemove') );
 			}
 
+			// If have couple
+			if (!$this->get('NodePerson')->canAddCouple($nodePerson)) {
+				// Try to delete the deleted auxiliar son
+				$this->get('NodePerson')->delete(-($nodePerson->personId), $personLoggedId);
+				// Try to delete the auxiliar son via couple
+				$couple = $nodePerson->couple()->first();
+				$this->get('NodePerson')->delete(-($couple->personId), $personLoggedId);
+			}
+
+			// Delete the person
 			$this->get('NodePerson')->delete($nodePerson->personId, $nodePerson->ownerId);
+
 
 			return Response::json( self::REQUEST_STATUS_SUCCESSFUL );
 		}
 		} catch (Exception $e) {
+			return Response::json( $e->getMessage() );
 			return Response::json( Lang::get('messages.error_removing_node') );
 		}
 

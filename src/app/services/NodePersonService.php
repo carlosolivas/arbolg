@@ -150,14 +150,15 @@ class NodePersonService extends BaseService
     * @param $firstCouple The first couple
     * @param $secondCouple The second couple
     */
-    public function addAuxiliarSon($firstCouple, $secondCouple)
+    public function addAuxiliarSon($firstCouple, $secondCouple, $ownerId)
     {
-      $id = 'aux_' . $firstCouple->personId . "_" . $secondCouple->personId;
+      // The personId of a auxiliar son node is the negative of parent id.
+      $id = -$firstCouple->personId;
       $auxNodePerson = NodePerson::create([
         'personId'          => $id,
-        'ownerId'           => $id,
+        'ownerId'           => $ownerId,
         'isACopy'           => 0,
-        'groupId'           => 0,
+        'groupId'           => $firstCouple->groupId,
         'aux'               => true]);
 
         $auxNodePerson->parents()->save($firstCouple);
