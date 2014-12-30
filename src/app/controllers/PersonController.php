@@ -82,10 +82,13 @@ class PersonController extends BaseController
 					}
 				}
 
+				// Real or auxiliar sons
+				$theCoupleHasSons = false;
 				/* Then the sons */
 				foreach ($person->getFamily()->Persons as $directFamiliar) {
 					if ($directFamiliar->role_id == self::SON) {
 						array_push($directFamiliars, $directFamiliar);
+						$theCoupleHasSons = true;
 					}
 				}
 
@@ -123,6 +126,12 @@ class PersonController extends BaseController
 									/* Add as the coup the logged Person and vice versa */
 									$this->get('NodePerson')->addCouple($person->id, $coupId);
 									$this->get('NodePerson')->addCouple($directFamiliar->id, $person->id);
+
+									if (!$theCoupleHasSons) {
+										// Create the auxiliar son node. For the right drawing
+				                        $this->get('NodePerson')->addAuxiliarSon($person, $directFamiliar, $nodePersonLogged->personId);
+				                        $theCoupleHasSons = true;
+									}
 								}
 							}
 

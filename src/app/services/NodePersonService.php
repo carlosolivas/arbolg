@@ -78,17 +78,20 @@ class NodePersonService extends BaseService
      * @param $ownerID The id of the NodePerson owner
      * @param $isACopy If the NodePerson is a copy of other NodePerson
      * @param $groupId The id of the Person's group
+     * @return NodePerson The new NodePerson
      */
     public function create($personId, $ownerId, $isACopy, $groupId)
     {
     	try {
 
-    		NodePerson::create([
-                'personId'          => $personId,
-                'ownerId'           => $ownerId,
-                'isACopy'           => $isACopy,
-                'groupId'           => $groupId,
-            ]);
+    		$nodePerson = NodePerson::create([
+          'personId'          => $personId,
+          'ownerId'           => $ownerId,
+          'isACopy'           => $isACopy,
+          'groupId'           => $groupId,
+        ]);
+
+        return $nodePerson;
 
     	} catch (Exception $e) {
     		Log::error($e);
@@ -281,12 +284,11 @@ class NodePersonService extends BaseService
             if ($fromKeepsTheTree) {
 
                 /* Creating a copy of nodePersonToConnect into connectionPerson tree */
-                $this->create($nodePersonToConnect->personId, $userWhoMakeTheInvitation, self::NODE_IS_A_COPY, $nodePersonToConnect->groupId);
+                $newNodePerson = $this->create($nodePersonToConnect->personId, $userWhoMakeTheInvitation, self::NODE_IS_A_COPY, $nodePersonToConnect->groupId);
 
                 /* New parents */
                 foreach ($connectionPerson->parents as $parent) {
-
-                    $this->get('NodePerson')->addParent($nodePersonToConnect->personId, $parent->personId);
+                    $newNodePerson->parents()->save($parent);
                 }
             }
             else
@@ -295,9 +297,9 @@ class NodePersonService extends BaseService
                 and add into the nodePeronToConnect's tree  */
 
                 /* Deleting parents */
-                if ($nodePersonToConnect->parents != null) {
-                    foreach ($nodePersonToConnect->parents as $parent) {
-                        $this->get('NodePerson')->removeParent($nodePersonToConnect->personId, $parent->personId);
+                if ($connectionPerson->parents != null) {
+                    foreach ($connectionPerson->parents as $parent) {
+                        $this->get('NodePerson')->removeParent($connectionPerson->personId, $parent->personId);
                     }
                 }
 
@@ -305,8 +307,8 @@ class NodePersonService extends BaseService
 
                 $nodePersonToConnectHasFather = false;
                 $nodePersonToConnectHasMother = false;
-                if ($connectionPerson->parents != null) {
-                      foreach ($connectionPerson->parents as $parent) {
+                if ($nodePersonToConnect->parents != null) {
+                      foreach ($nodePersonToConnect->parents as $parent) {
                         $person = $this->personRepository->getById($parent->personId);
 
                         if ($person != null && $person->gender == self::GENDER_MALE) {
@@ -380,9 +382,9 @@ class NodePersonService extends BaseService
                 $connectionPerson = $this->get('NodePerson')->findById($connectionPerson->personId);
 
                 /* New parents */
-                foreach ($connectionPerson->parents as $parent) {
+                foreach ($nodePersonToConnect->parents as $parent) {
 
-                    $this->get('NodePerson')->addParent($nodePersonToConnect->personId, $parent->personId);
+                    $this->get('NodePerson')->addParent($connectionPerson->personId, $parent->personId);
                 }
         }
 
