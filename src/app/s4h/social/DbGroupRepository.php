@@ -18,52 +18,76 @@ class DbGroupRepository implements GroupRepositoryInterface {
 	}
 
 	public function findNewFriends($groupTypeId, $keyword) {
-		$myGroups = \DB::table('group_person')
+
+        return Family::where('id', '<>', \Auth::user()->Person->Family->id)
+            ->where('name', 'like', '%' . $keyword . '%')
+            ->where('name', '<>', '')
+            ->get();
+		/*$myFriends = \DB::table('group_group')
 			->where('person_id', '=', \Auth::user()->Person->id)
-		                                               ->lists('group_id');
+            ->lists('group_id');
+*/
+		//return Family::all();
 
-		$groups = \DB::table('groups')
-			->where('GroupTypeId', '=', $groupTypeId)
-			->where('GroupName', 'like', '%' . $keyword . '%')
-			->whereNotIn('id', $myGroups)
-			->get();
 
-		return $groups;
 	}
 
 	public function createFamily($data) {
-        //store family's avatar
-        if (isset($data['photo'])) {
-            $file_id = $file->store($data['photo']);
-        } else {
-            $file_id = 26;
-        }
-		//Create the base group
-		$group = new Group;
-		$group->GroupName = $data['name'];
-		$group->GrouptypeID = 1;
-		$group->JoinAuthOption = 2;
-		$group->InviteAuthOption = 2;
-		$group->Active = 1;
-		$group->file_id = $file_id;
-		$group->save();
-
-		//Create the family specific object
+        //Create the family object
 		$family = new Family;
 		$family->name = $data['name'];
-		$family->group_id = $group->id;
-		$family->countrie_id = $data['country_id'];
+		//$family->group_id = $group->id;
+		$family->countrie_id = $data["country_id"];
 		$family->zipcode_id = $data['zipcode_id'];
 		$family->suburb_id = $data['suburb_id'];
 		$family->street = $data['street'];
 		$family->numberint = $data['numberint'];
 		$family->numberext = $data['numberext'];
 		$family->phone = $data['phone'];
-
 		$family->save();
 
-		return $group->id;
+        //Create base group
+        $data['grouptype_id'] = 1;
+        $data['joinAuthOpt'] = 2;
+        $data['inviteAuthOpt'] = 2;
+        $data['family_id'] = $family->id;
+        $this->createGroup($data);
+
+		return $family->id;
 	}
+
+    public function updateFamily($id, $data) {
+        $family = Family::findOrFail($id);
+
+        $family->name = $data['familyname'];
+        $family->street = $data['street'];
+        $family->numberext = $data['numberext'];
+        $family->numberint = $data['numberint'];
+        $family->phone = $data['phone'];
+        $family->countrie_id = $data['country'];
+        $family->zipcode_id = $data['zipcode'];
+        $family->suburb_id = $data['suburb'];
+
+        $family->save();
+
+        return $family;
+    }
+
+    public function addFamilyMember($familyId, $personId, $admin) {
+        $group = Group::where('family_id', '=', $familyId)
+            ->where('GroupTypeID', '=', 1)
+            ->first();
+
+        $this->addGroupMember($group->id, $personId, $admin);
+    }
+
+	public function addFamilyMemberX($familyId, $personId, $admin, $roleId) {
+        $group = Group::where('family_id', '=', $familyId)
+            ->where('GroupTypeID', '=', 1)
+            ->first();
+
+        $group->Persons()->attach($personId, array('admin'=>$admin, 'role_id'=>$roleId));
+    }
 
 	public function addGroupMember($groupId, $personId, $admin) {
 		$group = $this->get($groupId);
@@ -75,36 +99,78 @@ class DbGroupRepository implements GroupRepositoryInterface {
         return $group->Persons()->get();
     }
 
-	public function myFriends() {
-		$groupIds = \DB::table('group_person')
-			->where('person_id', '=', \Auth::user()->Person->id)
-            ->lists('group_id');
+	public function friendsByFamilyId($familyId) {
 
-		$groups = \DB::table('groups')
-			->where('GroupTypeId', '<>', '1')//La familia propia
-			->where('GroupTypeId', '<>', '4')//Las familias amigas
-			->whereIn('id', $groupIds)
-			->lists('id');
+		$groupId = $this->getFriendsGroupByFamilyId($familyId)->id;
 
-		$myFriends = array();
-		if (count($groups) > 0) {
-			$myFriends = Group::with('Persons')
-				->whereIn('id', $groups)	->get();
-		}
+        $myFamilyFriendsIDs = \DB::table('group_group')
+            ->join('groups', 'group_group.member_group_id', '=', 'groups.id')
+            ->where('group_group.group_id', $groupId)
+            ->lists('family_id');
 
-		$ff = \DB::table('groups')
-			->where('GroupTypeId', '=', '4')//Las familias amigas
-			->whereIn('id', $groupIds)
-			->lists('id');
+        if (!$myFamilyFriendsIDs)
+            return array();
 
-		$myFamilyFriends = array();
-		if (!empty($ff)) {
-			$myFamilyFriends = \DB::table('group_person')
-			->join('groups', 'group_person.group_id', '=', 'groups.id')
-			->whereIn('group_person.group_id', $ff)	->get();
-		}	
-
-		return array('myFriends' => $myFriends, 'myFamilyFriends' => $myFamilyFriends);
+        return Family::whereIn('id', $myFamilyFriendsIDs)->get();
 	}
 
+    /**
+     * @param $data
+     *
+     * @return array
+     */
+    public function createGroup($data)
+    {
+        //store family's avatar
+        if (isset($data['photo'])) {
+            $file_id = $this->file->store($data['photo']);
+        } else {
+            $file_id = 26;
+        }
+        //Create the base group
+        $group = new Group;
+        $group->GroupName = $data['name'];
+        $group->GrouptypeID = $data['grouptype_id'];
+        $group->JoinAuthOption = $data['joinAuthOpt'];
+        $group->InviteAuthOption = $data['inviteAuthOpt'];
+        $group->Active = 1;
+        $group->file_id = $file_id;
+        $group->family_id = $data['family_id'];
+        $group->save();
+
+        return $group;
+    }
+
+    public function getFriendsGroupByFamilyId($id)
+    {
+        return Group::where('family_id', '=', $id)
+            ->where('GroupTypeId', '=', 4)
+            ->first();
+    }
+
+    public function getFavoritesGroupByFamilyId($id)
+    {
+        return Group::where('family_id', '=', $id)
+            ->where('GroupTypeId', '=', 6)
+            ->first();
+    }
+
+    public function updatePhoto($id, $data) {
+        $file_id = $this->file->store($data['photo']);
+
+        $group = Group::findOrFail($id);
+        $group->file_id = $file_id;
+
+        if ($group->save()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function getFamilyByGroupId($id)
+    {
+        $group = Group::find($id);
+        return $group->Family;
+    }
 }

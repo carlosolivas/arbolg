@@ -98,9 +98,9 @@ class GroupsController extends \BaseController {
         $groupTypeId = Input::get('GroupTypeId');
         $keyword = Input::get('Name');
 
-		$groups = $this->group->findNewFriends($groupTypeId, $keyword);
+		$families = $this->group->findNewFriends($groupTypeId, $keyword);
 
-		return View::make('Groups.searchresults', array('groups' => $groups));
+		return View::make('Groups.searchresults', array('families' => $families));
 	}
 
 	/**
@@ -110,9 +110,9 @@ class GroupsController extends \BaseController {
 	 */
 	public function myFriends() {
 
-        $friends = $this->group->myFriends();
+        $friends = $this->group->friendsByFamilyId(Auth::user()->Person->family_id);
 
-		return View::make('Groups.myfriends', array('friends' => $friends['myFriends'], 'familyFriends' => $friends['myFamilyFriends']));
+		return View::make('Groups.myfriends')->with('friends', $friends);
 	}
 
 }

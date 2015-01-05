@@ -19,4 +19,14 @@ class ShareDetail extends \Eloquent {
     {
         return $this->belongsTo('s4h\share\Share');
     }
+
+    public function Options()
+    {
+        return $this->belongsToMany(
+            's4h\share\ShareOption',
+            'sharedetail_shareoption',
+            'sharedetail_id',
+            'shareoption_id')
+            ->withPivot('value');
+    }
 } 

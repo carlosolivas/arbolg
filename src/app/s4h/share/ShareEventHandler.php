@@ -8,6 +8,7 @@
 
 namespace s4h\share;
 use s4h\Facades\Sharing;
+use s4h\Facades\Notifications;
 
 class ShareEventHandler {
 
@@ -18,6 +19,8 @@ class ShareEventHandler {
         foreach($sharedElement->getSharedWith() as $sharedWith)
         {
             //Agregar entrada a la bitácora de notificaciones
+            if ($sharedWith->getPersonId())
+                Notifications::create('New Shared Element Created', $event->getClassName(), $sharedWith->getPersonId());
             //Enviar correo de notificación
             //Cambiar el estatus del elemento
             Sharing::changeShareDetailStatus($sharedWith->getId(), SharedElementDetailStatus::Sent);
@@ -26,7 +29,8 @@ class ShareEventHandler {
 
     public function onShareAccepted($event)
     {
-        print("Shared element {$event->id} was accepted by {$event->person_id}");
+        //Agregar entrada a la bitácora de notificaciones
+        Notifications::create("{$event->Share->class_name} {$event->id} was accepted by {$event->acceptedBy}","Shared element {$event->id} was accepted by {$event->acceptedBy}",$event->Share->person_id);
     }
 
     public function onShareRejected($event)

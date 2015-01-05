@@ -61,8 +61,11 @@ class ShareController extends \BaseController {
         $this->addCustomItems(
             $sharedElement,
             array_filter($otherElements, function($key) {
-                return substr($key, 0, 9) != 'shareWith';
-            }, ARRAY_FILTER_USE_KEY)
+                return substr($key, 0, 9) != 'shareWith'
+                    && substr($key, 0, 4) != 'hid_'
+                    && !in_array($key, array('sharetype_id','person_id','className','element_id','message','url'));
+            }, ARRAY_FILTER_USE_KEY),
+            $otherElements
         );
 
         $this->addSharedWithItems(
@@ -78,11 +81,13 @@ class ShareController extends \BaseController {
     /**
      * @param $customItems
      * @param $sharedElement
+     * @param $htmlElements
      */
-    private function addCustomItems(SharedElement $sharedElement, array $customItems)
+    private function addCustomItems(SharedElement $sharedElement, array $customItems, array $htmlElements)
     {
         foreach ($customItems as $key => $value) {
-            $sharedElement->addCustomItem(new SharedElementCustomItem($key, $value));
+            $html = $htmlElements['hid_'.$key];
+            $sharedElement->addCustomItem(new SharedElementCustomItem($key, $html, $value));
         }
     }
 
@@ -96,6 +101,11 @@ class ShareController extends \BaseController {
     }
 
     public function AcceptShareRequest($sharedDetailId)
+    {
+        return Sharing::displayAcceptShareForm($sharedDetailId, Auth::user()->Person->id);
+    }
+
+    public function AcceptShareRequest_Post($sharedDetailId)
     {
         return Sharing::accept($sharedDetailId, Auth::user()->Person->id);
     }

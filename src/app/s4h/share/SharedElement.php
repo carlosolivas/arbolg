@@ -31,7 +31,7 @@ class SharedElement {
     }
 
     /**
-     * Gets the Id of the Sahred element
+     * Gets the Id of the Shared element
      * @return mixed
      */
     public function getElementId()
@@ -40,7 +40,7 @@ class SharedElement {
     }
 
     /**
-     * Sets the Id of the Sahred element
+     * Sets the Id of the Shared element
      * @param mixed $elementId
      */
     public function setElementId($elementId)
@@ -85,7 +85,7 @@ class SharedElement {
     }
 
     /**
-     * Gets the Id of the person sharing the object
+     * Gets the Id of the person sharing the object (Sender)
      * @return mixed
      */
     public function getPersonId()
@@ -94,7 +94,7 @@ class SharedElement {
     }
 
     /**
-     * Sets the Id of the person sharing the object
+     * Sets the Id of the person sharing the object (Sender)
      * @param mixed $personId
      */
     public function setPersonId($personId)

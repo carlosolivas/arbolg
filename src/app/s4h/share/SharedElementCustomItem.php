@@ -27,15 +27,23 @@ class SharedElementCustomItem {
      */
     protected $html;
 
+
+    /**
+     * Value of the custom element
+     * @var $value
+     */
+    protected $value;
+
     /**
      * @param $name : Name of the custom item, this must match the HTML name
      * @param $html : HTML code to create the custom item
      */
 
-    function __construct($name, $html)
+    function __construct($name, $html, $value='')
     {
         $this->name = $name;
         $this->html = $html;
+        $this->value = $value;
     }
 
     /**
@@ -54,5 +62,14 @@ class SharedElementCustomItem {
     public function getHtml()
     {
         return $this->html;
+    }
+
+
+    /**
+     * Gets the value of the custom control
+     */
+    public function getValue()
+    {
+        return $this->value;
     }
 } 

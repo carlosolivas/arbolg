@@ -8,11 +8,21 @@ interface GroupRepositoryInterface {
 
 	public function createFamily($data);
 
+    public function createGroup($data);
+
 	public function findNewFriends($groupTypeId, $keyword);
 
     public function addGroupMember($groupId, $personId, $admin);
 
     public function getGroupMembers($groupId);
 
-	public function myFriends();
+    public function friendsByFamilyId($familyId);
+
+    public function updateFamily($id, $data);
+
+    public function getFriendsGroupByFamilyId($id);
+
+    public function getFavoritesGroupByFamilyId($id);
+
+    public function getFamilyByGroupId($id);
 }

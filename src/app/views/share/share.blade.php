@@ -34,28 +34,14 @@
                             URL: {{ Form::text('url', $message) }} <br />
                             @foreach($customControls as $customControl)
                                 {{ $customControl->getHtml() }}
+                                {{ Form::hidden('hid_'.$customControl->getName(), $customControl->getHtml()) }}
                             @endforeach
                             <br/>
-                            <p>Share with Friends: <br/>
-
-                            @if (!empty($myFriends))
-                                @foreach($myFriends as $friend)
-                                    @if ($friend != null && $friend->FriendType == 'Person')
-                                        {{ Form::radio('shareWithFriends', $friend->Id, '1', false)}} {{ $friend->Name }}
-                                    @endif
+                            <p>Share with Friends:<br/>
+                            @foreach($myFriends as $friend)
+                                {{ Form::radio('shareWithFamilies',$friend->getGroup()->id, '1', false)}} {{ $friend->name }}
                             @endforeach
-                            @endif
-                            
                             </p>
-
-                            <p>Share with Families:<br/>
-                            @if (!empty($myFriends))
-                                @foreach($myFriends as $friend)
-                                    @if ($friend != null && $friend->FriendType == 'Family')
-                                        {{ Form::radio('shareWithFamilies',$friend->Id, '1', false)}} {{ $friend->Name }}
-                                    @endif
-                                @endforeach
-                            @endif                            
                             {{ Form::submit(Lang::get('share.share')) }}
                         {{ Form::close() }}
                         </div>

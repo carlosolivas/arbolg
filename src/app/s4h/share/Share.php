@@ -24,4 +24,9 @@ class Share extends \Eloquent {
     {
         return $this->hasMany('s4h\share\ShareDetail');
     }
+
+    public function Person()
+    {
+        return $this->belongsTo('s4h\core\Person');
+    }
 }

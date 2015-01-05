@@ -23,4 +23,8 @@ class Group extends \Eloquent {
 	public function RequestedFriends() {
 		return $this->hasMany('FriendRequest', 'SourceGroupId', 'id');
 	}
+
+    public function Family() {
+        return $this->belongsTo('s4h\social\Family');
+    }
 }

@@ -44,7 +44,8 @@ class DbShareRepository implements ShareRepositoryInterface {
         {
             $shareOpt = new ShareOption();
             $shareOpt->name = $customItem->getName();
-            $shareOpt->option = $customItem->getHTML();
+            $shareOpt->option = $customItem->getValue();
+            $shareOpt->html = $customItem->getHtml();
             $share->ShareOptions()->save($shareOpt);
         }
 
@@ -56,6 +57,13 @@ class DbShareRepository implements ShareRepositoryInterface {
             $shareDetail->status = $sharedWith->getStatus();
             $shareDetail = $share->SharedWith()->save($shareDetail);
             $sharedWith->setId($shareDetail->id);
+        }
+
+        //relate details and options
+        foreach($share->sharedWith as $sharedWith) {
+            foreach($share->shareOptions as $shareOption) {
+                $sharedWith->Options()->attach($shareOption);
+            }
         }
 
         return $share->id;
