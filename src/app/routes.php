@@ -14,6 +14,10 @@
 Route::pattern('id', '[0-9]+');
 Route::pattern('ownerId', '[0-9]+');
 
+//test merging
+Route::get('/merge/{fromId}/{toId}/{keepTheTree}/{whoMakes}', 
+	array('as' => 'merge', 'uses' => 'PersonController@merge'));
+
 Route::group(array('prefix' => LaravelLocalization::setLocale()), function () {
 	Route::group(array("before" => 'auth'), function () {
 		Route::get('/', array('before' => 'auth', function () {

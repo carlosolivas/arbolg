@@ -124,27 +124,27 @@
 <div id="familiarDialog-form" title='Agregar padre' style="display: none">
 	<div id='familiarDialog-form-message'>
 
-			<input type="text" name="name" id="newPerson_name" class="form-control"
+			<input type="text" name="name" id="newOrUpdatingPerson_name" class="form-control"
 			placeholder="Nombre">
 
-		  	<input type="text" name="lastname" id="newPerson_lastname" class="form-control" placeholder="Apellido*">
+		  	<input type="text" name="lastname" id="newOrUpdatingPerson_lastname" class="form-control" placeholder="Apellido*">
 
-		  	<input type="text" name="mothersname" id="newPerson_mothersname" class="form-control" placeholder="Apellido materno">
+		  	<input type="text" name="mothersname" id="newOrUpdatingPerson_mothersname" class="form-control" placeholder="Apellido materno">
 
-		  	<input type="email" name="email" id="newPerson_email" class="form-control" placeholder="Email">
+		  	<input type="email" name="email" id="newOrUpdatingPerson_email" class="form-control" placeholder="Email">
 
 		 	<div class="input-group">
 				<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-				<input type="text" id="newPerson_dateOfBirth" class="form-control datePicker" placeholder="Fecha de Nacimiento">
+				<input type="date" id="newOrUpdatingPerson_dateOfBirth" class="form-control" placeholder="Fecha de Nacimiento">
 			</div>			
 
-			<select id="newPerson_gender" class="form-control">
+			<select id="newOrUpdatingPerson_gender" class="form-control">
 				<option default disable value="">Sexo*</option>
 				<option value="1">{{{ Lang::get('titles.male') }}}</option>
 				<option value="2">{{{ Lang::get('titles.female') }}}</option>
 			</select>
 
-		  	<input type="text" name="phone" id="newPerson_phone" class="form-control" placeholder="Teléfono">
+		  	<input type="text" name="phone" id="newOrUpdatingPerson_phone" class="form-control" placeholder="Teléfono">
 		  	<span class="help-block m-b-none" id="validationBlockMessage">(*) Campos obligatorios</span>
 	</div>
 </div>

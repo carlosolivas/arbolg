@@ -26,6 +26,7 @@ class PersonController extends BaseController
  	  const FATHER                                = 1;
     const MOTHER                                = 2;
     const SON                                   = 3;
+    const NODE_IS_A_COPY                    = 1;
     const NODE_IS_NOT_A_COPY                    = 0;
     const NO_GROUP                              = 0;
     const NOT_ADMIN                             = 0;
@@ -53,11 +54,11 @@ class PersonController extends BaseController
 	{
 		try
 		{
+			//return $this->get('NodePerson')->getFamily(106);
 			$person = Auth::user()->Person;
-
 			/* Check if the NodePerson for this user wasn´t created yet */
 			if (!($this->get('NodePerson')->nodePersonExists($person->getId()))) {
-
+				
 				$groupId = self::NO_GROUP;
 				if ($person->getFamily() != null) {
 					$groupId = $person->getFamily()->id;
@@ -203,9 +204,9 @@ class PersonController extends BaseController
 				$canAddCouple = $this->get('NodePerson')->canAddCouple($nodePerson);
 
 				// Check if the logged person can update his data
-				$canBeModifiedByLoggedUser = $nodePerson->ownerId == $personLogged;
+				$canBeModifiedByLoggedUser = ($nodePerson->ownerId == $personLogged) && ($nodePerson->isACopy != self::NODE_IS_A_COPY);
 				// If the node is the logged person, he can't remove itself
-				$canBeRemoved = ($nodePerson->personId != $personLogged) && $canBeModifiedByLoggedUser;
+				$canBeRemoved = ($nodePerson->personId != $personLogged) && ($nodePerson->ownerId == $personLogged);
 
 				$personId = $person->id;
 				$dataOfPerson = array(
@@ -464,34 +465,28 @@ class PersonController extends BaseController
 				$birthdate = $this->formatDate($input['dateOfBirth']);
 
 				$data = array(
-					'id'			=> $input['id'],
 					'name' 			=> $input['name'],
 					'lastname' 		=> $input['lastname'],
 					'mothersname' 	=> $input['mothersname'],
-					'birthdate' 	=> $birthdate,
-					'gender' 		=> $input['gender'],
-					'phone' 		=> $input['phone'],
-					'email'		    => $input['email'],
-					'user_id' 		=> null,
-					'role_id' 		=> $input['gender'] == self::MOTHER ? self::MOTHER : self::FATHER,
-					'file_id'		=> null
+					'date_of_birth' => $birthdate,
+					'sex' 		=> $input['gender'],
+					'cellphone' 	=> $input['phone'],
+					'role' 		=> $input['gender'] == self::MOTHER ? self::MOTHER : self::FATHER
 				);
 
 			 	$rules = array(
 				 	'name' => 'required',
 		            'lastname' => 'required',
-		            'gender' => 'required',
-		            'birthdate' => 'date',
-		            'phone' => 'numeric',
-	            	'email' => 'email'
+		            'sex' => 'required',
+		            'date_of_birth' => 'date',
+		            'cellphone' => 'numeric'
 	            );
 
 				$validation = Validator::make($data, $rules);
 
 				if (!($validation->fails())) {
-
-					// Edition a Person
-					$this->personRepository->store($data);
+					
+					$this->personRepository->updatePerson($personId, $data);
 
 					return Response::json( self::REQUEST_STATUS_SUCCESSFUL );
 				}
@@ -667,5 +662,10 @@ class PersonController extends BaseController
 		$birthdate = date('Y-m-d', strtotime($date));
 
 		return $birthdate;
+	}
+
+	public function merge($fromId, $toId, $keepTheTree, $whoMakes)
+	{
+		$this->get('NodePerson')->merge($fromId,$toId, $keepTheTree, $whoMakes);
 	}
 }

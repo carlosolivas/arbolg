@@ -82,7 +82,7 @@ class DbPersonRepository implements PersonRepositoryInterface
         $person->birthdate = $data['date_of_birth'];
         $person->gender = $data['sex'];
         $person->phone = $data['cellphone'];
-        $person->role_id = $data['role'];
+        //$person->role_id = $data['role'];
 
         if ($person->save())
             return true;

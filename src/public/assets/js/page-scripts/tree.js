@@ -222,18 +222,19 @@ cy = graph =  cytoscape({
             return false;
           }
 
+          $("#newOrUpdatingPerson_email").attr('disabled', true);
           optionSelected = getFamiliarOptionsToAdd().UPDATEDATA;
           $( this ).dialog().parent().hide("scale",200);
 
           // If has real data loaded (is not an auxiliar node for create brohers)
           if (personDetail_lastname.trim().length > 0)
           {
-            $("#newPerson_name").val(personDetail_name);
-            $("#newPerson_lastname").val(personDetail_lastname);
-            $("#newPerson_mothersname").val(personDetail_mothersname);
-            $("#newPerson_dateOfBirth").val(personDetail_birthdate);
-            $("#newPerson_gender").val(personDetail_gender);
-            $("#newPerson_phone").val(personDetail_phone);
+            $("#newOrUpdatingPerson_name").val(personDetail_name);
+            $("#newOrUpdatingPerson_lastname").val(personDetail_lastname);
+            $("#newOrUpdatingPerson_mothersname").val(personDetail_mothersname);
+            $("#newOrUpdatingPerson_dateOfBirth").val(personDetail_birthdate);
+            $("#newOrUpdatingPerson_gender").val(personDetail_gender);
+            $("#newOrUpdatingPerson_phone").val(personDetail_phone);
           }
 
           familiarDialog.dialog('option','title', getTitleForDialog(optionSelected) + personDetail_fullname);
@@ -365,13 +366,13 @@ cy = graph =  cytoscape({
           {
               // Fields of new Person
             var selectedPersonId = personDetail_id;
-            var newPerson_name = $("#newPerson_name").val();
-            var newPerson_lastname = $("#newPerson_lastname").val();
-            var newPerson_mothersname = $("#newPerson_mothersname").val();
-            var newPerson_dateOfBirth = $("#newPerson_dateOfBirth").val();
-            var newPerson_gender = $("#newPerson_gender").val();
-            var newPerson_phone = $("#newPerson_phone").val();
-            var newPerson_email = $("#newPerson_email").val();
+            var newOrUpdatingPerson_name = $("#newOrUpdatingPerson_name").val();
+            var newOrUpdatingPerson_lastname = $("#newOrUpdatingPerson_lastname").val();
+            var newOrUpdatingPerson_mothersname = $("#newOrUpdatingPerson_mothersname").val();
+            var newOrUpdatingPerson_dateOfBirth = $("#newOrUpdatingPerson_dateOfBirth").val();
+            var newOrUpdatingPerson_gender = $("#newOrUpdatingPerson_gender").val();
+            var newOrUpdatingPerson_phone = $("#newOrUpdatingPerson_phone").val();
+            var newOrUpdatingPerson_email = $("#newOrUpdatingPerson_email").val();
 
             // Save
             $.ajax({
@@ -380,36 +381,36 @@ cy = graph =  cytoscape({
               data: {
                 id: selectedPersonId, // Used when editing data of the Person
                 son: selectedPersonId, // Used when adding parent to Person
-                name: newPerson_name,
-                lastname: newPerson_lastname,
-                mothersname: newPerson_mothersname,
-                dateOfBirth: newPerson_dateOfBirth,
-                gender: newPerson_gender,
-                phone: newPerson_phone,
-                email: newPerson_email
+                name: newOrUpdatingPerson_name,
+                lastname: newOrUpdatingPerson_lastname,
+                mothersname: newOrUpdatingPerson_mothersname,
+                dateOfBirth: newOrUpdatingPerson_dateOfBirth,
+                gender: newOrUpdatingPerson_gender,
+                phone: newOrUpdatingPerson_phone,
+                email: newOrUpdatingPerson_email
               }
               }).done(function( json ) {
                    if (json == 'successful') {
 
-                    $("#newPerson_name").val("");
-                    $("#newPerson_lastname").val("");
-                    $("#newPerson_mothersname").val("");
-                    $("#newPerson_dateOfBirth").val("");
-                    $("#newPerson_gender").val("");
-                    $("#newPerson_phone").val("");
-                    $("#newPerson_email").val("");
+                    $("#newOrUpdatingPerson_name").val("");
+                    $("#newOrUpdatingPerson_lastname").val("");
+                    $("#newOrUpdatingPerson_mothersname").val("");
+                    $("#newOrUpdatingPerson_dateOfBirth").val("");
+                    $("#newOrUpdatingPerson_gender").val("");
+                    $("#newOrUpdatingPerson_phone").val("");
+                    $("#newOrUpdatingPerson_email").val("");
 
                     // Reload the graph elements
                     loadNodesAndRelations();
 
                    } else {
-                      $("#newPerson_name").val("");
-                      $("#newPerson_lastname").val("");
-                      $("#newPerson_mothersname").val("");
-                      $("#newPerson_dateOfBirth").val("");
-                      $("#newPerson_gender").val("");
-                      $("#newPerson_phone").val("");
-                      $("#newPerson_email").val("");
+                      $("#newOrUpdatingPerson_name").val("");
+                      $("#newOrUpdatingPerson_lastname").val("");
+                      $("#newOrUpdatingPerson_mothersname").val("");
+                      $("#newOrUpdatingPerson_dateOfBirth").val("");
+                      $("#newOrUpdatingPerson_gender").val("");
+                      $("#newOrUpdatingPerson_phone").val("");
+                      $("#newOrUpdatingPerson_email").val("");
                       alert(json);
                  }
             });
@@ -418,6 +419,7 @@ cy = graph =  cytoscape({
             setValidationBlockMessage();
 
             // Close the dialog
+            $("#newOrUpdatingPerson_email").attr('disabled', false);
             $(this).dialog("close");
             menuDialog.dialog("close");
 
@@ -435,12 +437,13 @@ cy = graph =  cytoscape({
          class: "btn btn-success btn-xs",
          click: function(){
 
-          $("#newPerson_name").val("");
-          $("#newPerson_lastname").val("");
-          $("#newPerson_mothersname").val("");
-          $("#newPerson_dateOfBirth").val("");
-          $("#newPerson_gender").val("");
-          $("#newPerson_phone").val("");
+          $("#newOrUpdatingPerson_name").val("");
+          $("#newOrUpdatingPerson_lastname").val("");
+          $("#newOrUpdatingPerson_mothersname").val("");
+          $("#newOrUpdatingPerson_dateOfBirth").val("");
+          $("#newOrUpdatingPerson_gender").val("");
+          $("#newOrUpdatingPerson_phone").val("");
+          $("#newOrUpdatingPerson_email").attr('disabled', false);
 
            // Reset the validation block message to original status
            setValidationBlockMessage();
@@ -598,9 +601,9 @@ function getFamiliarOptionsToAdd()
 
 function addFamiliar_completeFields()
 {
-  if (($("#newPerson_name").val() != null && $("#newPerson_name").val() != "") &&
-    ($("#newPerson_lastname").val() != null && $("#newPerson_lastname").val() != "") &&
-    ($("#newPerson_gender").val() != null && $("#newPerson_gender").val() != "") ) {
+  if (($("#newOrUpdatingPerson_name").val() != null && $("#newOrUpdatingPerson_name").val() != "") &&
+    ($("#newOrUpdatingPerson_lastname").val() != null && $("#newOrUpdatingPerson_lastname").val() != "") &&
+    ($("#newOrUpdatingPerson_gender").val() != null && $("#newOrUpdatingPerson_gender").val() != "") ) {
       return true;
   } else {
     return false;

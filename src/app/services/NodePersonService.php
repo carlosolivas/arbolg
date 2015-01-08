@@ -32,7 +32,7 @@ class NodePersonService extends BaseService
     /**
     * Queries
     */
-    const GET_ALL_FAMILY = 'MATCH (n:NodePerson {personId: R_PERSON})-[r*]-(p) RETURN DISTINCT p';
+    const GET_ALL_FAMILY = 'MATCH (n:NodePerson {personId: R_PERSON, ownerId: R_OWNER, isACopy: 0})-[r*]-(p) RETURN DISTINCT p';
     const DELETE_NODE    = 'MATCH (n:NodePerson {personId: R_PERSON, ownerId: R_OWNER }) OPTIONAL MATCH (n)-[r]-() DELETE n,r';
 
     /**
@@ -45,6 +45,7 @@ class NodePersonService extends BaseService
     const GENDER_MALE                       = 1;
     const GENDER_FEMALE                     = 2;
     const NODE_IS_A_COPY                    = 1;
+    const NODE_IS_NOT_A_COPY                = 0;
 
 
     /**
@@ -119,6 +120,7 @@ class NodePersonService extends BaseService
         }
     }
 
+
     /**
      * Add parent to a NodePerson
      * @param int $son The id of the son
@@ -178,18 +180,29 @@ class NodePersonService extends BaseService
         $family = array();
 
         $query = str_replace("R_PERSON", $personId, self::GET_ALL_FAMILY);
-
+        $query = str_replace("R_OWNER", $personId, $query);
         $result = DB::connection('neo4j')->select($query);
-
         foreach ($result as $item) {
-            $itemPersonId = $item->current()->getProperties('personId');
-            $person = $this->findById($itemPersonId);
+
+            $itemPersonId = $item->current()->getProperties()['personId'];
+            $itemOwnerId = $item->current()->getProperties()['ownerId'];
+            $itemIsACopy = $item->current()->getProperties()['isACopy'];
+
+            $person;
+
+            if ($itemIsACopy == 1) {
+              $person = NodePerson::where('personId', '=', $itemPersonId)
+              ->where('ownerId', '=', $itemOwnerId)
+              ->where('isACopy', '=', $itemIsACopy)->first();
+            }
+             else {
+             $person = $this->findById($itemPersonId);
+            }
 
             if ($person != null) {
                 $family[] = $person;
             }
         }
-
         // Add the logged user
         $family[] = $this->findById($personId);
 
@@ -274,32 +287,158 @@ class NodePersonService extends BaseService
     public function merge($fromId, $toId, $fromKeepsTheTree, $userWhoMakesTheInvitation)
     {
         try {
+            // data parsing
+            $fromId = (int)$fromId;
+            $toId = (int)$toId;
+            $fromKeepsTheTree = (int)$fromKeepsTheTree;
+            $userWhoMakesTheInvitation = (int)$userWhoMakesTheInvitation;
 
-            $connectionPerson = $this->get('NodePerson')->findById($fromId);
+            $connectionPerson = $this->findById($fromId);
 
-            $nodePersonToConnect = $this->get('NodePerson')->findById($toId);
+            $nodePersonToConnect = $this->findById($toId);            
 
             /* If connectionPerson keeps his tree, then we makes a copy of $nodePersonToConnect
             and set nodePersonToConnect like connectionPerson brother */
-            if ($fromKeepsTheTree) {
+            if ($fromKeepsTheTree == 1) {
 
-                /* Creating a copy of nodePersonToConnect into connectionPerson tree */
-                $newNodePerson = $this->create($nodePersonToConnect->personId, $userWhoMakeTheInvitation, self::NODE_IS_A_COPY, $nodePersonToConnect->groupId);
+              $connectionPersonHasParents = false;
+              $nodePersonToConnectHasParents = false;
 
-                /* New parents */
-                foreach ($connectionPerson->parents as $parent) {
-                    $newNodePerson->parents()->save($parent);
+              if ($connectionPerson->parents != null && $connectionPerson->parents()->count() != 0) {
+                $connectionPersonHasParents = true;
+              }
+
+              if ($nodePersonToConnect->parents != null && $nodePersonToConnect->parents()->count() != 0) {
+                $nodePersonToConnectHasParents = true;
+              }
+                
+                // If connectionPerson has parents 
+                if ($connectionPersonHasParents) {
+
+                  if ($nodePersonToConnectHasParents) {
+                      /* Creating a copy of nodePersonToConnect into connectionPerson tree */
+                      $newNodePerson = $this->create($nodePersonToConnect->personId, $userWhoMakesTheInvitation, self::NODE_IS_A_COPY, $nodePersonToConnect->groupId);
+
+                      /* New parents */
+                      foreach ($connectionPerson->parents as $parent) {
+                          $newNodePerson->parents()->save($parent);
+                      }
+                   }
+                   else {
+                      // Add nodePersonToConnect like connectionPerson parent's son
+                      foreach ($connectionPerson->parents as $parent) {
+                      $nodePersonToConnect->parents()->save($parent);
+                    }
+                   }
+
                 }
+                else {
+
+                  if ($nodePersonToConnectHasParents) {
+                    // Add connectionPerson like nodePersonToConnect parent's son
+                      foreach ($nodePersonToConnect->parents as $parent) {
+                      $connectionPerson->parents()->save($parent);
+                    }
+                  }
+                  else {
+
+                    /* Check if connectionPerson has father and mothers  */
+                    $connectionPersonHasFather = false;
+                    $connectionPersonHasMother = false;
+                    if ($connectionPerson->parents != null) {
+                          foreach ($connectionPerson->parents as $parent) {
+                            $person = $this->personRepository->getById($parent->personId);
+
+                            if ($person != null && $person->gender == self::GENDER_MALE) {
+                                $connectionPersonHasFather = true;
+                            }
+
+                            if ($person != null && $person->gender == self::GENDER_FEMALE) {
+                                $connectionPersonHasMother = true;
+                            }
+                        }
+                    }
+
+                    /* Create connectionPerson parent's */
+                    if (!$connectionPersonHasFather) {
+
+                        /* Father creation */
+
+                        $father = array(
+                            'name'          => 'Agregar Padre',
+                            'lastname'      => ' ',
+                            'mothersname'   => ' ',
+                            'birthdate'     => '',
+                            'gender'        => self::GENDER_MALE,
+                            'phone'         => '',
+                            'email'         => '',
+                            'user_id'       => null,
+                            'role_id'       => 1,
+                            'file_id'       => null
+                        );
+
+                        // Create a Person
+                        $newPersonId =  $this->personRepository->store($father);
+
+                        // Create a NodePerson (the owner is the user who makes the invitation)
+                        $this->create($newPersonId, $userWhoMakesTheInvitation, self::NODE_IS_NOT_A_COPY, $connectionPerson->groupId);
+
+                        // Add new Person as parent
+                        $parentId = $newPersonId;
+                        $this->addParent($connectionPerson->personId, $parentId);
+                    }
+
+                    if (!$connectionPersonHasMother) {
+
+                        /* Mother creation */
+
+                         $mother = array(
+                            'name'          => 'Agregar Madre',
+                            'lastname'      => ' ',
+                            'mothersname'   => ' ',
+                            'birthdate'     => '',
+                            'gender'        => self::GENDER_FEMALE,
+                            'phone'         => '',
+                            'email'         => '',
+                            'user_id'       => null,
+                            'role_id'       => 1,
+                            'file_id'       => null
+                        );
+
+                        // Create a Person
+                        $newPersonId =  $this->personRepository->store($mother);
+
+                        // Create a NodePerson (the owner is the user who makes the invitation)
+                        $this->create($newPersonId, $userWhoMakesTheInvitation, self::NODE_IS_NOT_A_COPY, $connectionPerson->groupId);
+
+                        // Add new Person as parent
+                        $parentId = $newPersonId;
+                        $this->addParent($connectionPerson->personId, $parentId);
+                    }
+
+                    // Get again connectionPerson to update the relations
+                    $connectionPerson = $this->findById($connectionPerson->personId);
+
+                    /* Add nodePersonToConnect like connectionPerson brother */
+                    foreach ($connectionPerson->parents as $parent) {
+
+                        $this->addParent($nodePersonToConnect->personId, $parent->personId);
+                    }
+                  }
+
+                }               
+                
             }
             else
             {
                 /* If connectionPerson don't keep his tree, then we separates him from the current tree
-                and add into the nodePeronToConnect's tree  */
+                and add into the nodePersonToConnect's tree  */
 
                 /* Deleting parents */
                 if ($connectionPerson->parents != null) {
-                    foreach ($connectionPerson->parents as $parent) {
-                        $this->get('NodePerson')->removeParent($connectionPerson->personId, $parent->personId);
+                  $connectionPersonParents = $connectionPerson->parents;
+                    foreach ($connectionPersonParents as $parent) {
+                        $connectionPerson->parents()->detach($parent);   
                     }
                 }
 
@@ -343,11 +482,11 @@ class NodePersonService extends BaseService
                     $newPersonId =  $this->personRepository->store($father);
 
                     // Create a NodePerson (the owner is the user who makes the invitation)
-                    $this->get('NodePerson')->create($newPersonId, $userWhoMakesTheInvitation);
+                    $this->create($newPersonId, $userWhoMakesTheInvitation, self::NODE_IS_NOT_A_COPY, $nodePersonToConnect->groupId);
 
                     // Add new Person as parent
                     $parentId = $newPersonId;
-                    $this->get('NodePerson')->addParent($connectionPerson->personId, $parentId);
+                    $this->addParent($nodePersonToConnect->personId, $parentId);
                 }
 
                 if (!$nodePersonToConnectHasMother) {
@@ -371,20 +510,20 @@ class NodePersonService extends BaseService
                     $newPersonId =  $this->personRepository->store($mother);
 
                     // Create a NodePerson (the owner is the user who makes the invitation)
-                    $this->get('NodePerson')->create($newPersonId, $userWhoMakesTheInvitation);
+                    $this->create($newPersonId, $userWhoMakesTheInvitation, self::NODE_IS_NOT_A_COPY, $nodePersonToConnect->groupId);
 
                     // Add new Person as parent
                     $parentId = $newPersonId;
-                    $this->get('NodePerson')->addParent($connectionPerson->personId, $parentId);
+                    $this->addParent($nodePersonToConnect->personId, $parentId);
                 }
 
                 // Get again nodePersonToConnect to update the relations
-                $connectionPerson = $this->get('NodePerson')->findById($connectionPerson->personId);
+                $nodePersonToConnect = $this->findById($nodePersonToConnect->personId);
 
                 /* New parents */
                 foreach ($nodePersonToConnect->parents as $parent) {
 
-                    $this->get('NodePerson')->addParent($connectionPerson->personId, $parent->personId);
+                    $this->addParent($connectionPerson->personId, $parent->personId);
                 }
         }
 

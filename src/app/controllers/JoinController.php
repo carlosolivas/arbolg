@@ -69,7 +69,7 @@ class JoinController extends BaseController
 		    $fileRepository = new \s4h\core\DbS3FileRepository;
 		    $groupRepository = new s4h\social\DbGroupRepository($fileRepository);
 		    $shareRepository = new s4h\share\DbShareRepository;
-		    $sharing = new s4h\share\Sharing($groupRepository, $shareRepository);
+		    $sharing = new s4h\share\Sharing($groupRepository, $shareRepository, $this->personRepository);
 
 		    $data = $sharing->displayShareForm($shareElement);
 
@@ -79,7 +79,10 @@ class JoinController extends BaseController
 		} catch (Exception $e) {
 
 			$response = array('status' => self::REQUEST_STATUS_FAILURE, 'data' => Lang::get('messages.error_loading_share_view'));
-			return Response::json($response);
+			//return Response::json($response);
+			return Response::json($e->getMessage());
 		}
 	}
+
+	
 }
