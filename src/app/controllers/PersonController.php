@@ -612,7 +612,7 @@ class PersonController extends BaseController
 			}
 
 			if ($this->userRepository->existsUser($id)) {
-			   // Do something
+			   return Response::json( Lang::get('messages.cannotRemove') );
 			}
 			else {
 				if ($nodePerson->ownerId != $personLoggedId) {
@@ -662,10 +662,5 @@ class PersonController extends BaseController
 		$birthdate = date('Y-m-d', strtotime($date));
 
 		return $birthdate;
-	}
-
-	public function merge($fromId, $toId, $keepTheTree, $whoMakes)
-	{
-		$this->get('NodePerson')->merge($fromId,$toId, $keepTheTree, $whoMakes);
 	}
 }
