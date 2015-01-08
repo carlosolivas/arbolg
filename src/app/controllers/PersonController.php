@@ -605,8 +605,9 @@ class PersonController extends BaseController
 			// Logged Person
 			$user = Auth::user();
 			$personLoggedId = $user->Person->id;
-
+			
 			$nodePerson = $this->get('NodePerson')->findById($id);
+
 			if ($nodePerson == null) {
 				return Response::json( Lang::get('messages.not_existing_node_person') );
 			}
@@ -621,11 +622,16 @@ class PersonController extends BaseController
 
 			// If have couple
 			if (!$this->get('NodePerson')->canAddCouple($nodePerson)) {
+
 				// Try to delete the deleted auxiliar son
 				$this->get('NodePerson')->delete(-($nodePerson->personId), $personLoggedId);
+
 				// Try to delete the auxiliar son via couple
-				$couple = $nodePerson->couple()->first();
-				$this->get('NodePerson')->delete(-($couple->personId), $personLoggedId);
+				$couple = $nodePerson->couple()->first();			
+
+				if ($couple != null) {
+					$this->get('NodePerson')->delete(-($couple->personId), $personLoggedId);
+				}				
 			}
 
 			// Delete the person
