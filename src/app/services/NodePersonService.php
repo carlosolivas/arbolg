@@ -34,6 +34,7 @@ class NodePersonService extends BaseService
     */
     const GET_ALL_FAMILY = 'MATCH (n:NodePerson {personId: R_PERSON, ownerId: R_OWNER, isACopy: 0})-[r*]-(p) RETURN DISTINCT p';
     const DELETE_NODE    = 'MATCH (n:NodePerson {personId: R_PERSON, ownerId: R_OWNER }) OPTIONAL MATCH (n)-[r]-() DELETE n,r';
+    const GET_SONS = 'MATCH (n {personId: R_PERSON})-[r:PARENT]->(s) RETURN DISTINCT s';
 
     /**
      * General constants
@@ -210,6 +211,26 @@ class NodePersonService extends BaseService
     }
 
     /**
+     * Get the id of the persons son
+     * @param  $personId The id of the Person
+     * @return id of Persons
+     */
+    public function getSonsId($personId)
+    {
+        $ids = array();
+
+        $query = str_replace("R_PERSON", $personId, self::GET_SONS);
+        $result = DB::connection('neo4j')->select($query);
+        foreach ($result as $item) {
+
+            $itemPersonId = $item->current()->getProperties()['personId'];
+            $ids[] = $itemPersonId;
+        }
+
+        return $ids;
+    }
+
+    /**
      * Return if the person has sons
      * @param  personId
      * @return Bool
@@ -322,6 +343,14 @@ class NodePersonService extends BaseService
                       /* New parents */
                       foreach ($connectionPerson->parents as $parent) {
                           $newNodePerson->parents()->save($parent);
+                      }
+
+                      /* Creating a copy of connectionPerson into nodePersonToConnect tree */
+                      $newConnectionPerson = $this->create($connectionPerson->personId, $userWhoMakesTheInvitation, self::NODE_IS_A_COPY, $connectionPerson->groupId);
+
+                      /* New parents of newConnectionPerson*/
+                      foreach ($nodePersonToConnect->parents as $parent) {
+                          $newConnectionPerson->parents()->save($parent);
                       }
                    }
                    else {

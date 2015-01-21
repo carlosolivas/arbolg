@@ -23,7 +23,7 @@ class JoinController extends BaseController
   	const SHARE_ELEMENT_CLASS_NAME_FAMILY_TREE	= "familyTree";
   	const SHARE_ELEMENT_TYPE					= 1;
   	const CUSTOM_ELEMENT_NAME_KEEP_THE_TREE		= "keepTheTree";
-  	const CUSTOM_ELEMENT_KEEP_THE_TREE_HTML		= "<input type='checkbox' name='keepTheTree' value='1'/>";
+  	const CUSTOM_ELEMENT_KEEP_THE_TREE_HTML		= "<input type='checkbox' name='keepTheTree' value='1' checked> Mantener mi árbol</input>";
   	const REQUEST_STATUS_SUCCESSFUL 			= 'successful';
   	const REQUEST_STATUS_FAILURE				= 'failure';
 
@@ -71,10 +71,13 @@ class JoinController extends BaseController
 		    $shareRepository = new s4h\share\DbShareRepository;
 		    $sharing = new s4h\share\Sharing($groupRepository, $shareRepository, $this->personRepository);
 
-		    $data = $sharing->displayShareForm($shareElement);
+		    return $sharing->displayShareForm($shareElement);
+
+		    // This lines return a json response for use the html returned into a modal popup
+		    /*$data = $sharing->displayShareForm($shareElement);
 
 		    $response = array('status' => self::REQUEST_STATUS_SUCCESSFUL, 'data' => (string)$data);
-			return Response::json($response);
+			return Response::json($response);*/
 
 		} catch (Exception $e) {
 

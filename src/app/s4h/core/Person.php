@@ -28,7 +28,7 @@ class Person extends \Eloquent {
 	}
 
 	public function Groups() {
-		return $this->belongsToMany('s4h\social\Group', 'group_person', 'person_id', 'group_id');
+		return $this->belongsToMany('s4h\social\Group', 'group_person', 'person_id', 'group_id')->withPivot('role_id');
 	}
 
 	public function getFamily() {

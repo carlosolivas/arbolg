@@ -256,7 +256,7 @@
                     <span class="m-r-sm text-muted welcome-message" style="color: white">{{ Lang::get('titles.welcome') }} {{ Confide::User()->person->name . " " . Confide::User()->person->lastname . " " . Confide::User()->person->mothersname }} |</span>
                 </li>
                 <li>
-                    <a href="user/logout">
+                    <a href="/user/logout">
                         <i class="fa fa-sign-out" style="color: white">{{ Lang::get('titles.logout') }}</i> 
                     </a>
                 </li>

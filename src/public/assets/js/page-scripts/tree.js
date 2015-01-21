@@ -297,6 +297,9 @@ cy = graph =  cytoscape({
          click: function() {
 
           var personIdToShare = parseInt(personDetail_id);
+          window.location = "/sharing/" + personIdToShare;
+          return false;
+
           $.ajax({
             type: "get",
             url: "/sharing/" + personIdToShare

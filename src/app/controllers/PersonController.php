@@ -56,6 +56,7 @@ class PersonController extends BaseController
 		{
 			//return $this->get('NodePerson')->getFamily(106);
 			$person = Auth::user()->Person;
+
 			/* Check if the NodePerson for this user wasn´t created yet */
 			if (!($this->get('NodePerson')->nodePersonExists($person->getId()))) {
 				
@@ -78,7 +79,7 @@ class PersonController extends BaseController
 
 				/* First the parents */
 				foreach ($person->getFamily()->Persons as $directFamiliar) {
-					if ($directFamiliar->role_id == self::FATHER || $directFamiliar->role_id == self::MOTHER) {
+					if ($directFamiliar->getFamily()->pivot->role_id == self::FATHER || $directFamiliar->getFamily()->pivot->role_id == self::MOTHER) {
 						array_push($directFamiliars, $directFamiliar);
 					}
 				}
@@ -87,7 +88,7 @@ class PersonController extends BaseController
 				$theCoupleHasSons = false;
 				/* Then the sons */
 				foreach ($person->getFamily()->Persons as $directFamiliar) {
-					if ($directFamiliar->role_id == self::SON) {
+					if ($directFamiliar->getFamily()->pivot->role_id == self::SON) {
 						array_push($directFamiliars, $directFamiliar);
 						$theCoupleHasSons = true;
 					}
@@ -108,36 +109,37 @@ class PersonController extends BaseController
 
 							/* Now we check the role of the logged Person and we infer how relate it to
 							the direct familiar */
-							if ($person->role_id == self::FATHER || $person->role_id == self::MOTHER) {
-								if ($directFamiliar->role_id == self::SON) {
+							if ($person->getFamily()->pivot->role_id == self::FATHER || $person->getFamily()->pivot->role_id == self::MOTHER) {
+								if ($directFamiliar->getFamily()->pivot->role_id == self::SON) {
 									$sonId = $directFamiliar->id;
 									$parentId = $person->id;
 
 									/* Add as parent the logged Person */
 									$this->get('NodePerson')->addParent($sonId, $parentId);
 
-									/* Add as parent the coup of logged Person */
-									if ($nodePersonLogged->coup != null) {
-										$this->get('NodePerson')->addParent($sonId, $nodePersonLogged->coup->personId);
+									/* Add as parent the couple of logged Person */
+									if ($nodePersonLogged->couple->first() != null) {
+										$this->get('NodePerson')->addParent($sonId, $nodePersonLogged->couple()->first()->personId);
 									}
 								}
 
-								if ($directFamiliar->role_id == self::FATHER || $directFamiliar->role_id == self::MOTHER) {
+								if ($directFamiliar->getFamily()->pivot->role_id == self::FATHER || $directFamiliar->getFamily()->pivot->role_id == self::MOTHER) {
 									$coupId = $directFamiliar->id;
 									/* Add as the coup the logged Person and vice versa */
 									$this->get('NodePerson')->addCouple($person->id, $coupId);
-									$this->get('NodePerson')->addCouple($directFamiliar->id, $person->id);
+									$this->get('NodePerson')->addCouple($coupId, $person->id);
 
 									if (!$theCoupleHasSons) {
 										// Create the auxiliar son node. For the right drawing
-				                        $this->get('NodePerson')->addAuxiliarSon($person, $directFamiliar, $nodePersonLogged->personId);
+										$coupleNode = $this->get('NodePerson')->findById($directFamiliar->id);
+				                        $this->get('NodePerson')->addAuxiliarSon($nodePersonLogged, $coupleNode, $nodePersonLogged->personId);
 				                        $theCoupleHasSons = true;
 									}
 								}
 							}
 
-							if ($person->role_id == self::SON) {
-								if ($directFamiliar->role_id == self::FATHER || $directFamiliar->role_id == self::MOTHER) {
+							if ($person->getFamily()->pivot->role_id == self::SON) {
+								if ($directFamiliar->getFamily()->pivot->role_id == self::FATHER || $directFamiliar->getFamily()->pivot->role_id == self::MOTHER) {
 									$sonId = $person->id;
 									$parentId = $directFamiliar->id;
 
@@ -155,7 +157,7 @@ class PersonController extends BaseController
 										}
 									}
 								}
-								if ($directFamiliar->role_id == self::SON) {
+								if ($directFamiliar->getFamily()->pivot->role_id == self::SON) {
 
 									$sonId = $directFamiliar->id;
 
