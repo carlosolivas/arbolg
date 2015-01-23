@@ -54,7 +54,6 @@ class PersonController extends BaseController
 	{
 		try
 		{
-			//return $this->get('NodePerson')->getFamily(106);
 			$person = Auth::user()->Person;
 
 			/* Check if the NodePerson for this user wasn´t created yet */
