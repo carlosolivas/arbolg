@@ -46,6 +46,12 @@ return array(
 
 	'connections' => array(
 
+		'neo4j'  => array(
+	        'driver' => 'neo4j',
+	        'host'   => 'localhost',
+	        'port'   => '7474'
+	    ),
+
 		'sqlite' => array(
 			'driver'   => 'sqlite',
 			'database' => __DIR__.'/../database/production.sqlite',
@@ -55,7 +61,7 @@ return array(
 		'mysql' => array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
-			'database'  => 'objetivos',
+			'database'  => 's4h',
 			'username'  => 'root',
 			'password'  => 'root',
 			'charset'   => 'utf8',

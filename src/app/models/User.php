@@ -4,6 +4,8 @@ use Zizaco\Confide\ConfideUser;
 
 class User extends ConfideUser {
 
+    protected $table = 'users';
+
     public function userdetail()
     {
         return $this->hasOne('Userdetail');
@@ -20,6 +22,6 @@ class User extends ConfideUser {
     }
 
     public function Person() {
-        return $this->hasOne('Person');
+        return $this->hasOne('s4h\core\Person');
     }
 }
